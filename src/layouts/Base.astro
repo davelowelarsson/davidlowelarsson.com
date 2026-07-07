@@ -39,10 +39,21 @@ const {
 <style is:global>
   :root {
     color-scheme: light dark;
-    --text: light-dark(#1a1a1a, #e8e8e8);
-    --muted: light-dark(#6b6b6b, #9a9a9a);
-    --bg: light-dark(#ffffff, #121212);
-    --accent: light-dark(#0b5fff, #7aa2ff);
+
+    /* ── FONT TOGGLE — comment A in, B out (or vice versa) and compare ──
+       A: quiet sans, leerob-calibrated */
+    --font-prose: system-ui, -apple-system, 'Segoe UI', sans-serif;
+    /* B: timeless essay serif (Charter ships on Apple platforms)
+    --font-prose: Charter, Georgia, 'Times New Roman', serif; */
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+    --ink: light-dark(#1b1b1f, #e6e6e9);
+    --muted: light-dark(#6f6f78, #9c9ca6);
+    --hairline: light-dark(rgb(0 0 0 / 12%), rgb(255 255 255 / 16%));
+    --chip: light-dark(rgb(0 0 0 / 5%), rgb(255 255 255 / 9%));
+    --bg: light-dark(#ffffff, #111113);
+    --warn: light-dark(#a16207, #fbbf24);
+    --focus: light-dark(#2563eb, #93b4ff);
   }
 
   * {
@@ -51,65 +62,71 @@ const {
 
   body {
     margin: 0 auto;
-    padding: 1.5rem 1rem 3rem;
+    padding: 2rem 1.25rem 4rem;
     max-width: 42rem;
-    font-family:
-      system-ui,
-      -apple-system,
-      sans-serif;
-    line-height: 1.6;
-    color: var(--text);
+    font-family: var(--font-prose);
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--ink);
     background: var(--bg);
+    text-rendering: optimizeLegibility;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /* ── Prose ── */
+
+  h1 {
+    font-size: 1.625rem;
+    font-weight: 650;
+    letter-spacing: -0.015em;
+    line-height: 1.25;
+    margin: 0 0 0.5rem;
+  }
+
+  h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 2.25em 0 0.5em;
+  }
+
+  h3 {
+    font-size: 1.0625rem;
+    font-weight: 600;
+    margin: 1.75em 0 0.5em;
+  }
+
+  p {
+    margin: 0 0 1.25em;
   }
 
   a {
-    color: var(--accent);
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: var(--muted);
+    text-underline-offset: 0.15em;
   }
 
-  header nav {
-    display: flex;
-    gap: 1.5rem;
-    margin-bottom: 3rem;
+  a:hover {
+    text-decoration-color: currentColor;
   }
 
-  header nav a:first-child {
-    font-weight: 600;
-    color: var(--text);
-    text-decoration: none;
-  }
-
-  footer {
-    display: flex;
-    gap: 1.5rem;
-    margin-top: 4rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--muted);
-  }
-
-  .post-list {
-    list-style: none;
-    padding: 0;
-  }
-
-  .post-list li {
-    margin-bottom: 1rem;
-  }
-
-  .post-meta {
-    display: block;
-    font-size: 0.875rem;
+  blockquote {
+    margin: 1.5rem 0;
+    padding: 0.25rem 0 0.25rem 1.25rem;
+    border-left: 2px solid var(--hairline);
     color: var(--muted);
   }
 
-  .badge {
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    font-size: 0.75rem;
-    margin-left: 0.5rem;
-  }
-
-  .badge-warning {
-    color: light-dark(#b45309, #fbbf24);
+  hr {
+    border: 0;
+    border-top: 1px solid var(--hairline);
+    margin: 2.5rem 0;
   }
 
   main img {
@@ -117,25 +134,148 @@ const {
     height: auto;
   }
 
+  /* ── Header / footer ── */
+
+  header nav {
+    display: flex;
+    align-items: baseline;
+    gap: 1.5rem;
+    margin-bottom: 4rem;
+  }
+
+  header nav a {
+    text-decoration: none;
+    color: var(--muted);
+  }
+
+  header nav a:first-child {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  header nav a:hover {
+    color: var(--ink);
+  }
+
+  footer {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--hairline);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+  }
+
+  footer a {
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  footer a:hover {
+    color: var(--ink);
+  }
+
+  /* ── The meta rail (signature element) ── */
+
+  .post-meta {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+  }
+
+  .badge {
+    letter-spacing: 0.05em;
+  }
+
+  .badge-warning {
+    color: var(--warn);
+  }
+
+  /* ── Post list ── */
+
+  .post-list {
+    list-style: none;
+    padding: 0;
+    margin: 1.5rem 0 0;
+  }
+
+  .post-list li + li {
+    margin-top: 0.25rem;
+  }
+
+  .post-link {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: 0.875rem 0.75rem;
+    margin: 0 -0.75rem;
+    border-radius: 10px;
+    text-decoration: none;
+  }
+
+  .post-link:hover {
+    background: var(--chip);
+  }
+
+  .post-cover {
+    flex: 0 0 auto;
+    width: 5.5rem;
+    height: auto;
+    border-radius: 6px;
+    border: 1px solid var(--hairline);
+  }
+
+  .post-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+  }
+
+  .post-title {
+    font-weight: 550;
+    line-height: 1.4;
+  }
+
+  .post-description {
+    font-size: 0.9375rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .post-list .post-meta {
+    margin-top: 0.15rem;
+  }
+
+  /* ── Code ── */
+
+  code {
+    font-family: var(--font-mono);
+  }
+
+  :not(pre) > code {
+    font-size: 0.875em;
+    padding: 0.1em 0.35em;
+    border-radius: 4px;
+    background: var(--chip);
+  }
+
   pre {
     margin: 1.5rem 0;
     padding: 1rem 1.25rem;
     border-radius: 8px;
+    border: 1px solid var(--hairline);
     overflow-x: auto;
     font-size: 0.875rem;
     line-height: 1.55;
   }
 
-  code {
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  }
-
-  :not(pre) > code {
-    font-size: 0.9em;
-    padding: 0.1em 0.35em;
-    border-radius: 4px;
-    background: light-dark(rgb(0 0 0 / 6%), rgb(255 255 255 / 10%));
-  }
+  /* ── Tables ── */
 
   table {
     border-collapse: collapse;
@@ -144,10 +284,24 @@ const {
     font-size: 0.9375rem;
   }
 
+  th {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
   th,
   td {
     text-align: left;
     padding: 0.5rem 0.75rem;
-    border-bottom: 1px solid light-dark(rgb(0 0 0 / 12%), rgb(255 255 255 / 15%));
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .post-link {
+      transition: background 120ms ease;
+    }
   }
 </style>

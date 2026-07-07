@@ -43,3 +43,14 @@ how the project actually grew.
 - **Relative image paths in markdown** (`![alt](./diagram.svg)`) are resolved
   and hashed by Astro's asset pipeline at build time — colocated assets move
   with their bundle. Docs: https://docs.astro.build/en/guides/images/#images-in-markdown-files
+
+## Design round 1 (2026-07-07)
+
+- **`image()` schema helper**: `schema: ({ image }) => z.object({ cover:
+  image().optional() })` turns a frontmatter path into ImageMetadata (src +
+  intrinsic width/height) at build — that's what lets the post list render
+  cover thumbnails with reserved space (no layout shift).
+  Docs: https://docs.astro.build/en/guides/images/#images-in-content-collections
+- **SVG intrinsic size**: an SVG with only a `viewBox` has no intrinsic
+  dimensions in an `<img>` — the browser can't reserve space and the layout
+  shifts. Explicit `width`/`height` on the SVG root fixes it.

@@ -5,6 +5,8 @@ pubDate: 2026-06-05
 category: essay
 draft: false
 tags: ["career", "platform-engineering", "3d-art", "tooling"]
+cover: ./essay-3d-art-pipeline.svg
+coverAlt: Render pipeline sketch
 ---
 
 > **WIP/TEST** — placeholder content while the site's design is under construction.
