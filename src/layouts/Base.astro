@@ -173,6 +173,16 @@ const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
     height: auto;
   }
 
+  /* Excalidraw exports dark strokes on a transparent background — legible on
+     a white page, invisible on a dark one. Invert lightness and spin the hue
+     back so black-on-transparent reads as light-on-transparent in dark mode,
+     without touching the exported SVG file itself. */
+  @media (prefers-color-scheme: dark) {
+    img[src*='excalidraw'] {
+      filter: invert(0.92) hue-rotate(180deg);
+    }
+  }
+
   /* In-article images and diagrams: centered, with room to breathe.
      cursor: zoom-in signals the Lightbox component's click-to-enlarge
      affordance (progressive enhancement — harmless with JS disabled). */
