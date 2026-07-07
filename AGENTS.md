@@ -37,3 +37,7 @@ Consult these guides before working on related tasks:
   `src/`.
 - **Drafts**: `SHOW_DRAFTS` (build-time, `astro:env/server`) is the only draft
   switch. Preview deploys build with it `true`, production with `false`.
+- **Publishing cadence**: posts ship on a self-renewing ~2-week cycle tracked in
+  GitHub issues, not ad-hoc. Before proposing what/when to publish, read
+  `docs/publishing-routine.md` and the open `content`-labelled `Content roadmap`
+  issue. David drives all writing — never draft post content into issues unasked.
