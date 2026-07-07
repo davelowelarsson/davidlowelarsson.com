@@ -6,5 +6,9 @@
   "compatibility_date": "2026-07-07",
   "assets": {
     "directory": "./dist"
-  }
+  },
+  // Production serves on the apex domain (zone must be on Cloudflare).
+  "routes": [{ "pattern": "davidlowelarsson.com", "custom_domain": true }],
+  // Branch/PR builds get shareable preview URLs via `wrangler versions upload`.
+  "preview_urls": true
 }
