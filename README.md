@@ -21,7 +21,24 @@ Individually: `npm run lint`, `npm run typecheck`, `npm test`, `npm run e2e`.
 
 ## Write a post
 
-Add a markdown file to `src/content/posts/`:
+A post is a **bundle**: a folder named after its slug, holding `index.md` plus
+everything that belongs to it (images, diagrams). Parent folders organize by
+year and never appear in URLs — the folder name IS the slug, and moving a
+bundle never breaks a link.
+
+```
+src/content/posts/
+  2026/
+    my-post-slug/
+      index.md          → /posts/my-post-slug/
+      diagram.svg       → referenced as ![alt](./diagram.svg)
+```
+
+Shared images used across posts live in `src/assets/`. Downloadable files
+(PDFs etc.) go in `public/files/<slug>/` and are linked absolutely
+(`/files/<slug>/paper.pdf`).
+
+Frontmatter in `index.md`:
 
 ```md
 ---

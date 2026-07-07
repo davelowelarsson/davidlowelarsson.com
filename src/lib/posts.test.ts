@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isVisible, sortByPubDateDesc } from './posts';
+import { isVisible, postIdFromEntry, sortByPubDateDesc } from './posts';
 
 const post = (overrides: Partial<{ pubDate: Date; draft: boolean }> = {}) => ({
   data: {
@@ -21,6 +21,21 @@ describe('isVisible', () => {
 
   it('shows drafts in previews (showDrafts = true)', () => {
     expect(isVisible(post({ draft: true }).data, true)).toBe(true);
+  });
+});
+
+describe('postIdFromEntry', () => {
+  it('uses the bundle folder name as the post id', () => {
+    expect(postIdFromEntry('2026/draft-preview-pipeline/index.md')).toBe('draft-preview-pipeline');
+  });
+
+  it('ignores intermediate folders — organization never changes URLs', () => {
+    expect(postIdFromEntry('2026/07/some-note/index.md')).toBe('some-note');
+    expect(postIdFromEntry('deep/nested/tree/some-note/index.md')).toBe('some-note');
+  });
+
+  it('throws on a non-bundle entry instead of minting a broken id', () => {
+    expect(() => postIdFromEntry('loose-file.md')).toThrow();
   });
 });
 

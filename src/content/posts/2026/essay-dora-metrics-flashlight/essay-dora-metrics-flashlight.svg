@@ -1,0 +1,17 @@
+<svg viewBox="0 0 400 220" xmlns="http://www.w3.org/2000/svg">
+  <title>A beam of light sweeping across a dark field, illuminating a small area</title>
+  <style>svg { color: #3f3f46; } @media (prefers-color-scheme: dark) { svg { color: #d4d4d8; } }</style>
+  <defs>
+    <radialGradient id="g5" cx="35%" cy="45%" r="55%">
+      <stop offset="0%" stop-color="#ffd166" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="#ffd166" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+  <circle cx="140" cy="100" r="90" fill="url(#g5)" />
+  <path d="M40 40 L140 100 L40 170 Z" fill="currentColor" opacity="0.08" />
+  <circle cx="140" cy="100" r="8" fill="currentColor" opacity="0.6" />
+  <circle cx="260" cy="60" r="2" fill="currentColor" opacity="0.3" />
+  <circle cx="300" cy="130" r="2.5" fill="currentColor" opacity="0.3" />
+  <circle cx="330" cy="80" r="1.5" fill="currentColor" opacity="0.3" />
+  <circle cx="280" cy="170" r="2" fill="currentColor" opacity="0.3" />
+</svg>

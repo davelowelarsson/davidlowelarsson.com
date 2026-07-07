@@ -111,4 +111,43 @@ const {
   .badge-warning {
     color: light-dark(#b45309, #fbbf24);
   }
+
+  main img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  pre {
+    margin: 1.5rem 0;
+    padding: 1rem 1.25rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 0.875rem;
+    line-height: 1.55;
+  }
+
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  :not(pre) > code {
+    font-size: 0.9em;
+    padding: 0.1em 0.35em;
+    border-radius: 4px;
+    background: light-dark(rgb(0 0 0 / 6%), rgb(255 255 255 / 10%));
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1.5rem 0;
+    font-size: 0.9375rem;
+  }
+
+  th,
+  td {
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid light-dark(rgb(0 0 0 / 12%), rgb(255 255 255 / 15%));
+  }
 </style>

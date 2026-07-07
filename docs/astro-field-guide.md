@@ -28,3 +28,18 @@ how the project actually grew.
   frontmatter, and heading anchors with zero config. remark/rehype plugins
   are opt-in via `@astrojs/markdown-remark` if ever needed.
   Docs: https://docs.astro.build/en/guides/markdown-content/
+
+## Kitchen-sink content + post bundles (2026-07-07, PR #15)
+
+- **`generateId` on the glob loader** decouples post IDs (→ URLs) from file
+  layout: our posts live in `year/<slug>/index.md` bundles, but the ID is just
+  the bundle folder name, so reorganizing folders never breaks URLs.
+  Docs: https://docs.astro.build/en/reference/content-loader-reference/
+- **SVG + `currentColor` gotcha**: markdown images render as `<img>`, and an
+  SVG loaded that way resolves `currentColor` to black — invisible on dark
+  backgrounds. Fix: a `<style>` inside the SVG setting `color` with a
+  `prefers-color-scheme` media query (media queries DO apply inside
+  `<img>`-loaded SVGs; inherited page styles do NOT).
+- **Relative image paths in markdown** (`![alt](./diagram.svg)`) are resolved
+  and hashed by Astro's asset pipeline at build time — colocated assets move
+  with their bundle. Docs: https://docs.astro.build/en/guides/images/#images-in-markdown-files
