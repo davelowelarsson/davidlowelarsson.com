@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <title>David Lowe Larsson</title>
+  <style>
+    text { fill: #1a1a1a; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #e8e8e8; }
+    }
+  </style>
+  <text x="64" y="96" text-anchor="middle" font-family="system-ui, sans-serif" font-size="96" font-weight="700">D</text>
+</svg>

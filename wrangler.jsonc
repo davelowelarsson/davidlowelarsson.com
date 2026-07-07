@@ -1,0 +1,10 @@
+// Cloudflare Workers static-assets deployment.
+// The entire Cloudflare coupling of this project lives in this file plus the
+// deploy job in .github/workflows/ci.yml — moving host means replacing those two.
+{
+  "name": "davidlowelarsson-com",
+  "compatibility_date": "2026-07-07",
+  "assets": {
+    "directory": "./dist"
+  }
+}

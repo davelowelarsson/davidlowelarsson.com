@@ -1,0 +1,35 @@
+---
+import type { Category } from '../lib/posts';
+
+interface Props {
+  posts: Array<{
+    id: string;
+    data: {
+      title: string;
+      pubDate: Date;
+      category: Category;
+      draft: boolean;
+    };
+  }>;
+}
+
+const { posts } = Astro.props;
+
+const formatDate = (date: Date) =>
+  date.toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: 'numeric' });
+---
+
+<ul class="post-list">
+  {
+    posts.map((post) => (
+      <li>
+        <a href={`/posts/${post.id}/`}>{post.data.title}</a>
+        <span class="post-meta">
+          <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate)}</time>
+          <span class="badge">{post.data.category}</span>
+          {post.data.draft && <span class="badge badge-warning">draft</span>}
+        </span>
+      </li>
+    ))
+  }
+</ul>

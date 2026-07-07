@@ -1,0 +1,114 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const {
+  title,
+  description = 'David Lowe Larsson — engineering leadership, DORA metrics, and creative roots.',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <a href="/">David Lowe Larsson</a>
+        <a href="/posts/">Posts</a>
+      </nav>
+    </header>
+    <main>
+      <slot />
+    </main>
+    <footer>
+      <a href="https://www.linkedin.com/in/davidlowelarsson/">LinkedIn</a>
+      <a href="https://github.com/davelowelarsson">GitHub</a>
+    </footer>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    color-scheme: light dark;
+    --text: light-dark(#1a1a1a, #e8e8e8);
+    --muted: light-dark(#6b6b6b, #9a9a9a);
+    --bg: light-dark(#ffffff, #121212);
+    --accent: light-dark(#0b5fff, #7aa2ff);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0 auto;
+    padding: 1.5rem 1rem 3rem;
+    max-width: 42rem;
+    font-family:
+      system-ui,
+      -apple-system,
+      sans-serif;
+    line-height: 1.6;
+    color: var(--text);
+    background: var(--bg);
+  }
+
+  a {
+    color: var(--accent);
+  }
+
+  header nav {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  header nav a:first-child {
+    font-weight: 600;
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  footer {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 4rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--muted);
+  }
+
+  .post-list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .post-list li {
+    margin-bottom: 1rem;
+  }
+
+  .post-meta {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--muted);
+  }
+
+  .badge {
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.75rem;
+    margin-left: 0.5rem;
+  }
+
+  .badge-warning {
+    color: light-dark(#b45309, #fbbf24);
+  }
+</style>

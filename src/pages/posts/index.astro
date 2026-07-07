@@ -1,0 +1,16 @@
+---
+import { getCollection } from 'astro:content';
+import { SHOW_DRAFTS } from 'astro:env/server';
+import PostList from '../../components/PostList.astro';
+import Base from '../../layouts/Base.astro';
+import { isVisible, sortByPubDateDesc } from '../../lib/posts';
+
+const posts = sortByPubDateDesc(
+  await getCollection('posts', ({ data }) => isVisible(data, SHOW_DRAFTS)),
+);
+---
+
+<Base title="Posts — David Lowe Larsson">
+  <h1>Posts</h1>
+  <PostList posts={posts} />
+</Base>

@@ -1,0 +1,28 @@
+---
+import { getCollection, render } from 'astro:content';
+import { SHOW_DRAFTS } from 'astro:env/server';
+import Base from '../../layouts/Base.astro';
+import { isVisible } from '../../lib/posts';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts', ({ data }) => isVisible(data, SHOW_DRAFTS));
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+---
+
+<Base title={`${post.data.title} — David Lowe Larsson`} description={post.data.description}>
+  <article>
+    <h1>{post.data.title}</h1>
+    <p class="post-meta">
+      <time datetime={post.data.pubDate.toISOString()}>
+        {post.data.pubDate.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' })}
+      </time>
+      <span class="badge">{post.data.category}</span>
+      {post.data.draft && <span class="badge badge-warning">draft</span>}
+    </p>
+    <Content />
+  </article>
+</Base>
