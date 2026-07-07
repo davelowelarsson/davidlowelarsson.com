@@ -79,3 +79,17 @@ how the project actually grew.
 - **Layout props as the SEO surface**: Base.astro takes ogType/ogImage/
   publishedTime/jsonLd so each page declares its own semantics — pages stay
   dumb, the layout owns the head.
+
+## RSS in-body images (2026-07-07, issue #19)
+
+- **`import.meta.glob(..., { eager: true, import: 'default' })`** on an image
+  pattern returns `Record<string, ImageMetadata>` — every matching file is
+  already run through Astro's asset pipeline at build time, so `.src` is the
+  real hashed `/_astro/...` URL, no per-file `getImage()` call needed.
+  Docs: https://vite.dev/guide/features.html#glob-import
+- **`entry.filePath`**: every content-collection entry loaded via the `glob()`
+  loader carries `filePath` — the project-root-relative path of its source
+  file (e.g. `src/content/posts/2026/slug/index.md`). It's the only way to
+  resolve a markdown image's relative `src` (`./diagram.svg`) back to a real
+  file, since `getCollection()` results don't otherwise know where they came
+  from on disk.

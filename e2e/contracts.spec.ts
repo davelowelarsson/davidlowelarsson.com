@@ -50,6 +50,24 @@ test('every rss item is complete', async ({ request }) => {
   expect(xml).toContain('xmlns:media=');
 });
 
+test('rss item for a diagram post resolves its in-body image to a served hashed URL', async ({
+  request,
+}) => {
+  const xml = await (await request.get('/rss.xml')).text();
+
+  const items = xml.split('<item>').slice(1);
+  const diagramItem = items.find((item) =>
+    item.includes('<link>https://davidlowelarsson.com/posts/experiment-draft-preview-pipeline/'),
+  );
+
+  expect(diagramItem, 'expected the draft-preview-pipeline post in the feed').toBeTruthy();
+  // `<content:encoded>` is HTML-entity-escaped by the XML builder, so the
+  // `<img>` markup shows up as `&lt;img src=&quot;...&quot;`.
+  expect(diagramItem).toMatch(
+    /&lt;img src=&quot;https:\/\/davidlowelarsson\.com\/_astro\/[^&]+&quot;/,
+  );
+});
+
 test('sitemap covers every page the build produced', async ({ request }) => {
   const sitemap = await (await request.get('/sitemap-0.xml')).text();
   const urls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
