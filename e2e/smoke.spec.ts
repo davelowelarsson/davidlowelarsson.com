@@ -79,10 +79,11 @@ test('pages carry OpenGraph metadata and structured data', async ({ page }) => {
     'content',
     'https://davidlowelarsson.com/og-default.png',
   );
-  const person = JSON.parse(
+  const profile = JSON.parse(
     (await page.locator('script[type="application/ld+json"]').textContent()) ?? '{}',
   );
-  expect(person['@type']).toBe('Person');
+  expect(profile['@type']).toBe('ProfilePage');
+  expect(profile.mainEntity['@type']).toBe('Person');
 
   await page.goto('/posts/essay-dora-metrics-flashlight/');
   await expect(page.locator('meta[property="og:type"]')).toHaveAttribute('content', 'article');
@@ -92,6 +93,22 @@ test('pages carry OpenGraph metadata and structured data', async ({ page }) => {
   );
   expect(posting['@type']).toBe('BlogPosting');
   expect(posting.url).toBe('https://davidlowelarsson.com/posts/essay-dora-metrics-flashlight/');
+  expect(posting.image['@type']).toBe('ImageObject');
+  expect(posting.publisher['@type']).toBe('Organization');
+
+  await page.goto('/posts/');
+  const collection = JSON.parse(
+    (await page.locator('script[type="application/ld+json"]').textContent()) ?? '{}',
+  );
+  expect(collection['@type']).toBe('CollectionPage');
+  expect(collection.mainEntity.numberOfItems).toBeGreaterThan(0);
+});
+
+test('favicon.ico is the monogram, not the scaffold rocket', async ({ request }) => {
+  const response = await request.get('/favicon.ico');
+  expect(response.status()).toBe(200);
+  const body = await response.body();
+  expect(body.length).toBeLessThan(5000);
 });
 
 test('llms.txt lists published posts for AI crawlers', async ({ request }) => {

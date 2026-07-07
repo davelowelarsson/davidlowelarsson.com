@@ -4,7 +4,7 @@ import { SHOW_DRAFTS } from 'astro:env/server';
 import PostList from '../components/PostList.astro';
 import Base from '../layouts/Base.astro';
 import { isVisible, sortByPubDateDesc } from '../lib/posts';
-import { personJsonLd } from '../lib/seo';
+import { profilePageJsonLd } from '../lib/seo';
 
 const recent = sortByPubDateDesc(
   await getCollection('posts', ({ data }) => isVisible(data, SHOW_DRAFTS)),
@@ -13,7 +13,7 @@ const recent = sortByPubDateDesc(
 const site = Astro.site?.href ?? 'https://davidlowelarsson.com';
 ---
 
-<Base title="David Lowe Larsson" jsonLd={personJsonLd(site)}>
+<Base title="David Lowe Larsson" jsonLd={profilePageJsonLd(site)}>
   <h1>David Lowe Larsson</h1>
   <p>
     I lead engineering teams and care about how software gets made — flow, feedback, and the DORA
