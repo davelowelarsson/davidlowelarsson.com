@@ -229,3 +229,33 @@ how the project actually grew.
   and is not bundled/minified — fine for a one-per-page tagline, not for a
   widely-reused component. Doc:
   https://docs.astro.build/en/reference/directives-reference/#definevars
+
+## Deterministic CI path filtering (2026-07-07)
+
+- **`dorny/paths-filter@v4`** (`.github/paths-filter.yml`) decides whether a
+  change actually touches the built site, so docs-only changes skip
+  build/test/deploy. The manifest is a fail-safe **denylist** (`'**'` then
+  `!docs/**`, `!*.md`, …) — anything unlisted counts as an app change, so a new
+  top-level dir triggers a build by default instead of being silently skipped.
+  `*.md` matches root-level docs only (picomatch `*` doesn't cross `/`), so
+  `src/content/**` markdown — which *is* the app — still builds and deploys.
+- **`predicate-quantifier: 'every'` is mandatory for a denylist.** The default
+  `some` makes a file match if it matches *any* rule — and `'**'` matches
+  everything, so nothing is ever excluded (the filter becomes a silent no-op).
+  `every` requires a file to match *all* rules, so `!docs/**` etc. actually
+  subtract. picomatch runs with `dot: true`, so dotfiles (`.node-version`,
+  `.github/**`) still match `'**'`.
+- **`base` only matters on push.** With the default token, PR events detect
+  changes against the PR base via the REST API (needs `pull-requests: read`)
+  and ignore `base`. On push to `main` we set `base: github.ref_name` so it
+  diffs against the commit *before* the push (long-lived-branch mode) rather
+  than an implicit default-branch merge-base.
+- **The required check must always report — and fail loudly if detection
+  breaks.** `quality` is the only required status check on `main`. A job-level
+  `if` that evaluates false makes it "skipped", which branch protection can
+  treat as *passing* — so a broken `changes` job could let a PR merge untested.
+  Fix: `quality` runs with `if: ${{ always() }}`, gates its real work with
+  step-level `if: needs.changes.outputs.app == 'true'`, and has a guard step
+  that `exit 1`s when `needs.changes.result != 'success'`. `deploy-preview`/
+  `deploy-production` aren't required checks, so a job-level `if` is fine there.
+  Docs: https://github.com/dorny/paths-filter

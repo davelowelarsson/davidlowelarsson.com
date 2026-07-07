@@ -1,0 +1,12 @@
+# Single source of truth for "does this change affect the built site?"
+# Inverse of .dockerignore: everything counts as an app change (build/test/
+# deploy) UNLESS it only touches the docs paths listed below.
+# NOTE: content markdown under src/content/** is the app — it is intentionally
+# NOT excluded here. `*.md` matches root-level docs only (picomatch `*` does
+# not cross `/`), so posts still count.
+app:
+  - '**'
+  - '!docs/**'
+  - '!*.md'
+  - '!.github/**/*.md'
+  - '!LICENSE'
