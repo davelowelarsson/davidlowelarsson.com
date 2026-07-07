@@ -5,6 +5,8 @@ pubDate: 2026-04-20
 category: experiment
 draft: false
 tags: ["homelab", "cloudflare", "networking", "self-hosting"]
+cover: ./experiment-home-lab-topology.svg
+coverAlt: Home lab topology diagram
 ---
 
 > **WIP/TEST** — placeholder content while the site's design is under construction.

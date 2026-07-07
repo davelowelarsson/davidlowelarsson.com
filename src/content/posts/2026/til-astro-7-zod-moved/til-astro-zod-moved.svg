@@ -1,4 +1,4 @@
-<svg viewBox="0 0 400 220" xmlns="http://www.w3.org/2000/svg">
+<svg width="400" height="220" viewBox="0 0 400 220" xmlns="http://www.w3.org/2000/svg">
   <title>Abstract shape splitting into two aligned paths</title>
   <style>svg { color: #3f3f46; } @media (prefers-color-scheme: dark) { svg { color: #d4d4d8; } }</style>
   <defs>

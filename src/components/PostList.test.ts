@@ -6,12 +6,15 @@ const entry = (id: string, overrides: Record<string, unknown> = {}) => ({
   id,
   data: {
     title: `Title of ${id}`,
+    description: `What ${id} is about`,
     pubDate: new Date('2026-07-01'),
     category: 'til',
     draft: false,
     ...overrides,
   },
 });
+
+const cover = { src: '/_astro/cover.hash.png', width: 800, height: 500, format: 'png' as const };
 
 describe('PostList', () => {
   it('renders a link to each post', async () => {
@@ -51,5 +54,35 @@ describe('PostList', () => {
     });
 
     expect(html).not.toContain('draft');
+  });
+
+  it('shows the post description', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(PostList, {
+      props: { posts: [entry('described')] },
+    });
+
+    expect(html).toContain('What described is about');
+  });
+
+  it('renders a cover thumbnail with intrinsic dimensions when provided', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(PostList, {
+      props: { posts: [entry('with-cover', { cover, coverAlt: 'A cover' })] },
+    });
+
+    expect(html).toContain('src="/_astro/cover.hash.png"');
+    expect(html).toContain('alt="A cover"');
+    expect(html).toMatch(/width="800"/);
+    expect(html).toMatch(/height="500"/);
+  });
+
+  it('renders no img element for posts without a cover', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(PostList, {
+      props: { posts: [entry('plain')] },
+    });
+
+    expect(html).not.toContain('<img');
   });
 });
