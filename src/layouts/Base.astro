@@ -135,6 +135,13 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     height: auto;
   }
 
+  /* In-article images and diagrams: centered, with room to breathe */
+  article > img,
+  article p > img {
+    display: block;
+    margin: 2rem auto;
+  }
+
   /* ── Header / footer ── */
 
   header nav {
@@ -193,8 +200,48 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     letter-spacing: 0.05em;
   }
 
+  /* Quiet category tints — legible as monochrome, scannable as color */
+  .badge-essay {
+    color: light-dark(#4338ca, #a5b4fc);
+  }
+
+  .badge-til {
+    color: light-dark(#047857, #6ee7b7);
+  }
+
+  .badge-experiment {
+    color: light-dark(#0e7490, #67e8f9);
+  }
+
   .badge-warning {
     color: var(--warn);
+  }
+
+  .section-heading {
+    margin-top: 3.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--hairline);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .all-posts {
+    margin-top: 1rem;
+  }
+
+  .all-posts a {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  .all-posts a:hover {
+    color: var(--ink);
   }
 
   /* ── Post list ── */

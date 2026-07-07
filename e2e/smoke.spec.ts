@@ -4,9 +4,16 @@ test('landing page presents David and navigates to posts', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { level: 1 })).toContainText('David Lowe Larsson');
 
-  await page.getByRole('link', { name: 'Posts' }).click();
+  await page.getByRole('link', { name: 'Posts', exact: true }).click();
   await expect(page).toHaveURL(/\/posts\/$/);
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Posts');
+});
+
+test('landing page surfaces recent writing', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByRole('heading', { name: 'Recent' })).toBeVisible();
+  await expect(page.locator('.post-list li')).not.toHaveCount(0);
+  await expect(page.getByRole('link', { name: 'All posts' })).toBeVisible();
 });
 
 test('footer links point at LinkedIn and GitHub', async ({ page }) => {
