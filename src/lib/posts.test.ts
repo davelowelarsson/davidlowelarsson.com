@@ -3,6 +3,7 @@ import {
   CATEGORIES,
   CATEGORY_DESCRIPTIONS,
   filterByCategory,
+  groupByYear,
   isVisible,
   postIdFromEntry,
   sortByPubDateDesc,
@@ -49,6 +50,24 @@ describe('CATEGORY_DESCRIPTIONS', () => {
     for (const category of CATEGORIES) {
       expect(CATEGORY_DESCRIPTIONS[category], `missing description for ${category}`).toBeTruthy();
     }
+  });
+});
+
+describe('groupByYear', () => {
+  it('groups posts into year buckets, newest year first, posts newest-first within', () => {
+    const p2026 = post({ pubDate: new Date('2026-07-01') });
+    const p2026b = post({ pubDate: new Date('2026-01-15') });
+    const p2013 = post({ pubDate: new Date('2013-09-30') });
+
+    const groups = groupByYear([p2013, p2026b, p2026]);
+
+    expect(groups.map((g) => g.year)).toEqual([2026, 2013]);
+    expect(groups[0]?.posts).toEqual([p2026, p2026b]);
+    expect(groups[1]?.posts).toEqual([p2013]);
+  });
+
+  it('returns empty for no posts', () => {
+    expect(groupByYear([])).toEqual([]);
   });
 });
 

@@ -3,12 +3,13 @@ import { getCollection } from 'astro:content';
 import { SHOW_DRAFTS } from 'astro:env/server';
 import PostList from '../../components/PostList.astro';
 import Base from '../../layouts/Base.astro';
-import { CATEGORIES, isVisible, sortByPubDateDesc } from '../../lib/posts';
+import { CATEGORIES, groupByYear, isVisible, sortByPubDateDesc } from '../../lib/posts';
 import { collectionPageJsonLd } from '../../lib/seo';
 
 const posts = sortByPubDateDesc(
   await getCollection('posts', ({ data }) => isVisible(data, SHOW_DRAFTS)),
 );
+const years = groupByYear(posts);
 
 const site = Astro.site?.href ?? 'https://davidlowelarsson.com';
 ---
@@ -23,8 +24,13 @@ const site = Astro.site?.href ?? 'https://davidlowelarsson.com';
     {CATEGORIES.map((category) => <a href={`/category/${category}/`}>{category}</a>)}
   </nav>
   {
-    posts.length > 0 ? (
-      <PostList posts={posts} />
+    years.length > 0 ? (
+      years.map(({ year, posts: yearPosts }) => (
+        <>
+          <h2 class="year-heading">{year}</h2>
+          <PostList posts={yearPosts} />
+        </>
+      ))
     ) : (
       <p>Nothing published yet — the first posts are still drafts.</p>
     )

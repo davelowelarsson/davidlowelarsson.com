@@ -239,6 +239,19 @@ const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
 
   /* ── The meta rail (signature element) ── */
 
+  /* Year dividers in archive listings — the quiet signal that a 2013 study
+     is a 2013 study. Same mono voice as the meta rail. */
+  .year-heading {
+    margin: 2.5rem 0 0.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--hairline);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+  }
+
   .tagline {
     font-family: var(--font-mono);
     font-size: 0.8125rem;

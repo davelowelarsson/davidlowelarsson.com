@@ -39,6 +39,16 @@ test('category pages list only their category and explain the term', async ({ pa
   await expect(page.getByText('DORA metrics are a flashlight')).toBeVisible();
 });
 
+test('the posts archive divides entries by year, newest first', async ({ page }) => {
+  await page.goto('/posts/');
+  const years = page.locator('.year-heading');
+  await expect(years.first()).toBeVisible();
+  const texts = await years.allTextContents();
+  const numbers = texts.map((t) => Number(t.trim()));
+  expect(numbers.every((n) => n >= 2009 && n <= 2100)).toBe(true);
+  expect([...numbers].sort((a, b) => b - a)).toEqual(numbers);
+});
+
 test('categories are reachable from the posts filter rail and from a post page', async ({
   page,
 }) => {
