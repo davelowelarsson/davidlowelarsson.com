@@ -7,8 +7,14 @@
   "assets": {
     "directory": "./dist"
   },
-  // Production serves on the apex domain (zone must be on Cloudflare).
-  "routes": [{ "pattern": "davidlowelarsson.com", "custom_domain": true }],
+  // Zone routes overlay the Worker on the existing proxied DNS records instead
+  // of replacing them (a Custom Domain would require deleting those records).
+  // Fallback: disable the route or unproxy the record and traffic flows to the
+  // origin A record again.
+  "routes": [
+    { "pattern": "davidlowelarsson.com/*", "zone_name": "davidlowelarsson.com" },
+    { "pattern": "www.davidlowelarsson.com/*", "zone_name": "davidlowelarsson.com" }
+  ],
   // Branch/PR builds get shareable preview URLs via `wrangler versions upload`.
   "preview_urls": true
 }
