@@ -5,7 +5,10 @@
   "name": "davidlowelarsson-com",
   "compatibility_date": "2026-07-07",
   "assets": {
-    "directory": "./dist"
+    "directory": "./dist",
+    // Serves dist/404.html (with a 404 status) for any request that doesn't
+    // match a built asset, instead of Workers' default "no route" response.
+    "not_found_handling": "404-page"
   },
   // Zone routes overlay the Worker on the existing proxied DNS records instead
   // of replacing them (a Custom Domain would require deleting those records).

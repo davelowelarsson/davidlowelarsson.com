@@ -1,0 +1,22 @@
+---
+import { Image } from 'astro:assets';
+import serverError from '../assets/error-500.png';
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="500 — David Lowe Larsson" description="Something went wrong.">
+  <p class="post-meta"><span class="badge badge-warning">500</span> <span>server error</span></p>
+  <h1>500 — something broke on this end</h1>
+  <p>
+    Not you, me. This site is static, so if you're reading this something genuinely unusual
+    happened. Trying again in a moment usually does it.
+  </p>
+  <Image
+    src={serverError}
+    alt="Pixel-art David clutching his head beside a smoking server rack with a red alarm light"
+    width={340}
+    densities={[1, 2]}
+    class="error-illustration"
+  />
+  <p class="all-posts"><a href="/">← Home</a> · <a href="/posts/">Posts →</a></p>
+</Base>
