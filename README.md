@@ -71,6 +71,16 @@ production with drafts hidden.
 5. Ready? Flip `draft: false` (or keep drafting), merge — `main` deploys
    production with drafts hidden
 
+## Publishing routine (editorial cadence)
+
+Shipping posts is a standing habit, not an ad-hoc thing. It runs as ~2-week
+**cycles**, each a dated milestone plus one `content`-labelled tracker issue
+`Content roadmap — cycle N` whose final checkbox opens the next cycle — a loop
+that never terminates. Old posts publish as **cousin posts** (an archive piece
+released as a companion to a current one). Full ritual, principles, and how to
+mine the vault for material: **`docs/publishing-routine.md`**. To act now, open
+the current tracker: the open issue labelled `content` titled `Content roadmap`.
+
 ## Writing from Obsidian
 
 Drafts start in an Obsidian vault. The site is never coupled to that — the interface is the
@@ -127,5 +137,6 @@ that would otherwise vanish on a dark page.
 
 - `CONTEXT.md` — glossary (Post, Category, Draft, …)
 - `docs/prd.md` — v1 scope and working agreement
-- `docs/adr/` — architecture decisions (Workers over Pages, static-with-SSR-hatch, category-as-data)
+- `docs/adr/` — architecture decisions (Workers over Pages, static-with-SSR-hatch, category-as-data, self-renewing publishing loop)
 - `docs/astro-field-guide.md` — running ledger of Astro concepts, PR by PR
+- `docs/publishing-routine.md` — the editorial cadence: cycles, the self-renewing issue loop, vault mining
