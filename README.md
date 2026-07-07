@@ -35,6 +35,18 @@ draft: true     # visible in previews, hidden in production
 Open a PR — the preview deployment shows drafts; merging to `main` deploys
 production with drafts hidden.
 
+## The publish loop
+
+1. Write a post with `draft: true`, push a branch, open a PR
+2. CI runs quality gates, then `deploy-preview` uploads a version built with
+   `SHOW_DRAFTS=true`
+3. Find the preview URL in the PR's **deploy-preview job output** (the
+   `Version Preview URL: https://<hash>-davidlowelarsson-com...workers.dev`
+   line) — every push gets a fresh URL
+4. Review on any device; iterate by pushing to the branch
+5. Ready? Flip `draft: false` (or keep drafting), merge — `main` deploys
+   production with drafts hidden
+
 ## Where things are decided
 
 - `CONTEXT.md` — glossary (Post, Category, Draft, …)
