@@ -30,6 +30,9 @@ jobs:
     if: github.event_name == 'pull_request'
     needs: quality
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     env:
       HAS_CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
     steps:
@@ -44,12 +47,35 @@ jobs:
         env:
           SHOW_DRAFTS: 'true'
       - name: Upload preview version
+        id: upload
         if: env.HAS_CLOUDFLARE_TOKEN == 'true'
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: versions upload
+      - name: Comment preview URL on PR
+        if: env.HAS_CLOUDFLARE_TOKEN == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DEPLOYMENT_URL: ${{ steps.upload.outputs.deployment-url }}
+          CMD_OUTPUT: ${{ steps.upload.outputs.command-output }}
+        run: |
+          URL="$DEPLOYMENT_URL"
+          if [ -z "$URL" ]; then
+            URL=$(printf '%s' "$CMD_OUTPUT" | grep -oE 'https://[A-Za-z0-9-]+\.[A-Za-z0-9-]+\.workers\.dev' | head -1)
+          fi
+          if [ -z "$URL" ]; then
+            echo "::warning::No preview URL found in wrangler output"
+            exit 0
+          fi
+          BODY="🔍 **Preview deployment** (drafts visible): $URL
+
+          Built from \`${{ github.event.pull_request.head.sha }}\`. This comment is updated on every push."
+          gh pr comment "${{ github.event.pull_request.number }}" \
+            --repo "${{ github.repository }}" \
+            --edit-last --create-if-none \
+            --body "$BODY"
       - name: Skipped deploy notice
         if: env.HAS_CLOUDFLARE_TOKEN != 'true'
         run: echo "::notice::CLOUDFLARE_API_TOKEN not configured — preview deploy skipped."
