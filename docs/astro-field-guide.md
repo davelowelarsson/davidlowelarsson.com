@@ -142,3 +142,36 @@ how the project actually grew.
   `::backdrop` isn't a real descendant). Progressive enhancement — with JS
   disabled, article images are just images, no dead click affordance. Docs:
   https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog
+
+## Mermaid diagrams (2026-07-07, issue #6)
+
+- **Sätteri vs. unified**: Astro 7's native processor ("Sätteri") has no
+  remark/rehype plugin hooks, so a mermaid-rendering approach has to be
+  processor-independent. `markdown.syntaxHighlight.excludeLangs: ['mermaid']`
+  in `astro.config.mjs` just tells Shiki to leave that one fenced-code
+  language alone — the block passes through as plain
+  `<pre><code class="language-mermaid">` (verified by inspecting `dist/`
+  output, not assumed), which a client script can then find and replace.
+  This is what keeps the codebase on Sätteri instead of being forced onto
+  `@astrojs/markdown-remark`/unified just to support one diagram type. Docs:
+  https://docs.astro.build/en/reference/configuration-reference/#markdownsyntaxhighlight
+- **Client-side over SSR (`rehype-mermaid`)**: SSR rendering needs
+  unified() *and* a Playwright-driven build step just to rasterize diagrams
+  ahead of time — two new pipeline dependencies for a feature most pages
+  don't use. Client-side means a ~30-line script that only pays mermaid's
+  cost on the pages that actually have a diagram.
+- **Lazy dynamic `import('mermaid')`**: `Mermaid.astro`'s script queries for
+  `pre > code.language-mermaid` first and returns early if there are none —
+  the `import('mermaid')` line is never reached on pages without a diagram,
+  so Vite's code-splitting never fetches that chunk there (verified in
+  `e2e/mermaid.spec.ts` via `page.on('request')`). On a page that does have
+  a diagram, mermaid's real cost shows up: ~30 lazy chunks, ~745 KB
+  uncompressed JS (dagre for layout, roughjs for the sketch-style render,
+  d3 internals) — paid once, only where it's used, and it's a real ES
+  module specifier so it bundles under `/_astro/` same-origin, which is
+  what satisfies the CSP's `script-src 'self'` without a CDN allowance.
+- **Theme via `matchMedia`, not a CSS toggle**: mermaid renders to static
+  SVG at call time, so "theme-aware" means picking `dark` vs. `neutral` in
+  `mermaid.initialize()` *before* rendering
+  (`matchMedia('(prefers-color-scheme: dark)').matches`), not styling the
+  output after the fact.

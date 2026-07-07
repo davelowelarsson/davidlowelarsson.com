@@ -1,6 +1,7 @@
 ---
 import { CLOUDFLARE_ANALYTICS_TOKEN } from 'astro:env/client';
 import Lightbox from '../components/Lightbox.astro';
+import Mermaid from '../components/Mermaid.astro';
 import { AUTHOR } from '../lib/seo';
 
 interface Props {
@@ -76,6 +77,7 @@ const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
       <a href="/rss.xml">RSS</a>
     </footer>
     <Lightbox />
+    <Mermaid />
   </body>
 </html>
 

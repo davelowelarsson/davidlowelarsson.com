@@ -35,6 +35,18 @@ export default defineConfig({
     layout: 'constrained',
     responsiveStyles: true,
   },
+  // `mermaid` code blocks skip Shiki entirely and pass through as plain
+  // `<pre><code class="language-mermaid">` — Mermaid.astro finds them by
+  // that class and renders them client-side. Processor-independent (works
+  // with Sätteri, Astro 7's default), so it doesn't force the pipeline back
+  // to unified/@astrojs/markdown-remark.
+  // Docs: https://docs.astro.build/en/reference/configuration-reference/#markdownsyntaxhighlight
+  markdown: {
+    syntaxHighlight: {
+      type: 'shiki',
+      excludeLangs: ['mermaid'],
+    },
+  },
   integrations: [
     sitemap({
       serialize(item) {
