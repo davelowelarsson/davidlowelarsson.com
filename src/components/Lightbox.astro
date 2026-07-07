@@ -1,0 +1,56 @@
+---
+// Dependency-free progressive enhancement: click an in-article image to see
+// it full-size in a native <dialog>. No JS → images stay plain images, no
+// broken affordance (there's no "click to zoom" chrome that would then do
+// nothing). Escape and backdrop-click both close the dialog.
+// Docs: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog
+---
+
+<dialog id="lightbox" aria-label="Enlarged image">
+  <img alt="" />
+</dialog>
+
+<style>
+  /* No open/close animation at all — the simplest way to respect
+     prefers-reduced-motion is to never add motion in the first place. */
+  #lightbox {
+    padding: 0;
+    border: none;
+    max-width: 92vw;
+    max-height: 92vh;
+    background: transparent;
+  }
+
+  #lightbox::backdrop {
+    background: rgb(0 0 0 / 75%);
+  }
+
+  #lightbox img {
+    display: block;
+    max-width: 92vw;
+    max-height: 92vh;
+  }
+</style>
+
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>('#lightbox');
+  const preview = dialog?.querySelector('img');
+
+  if (dialog && preview) {
+    for (const img of document.querySelectorAll<HTMLImageElement>('article img')) {
+      img.addEventListener('click', () => {
+        preview.src = img.src;
+        preview.alt = img.alt;
+        dialog.showModal();
+      });
+    }
+
+    // A click that lands on the backdrop reports the <dialog> itself as the
+    // target (the backdrop isn't a real descendant node) — that's how we
+    // tell it apart from a click on the image. Escape already closes a
+    // showModal() dialog natively, so it needs no handler here.
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+  }
+</script>
