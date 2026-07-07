@@ -71,6 +71,51 @@ production with drafts hidden.
 5. Ready? Flip `draft: false` (or keep drafting), merge — `main` deploys
    production with drafts hidden
 
+## Writing from Obsidian
+
+Drafts start in an Obsidian vault. The site is never coupled to that — the interface is the
+frontmatter contract, not the editor: anything that lands in `src/content/posts/` with valid
+frontmatter publishes, no matter what wrote it.
+
+**Copy-on-publish.** Write and sketch in the vault, however messy. When a note is close to ready,
+copy it — and anything it references — into a post bundle in this repo:
+
+```sh
+cp -r ~/vault/publish/my-post src/content/posts/2026/my-post-slug
+```
+
+That's the same shape `templates/new-post` produces: a folder named after the slug, `index.md`
+plus colocated images, `draft: true` while you finetune it against the preview URL. Open a PR,
+review on the preview deployment, flip `draft: false`, merge.
+
+If copy-on-publish ever becomes real friction, the next step (not built yet — only worth it once
+this one bites) is a dedicated `publish/` folder in the vault plus the Obsidian Git plugin or a
+sync script opening PRs automatically.
+
+**Excalidraw sketches.** Enable **Auto-export SVG** in Obsidian's Excalidraw plugin (same folder,
+transparent background). Every save drops a matching `.svg` next to the `.excalidraw` source —
+copy that `.svg` into the post bundle along with the markdown and reference it with standard
+relative syntax, same as any other image:
+
+```md
+![Alt text](./sketch.excalidraw.svg)
+```
+
+No client JS, no canvas — Astro hashes and caches it like any static asset. Dark-mode legibility is
+handled globally: `img[src*='excalidraw']` gets a `filter: invert(...) hue-rotate(180deg)` in
+Base.astro's dark-mode styles, since Excalidraw exports dark strokes on a transparent background
+that would otherwise vanish on a dark page.
+
+**Watch out for:**
+
+- **Wiki-links.** Obsidian embeds default to `![[sketch.excalidraw]]` — meaningless to a standard
+  markdown renderer. Convert every `![[...]]` to a relative markdown link
+  (`![alt](./sketch.excalidraw.svg)`) before copying anything out of the vault.
+- **The whole vault is not the publish surface.** Never point a sync script, git plugin, or CI job
+  at the entire vault — only at an explicit publish folder. The vault has drafts, private notes,
+  and things nobody consented to being blogged about; copy-on-publish is a deliberate one-way step
+  precisely so a bug in the sync path can't leak any of that.
+
 ## Where things are decided
 
 - `CONTEXT.md` — glossary (Post, Category, Draft, …)

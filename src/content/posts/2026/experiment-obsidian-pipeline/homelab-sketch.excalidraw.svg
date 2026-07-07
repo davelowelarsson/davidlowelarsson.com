@@ -1,0 +1,56 @@
+<svg width="760" height="420" viewBox="0 0 760 420" xmlns="http://www.w3.org/2000/svg">
+  <!-- svg-source:excalidraw -->
+  <title>Rough Excalidraw sketch of a home lab: router, switch, Pi, and NAS, hand-drawn in the Obsidian vault</title>
+  <g stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <!-- router: two overlapping wobbly strokes, the rough.js "sketchy" look -->
+    <path d="M40 60 C39 58, 200 55, 240 58 C242 90, 244 118, 241 150 C200 152, 80 154, 42 151 C39 120, 38 88, 40 60 Z" stroke="#1e1e1e" stroke-width="1.5" />
+    <path d="M42 62 C90 59, 210 61, 238 60 C239 92, 240 116, 239 148 C190 150, 90 151, 44 149 C41 118, 40 90, 42 62 Z" stroke="#1e1e1e" stroke-width="1.5" />
+    <text x="140" y="108" font-family="Virgil, Excalifont, 'Segoe UI Emoji', sans-serif" font-size="20" fill="#1e1e1e" text-anchor="middle" transform="rotate(-1.2 140 108)">router</text>
+
+    <!-- antenna squiggles on the router, freehand -->
+    <path d="M80 58 C76 44, 84 34, 78 22" stroke="#1e1e1e" stroke-width="1.3" />
+    <path d="M190 58 C195 43, 187 33, 194 21" stroke="#1e1e1e" stroke-width="1.3" />
+
+    <!-- switch: blue accent box -->
+    <path d="M320 70 C318 68, 480 66, 520 69 C523 96, 521 124, 519 150 C480 153, 360 154, 322 151 C319 124, 318 96, 320 70 Z" stroke="#1971c2" stroke-width="1.5" />
+    <path d="M322 72 C400 69, 470 71, 517 71 C519 98, 518 122, 517 148 C460 150, 370 151, 324 149 C321 122, 320 98, 322 72 Z" stroke="#1971c2" stroke-width="1.5" />
+    <text x="420" y="118" font-family="Virgil, Excalifont, 'Segoe UI Emoji', sans-serif" font-size="20" fill="#1971c2" text-anchor="middle" transform="rotate(0.6 420 118)">switch</text>
+
+    <!-- pi: green box, bottom-left -->
+    <path d="M60 240 C58 238, 200 236, 236 239 C238 264, 237 288, 235 312 C200 315, 100 316, 62 313 C59 288, 58 264, 60 240 Z" stroke="#2f9e44" stroke-width="1.5" />
+    <path d="M62 242 C120 240, 190 241, 233 241 C234 266, 233 288, 233 310 C185 312, 110 313, 64 311 C61 288, 60 266, 62 242 Z" stroke="#2f9e44" stroke-width="1.5" />
+    <text x="148" y="282" font-family="Virgil, Excalifont, 'Segoe UI Emoji', sans-serif" font-size="18" fill="#2f9e44" text-anchor="middle" transform="rotate(-0.8 148 282)">raspberry pi</text>
+
+    <!-- nas: black box, bottom-right -->
+    <path d="M320 236 C318 234, 480 232, 520 236 C523 264, 522 290, 519 316 C480 319, 360 320, 322 317 C319 290, 318 264, 320 236 Z" stroke="#1e1e1e" stroke-width="1.5" />
+    <path d="M322 238 C400 235, 470 237, 517 238 C519 264, 518 290, 517 314 C460 317, 370 318, 324 315 C321 288, 320 264, 322 238 Z" stroke="#1e1e1e" stroke-width="1.5" />
+    <text x="420" y="284" font-family="Virgil, Excalifont, 'Segoe UI Emoji', sans-serif" font-size="20" fill="#1e1e1e" text-anchor="middle" transform="rotate(0.4 420 284)">nas</text>
+
+    <!-- wobbly connector: router -> switch -->
+    <path d="M242 100 C270 98, 290 104, 318 101" stroke="#1e1e1e" stroke-width="1.5" />
+    <path d="M300 92 C310 97, 314 101, 305 108 C312 104, 318 100, 310 96" stroke="#1e1e1e" stroke-width="1.5" fill="#1e1e1e" />
+
+    <!-- connector: switch -> pi (down-left) -->
+    <path d="M360 152 C300 190, 220 214, 178 238" stroke="#1e1e1e" stroke-width="1.3" />
+    <path d="M188 227 C182 234, 179 238, 172 240 C180 243, 186 244, 191 238" stroke="#1e1e1e" stroke-width="1.3" fill="#1e1e1e" />
+
+    <!-- connector: switch -> nas (down) -->
+    <path d="M420 152 C419 180, 421 208, 420 234" stroke="#1e1e1e" stroke-width="1.3" />
+    <path d="M412 220 C415 228, 420 234, 420 234 C420 234, 425 228, 428 220" stroke="#1e1e1e" stroke-width="1.3" fill="#1e1e1e" />
+
+    <!-- red annotation arrow + handwritten note, like a margin scribble -->
+    <path d="M560 250 C600 230, 630 200, 648 168" stroke="#e03131" stroke-width="1.6" />
+    <path d="M636 178 C640 172, 648 168, 648 168 C648 168, 646 176, 644 184" stroke="#e03131" stroke-width="1.6" fill="#e03131" />
+    <text x="560" y="270" font-family="Virgil, Excalifont, 'Segoe UI Emoji', sans-serif" font-size="16" fill="#e03131" transform="rotate(-3 560 270)">add tunnel here??</text>
+
+    <!-- title, hand-lettered, slightly tilted like a real quick sketch -->
+    <text x="40" y="30" font-family="Virgil, Excalifont, 'Segoe UI Emoji', sans-serif" font-size="24" fill="#1e1e1e" transform="rotate(-0.6 40 30)">homelab v2 (draft)</text>
+
+    <!-- underline scribble beneath the title -->
+    <path d="M40 38 C110 41, 190 36, 260 39" stroke="#1e1e1e" stroke-width="1.4" />
+
+    <!-- corner doodle: a little cloud, because every whiteboard sketch has one -->
+    <path d="M600 340 C592 330, 604 320, 616 324 C620 314, 636 314, 640 324 C652 320, 662 330, 654 340 C662 348, 652 358, 640 354 C636 364, 620 364, 616 354 C604 358, 592 348, 600 340 Z" stroke="#1971c2" stroke-width="1.3" />
+    <text x="628" y="342" font-family="Virgil, Excalifont, 'Segoe UI Emoji', sans-serif" font-size="14" fill="#1971c2" text-anchor="middle">cloudflare</text>
+  </g>
+</svg>
