@@ -23,6 +23,22 @@ test('drafts are hidden when SHOW_DRAFTS is off (production behavior)', async ({
   await expect(page.getByText('Hello, world (again)')).toHaveCount(0);
 });
 
+test('rss feed serves published posts and never drafts', async ({ request }) => {
+  const response = await request.get('/rss.xml');
+  expect(response.status()).toBe(200);
+
+  const xml = await response.text();
+  expect(xml).toContain('DORA metrics are a flashlight');
+  expect(xml).not.toContain('Hello, world (again)');
+});
+
+test('sitemap and robots.txt are served', async ({ request }) => {
+  expect((await request.get('/sitemap-index.xml')).status()).toBe(200);
+
+  const robots = await (await request.get('/robots.txt')).text();
+  expect(robots).toContain('Sitemap: https://davidlowelarsson.com/sitemap-index.xml');
+});
+
 test('every page declares its canonical URL on the apex domain', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
