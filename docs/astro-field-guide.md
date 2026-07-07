@@ -143,6 +143,28 @@ how the project actually grew.
   disabled, article images are just images, no dead click affordance. Docs:
   https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog
 
+## Obsidian publish workflow (2026-07-07, issue #7)
+
+- **Excalidraw-as-SVG convention**: an Excalidraw sketch drawn in Obsidian
+  (Auto-export SVG, transparent background) is committed as a plain `.svg`
+  colocated with its post, referenced with the same relative markdown syntax
+  as any other image (`![alt](./sketch.excalidraw.svg)`). No canvas, no
+  client JS — it's asset-pipeline-processed exactly like a hand-drawn diagram
+  SVG; the only difference is who drew it and with what tool.
+- **Dark-mode filter trick**: unlike this repo's own diagrams (which use
+  `currentColor` + an internal `prefers-color-scheme` `<style>`, see the
+  kitchen-sink entry above), an Excalidraw export hardcodes its stroke colors
+  — dark ink on a transparent background, illegible on a dark page. Rather
+  than edit every exported SVG, a global selector in Base.astro,
+  `img[src*='excalidraw']`, applies `filter: invert(0.92) hue-rotate(180deg)`
+  inside a `prefers-color-scheme: dark` block: inverting lightness flips dark
+  strokes to light, and the hue rotation undoes invert's side effect of also
+  flipping any hue-bearing accent colors, so a red annotation stays
+  recognizably red instead of turning cyan. The filter targets the `<img>` in
+  the page, not the SVG file, so one rule covers every current and future
+  Excalidraw export with zero per-file work.
+  Docs: https://developer.mozilla.org/en-US/docs/Web/CSS/filter-function/invert
+
 ## Mermaid diagrams (2026-07-07, issue #6)
 
 - **Sätteri vs. unified**: Astro 7's native processor ("Sätteri") has no
