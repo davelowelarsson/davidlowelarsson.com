@@ -66,3 +66,16 @@ how the project actually grew.
 - **`@astrojs/sitemap`** is config-only: it walks the *built* pages, so drafts
   are excluded in production automatically. Served at `/sitemap-index.xml`,
   pointed to by `public/robots.txt`.
+
+## Discoverability (2026-07-07, issue #8)
+
+- **`set:html` + JSON.stringify** is the Astro idiom for JSON-LD:
+  `<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />` —
+  builders are pure functions in `src/lib/seo.ts`, unit-tested.
+- **OG images must be raster** — crawlers ignore SVG, so posts fall back to
+  `/og-default.png` unless their cover is png/jpg. The default card was
+  rendered from HTML via `playwright screenshot` (repeatable: scratchpad
+  og-card.html → 1200×630 png).
+- **Layout props as the SEO surface**: Base.astro takes ogType/ogImage/
+  publishedTime/jsonLd so each page declares its own semantics — pages stay
+  dumb, the layout owns the head.

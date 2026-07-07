@@ -3,6 +3,7 @@ import { getCollection, render } from 'astro:content';
 import { SHOW_DRAFTS } from 'astro:env/server';
 import Base from '../../layouts/Base.astro';
 import { isVisible } from '../../lib/posts';
+import { blogPostingJsonLd } from '../../lib/seo';
 
 export async function getStaticPaths() {
   const posts = await getCollection('posts', ({ data }) => isVisible(data, SHOW_DRAFTS));
@@ -11,9 +12,22 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props;
 const { Content } = await render(post);
+
+const site = Astro.site?.href ?? 'https://davidlowelarsson.com';
+const rasterCover =
+  post.data.cover && post.data.cover.format !== 'svg'
+    ? new URL(post.data.cover.src, site).href
+    : undefined;
 ---
 
-<Base title={`${post.data.title} — David Lowe Larsson`} description={post.data.description}>
+<Base
+  title={`${post.data.title} — David Lowe Larsson`}
+  description={post.data.description}
+  ogType="article"
+  ogImage={rasterCover}
+  publishedTime={post.data.pubDate.toISOString()}
+  jsonLd={blogPostingJsonLd(post, site)}
+>
   <article>
     <h1>{post.data.title}</h1>
     <p class="post-meta">

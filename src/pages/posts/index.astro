@@ -4,13 +4,19 @@ import { SHOW_DRAFTS } from 'astro:env/server';
 import PostList from '../../components/PostList.astro';
 import Base from '../../layouts/Base.astro';
 import { CATEGORIES, isVisible, sortByPubDateDesc } from '../../lib/posts';
+import { collectionPageJsonLd } from '../../lib/seo';
 
 const posts = sortByPubDateDesc(
   await getCollection('posts', ({ data }) => isVisible(data, SHOW_DRAFTS)),
 );
+
+const site = Astro.site?.href ?? 'https://davidlowelarsson.com';
 ---
 
-<Base title="Posts — David Lowe Larsson">
+<Base
+  title="Posts — David Lowe Larsson"
+  jsonLd={collectionPageJsonLd('Posts', 'All writing by David Lowe Larsson.', posts, site)}
+>
   <h1>Posts</h1>
   <nav class="filter-rail" aria-label="Filter by category">
     <span aria-current="true">all</span>

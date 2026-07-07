@@ -11,6 +11,7 @@ import {
   isVisible,
   sortByPubDateDesc,
 } from '../../lib/posts';
+import { collectionPageJsonLd } from '../../lib/seo';
 
 export function getStaticPaths() {
   return CATEGORIES.map((category) => ({ params: { category } }));
@@ -24,11 +25,14 @@ const posts = sortByPubDateDesc(
     category,
   ),
 );
+
+const site = Astro.site?.href ?? 'https://davidlowelarsson.com';
 ---
 
 <Base
   title={`${category} — David Lowe Larsson`}
   description={CATEGORY_DESCRIPTIONS[category]}
+  jsonLd={collectionPageJsonLd(category, CATEGORY_DESCRIPTIONS[category], posts, site)}
 >
   <h1>{category}</h1>
   <p class="category-description">{CATEGORY_DESCRIPTIONS[category]}</p>
