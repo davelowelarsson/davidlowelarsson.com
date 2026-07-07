@@ -27,6 +27,14 @@ const postLastmod = postDates();
 // https://astro.build/config
 export default defineConfig({
   site: 'https://davidlowelarsson.com',
+  // Every processed image (Markdown or <Image>) gets srcset/sizes + the
+  // matching CSS for free — no per-image config. SVGs pass through
+  // untouched (vector, no rasterization) so this only bites on raster art.
+  // Docs: https://docs.astro.build/en/guides/images/#responsive-images
+  image: {
+    layout: 'constrained',
+    responsiveStyles: true,
+  },
   integrations: [
     sitemap({
       serialize(item) {

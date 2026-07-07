@@ -117,3 +117,28 @@ how the project actually grew.
   resolve a markdown image's relative `src` (`./diagram.svg`) back to a real
   file, since `getCollection()` results don't otherwise know where they came
   from on disk.
+
+## Image pipeline + lightbox (2026-07-07, issue #9)
+
+- **`image.layout` + `image.responsiveStyles`** in astro.config.mjs apply
+  globally to every processed image — `<Image>`/`<Picture>` components *and*
+  plain Markdown `![]()` images — so `srcset`/`sizes`/`loading="lazy"` are
+  automatic, zero per-image config. Docs:
+  https://docs.astro.build/en/guides/images/#responsive-images
+- **SVG vs. raster**: Astro can't rasterize vectors, so an SVG referenced in
+  Markdown gets the `layout` attributes but only *one* `srcset` candidate
+  (itself) — no real responsiveness. A raster image (`workbench.png` in the
+  3D-art-to-platform-engineering post) is what actually proves the pipeline:
+  multiple width candidates in `srcset`, verified in
+  `e2e/image-pipeline.spec.ts`.
+- **`responsiveStyles` ships as a virtual CSS module** imported by the
+  compiled `<Image>`/`<Picture>` components — since this codebase only uses
+  Markdown images (no `<Image>` component anywhere), that CSS never actually
+  gets bundled. The `data-astro-image` attributes still land on every
+  Markdown image either way; they're just inert without the component. Net
+  effect here: zero layout risk from turning this flag on.
+- **Native `<dialog>` lightbox**: `showModal()` gets Escape-to-close for
+  free; backdrop-click needs one JS check (`event.target === dialog`, since
+  `::backdrop` isn't a real descendant). Progressive enhancement — with JS
+  disabled, article images are just images, no dead click affordance. Docs:
+  https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog

@@ -36,6 +36,11 @@ a deadline.
 That's platform engineering. Different substrate, same job: reduce the cognitive load of the
 people doing the primary work, and be invisible when it's going well.
 
+![A cluttered digital art workbench: reference boards, in-progress renders, and a job queue script pinned beside them](./workbench.png)
+
+That workbench — half art tool, half ops console — is the clearest artifact I have of the
+transition already underway before I had a name for it.
+
 ### What breaks in both worlds
 
 > A render that fails at 90% and a deploy that fails after the health check passes cost you the

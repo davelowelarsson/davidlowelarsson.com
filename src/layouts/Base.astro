@@ -1,5 +1,6 @@
 ---
 import { CLOUDFLARE_ANALYTICS_TOKEN } from 'astro:env/client';
+import Lightbox from '../components/Lightbox.astro';
 import { AUTHOR } from '../lib/seo';
 
 interface Props {
@@ -74,6 +75,7 @@ const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
       <a href={AUTHOR.github}>GitHub</a>
       <a href="/rss.xml">RSS</a>
     </footer>
+    <Lightbox />
   </body>
 </html>
 
@@ -171,11 +173,14 @@ const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
     height: auto;
   }
 
-  /* In-article images and diagrams: centered, with room to breathe */
+  /* In-article images and diagrams: centered, with room to breathe.
+     cursor: zoom-in signals the Lightbox component's click-to-enlarge
+     affordance (progressive enhancement — harmless with JS disabled). */
   article > img,
   article p > img {
     display: block;
     margin: 2rem auto;
+    cursor: zoom-in;
   }
 
   /* ── Header / footer ── */
