@@ -99,7 +99,7 @@ how the project actually grew.
 - **Optional client env vars**: `envField.string({ context: 'client',
   access: 'public', optional: true })` in `astro.config.mjs` gives a var
   that's `undefined` when unset, importable from `astro:env/client` inside
-  a component's frontmatter. `CF_ANALYTICS_TOKEN` uses this so the beacon
+  a component's frontmatter. `CLOUDFLARE_ANALYTICS_TOKEN` uses this so the beacon
   `<script>` in Base.astro is skipped entirely (not just empty) in local
   dev and CI, where the token is never configured.
   Docs: https://docs.astro.build/en/guides/environment-variables/

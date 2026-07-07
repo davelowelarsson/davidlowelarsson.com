@@ -46,7 +46,7 @@ jobs:
         run: npm run build
         env:
           SHOW_DRAFTS: 'true'
-          CF_ANALYTICS_TOKEN: ${{ vars.CF_ANALYTICS_TOKEN || '' }}
+          CLOUDFLARE_ANALYTICS_TOKEN: ${{ vars.CLOUDFLARE_ANALYTICS_TOKEN || '' }}
       - name: Upload preview version
         id: upload
         if: env.HAS_CLOUDFLARE_TOKEN == 'true'
@@ -98,7 +98,7 @@ jobs:
         run: npm run build
         env:
           SHOW_DRAFTS: 'false'
-          CF_ANALYTICS_TOKEN: ${{ vars.CF_ANALYTICS_TOKEN || '' }}
+          CLOUDFLARE_ANALYTICS_TOKEN: ${{ vars.CLOUDFLARE_ANALYTICS_TOKEN || '' }}
       - name: Deploy to Cloudflare Workers
         if: env.HAS_CLOUDFLARE_TOKEN == 'true'
         uses: cloudflare/wrangler-action@v3

@@ -46,7 +46,7 @@ export default defineConfig({
       }),
       // Cloudflare Web Analytics site token. Left unset locally and in CI —
       // undefined means Base.astro skips rendering the beacon entirely.
-      CF_ANALYTICS_TOKEN: envField.string({
+      CLOUDFLARE_ANALYTICS_TOKEN: envField.string({
         context: 'client',
         access: 'public',
         optional: true,

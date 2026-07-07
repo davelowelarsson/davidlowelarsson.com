@@ -19,7 +19,16 @@ test('unknown routes serve the styled 404 page with a link home and to posts', a
   );
 });
 
-test('analytics beacon is absent when CF_ANALYTICS_TOKEN is unset', async ({ page }) => {
+test('analytics beacon is absent when CLOUDFLARE_ANALYTICS_TOKEN is unset', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('script[src*="static.cloudflareinsights.com"]')).toHaveCount(0);
+});
+
+test('a 500 page is built and styled for future use', async ({ page }) => {
+  await page.goto('/500');
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('500');
+  await expect(page.getByRole('main').getByRole('link', { name: /home/i })).toHaveAttribute(
+    'href',
+    '/',
+  );
 });
