@@ -1,4 +1,5 @@
 ---
+import { CLOUDFLARE_ANALYTICS_TOKEN } from 'astro:env/client';
 import { AUTHOR } from '../lib/seo';
 
 interface Props {
@@ -47,6 +48,16 @@ const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageUrl} />
     {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+    {
+      CLOUDFLARE_ANALYTICS_TOKEN && (
+        <script
+          is:inline
+          defer
+          src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon={JSON.stringify({ token: CLOUDFLARE_ANALYTICS_TOKEN })}
+        />
+      )
+    }
   </head>
   <body>
     <header>
@@ -276,6 +287,17 @@ const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
 
   .badge-warning {
     color: var(--warn);
+  }
+
+  /* Error-page illustrations keep their own gray plate — framed like a card
+     so the fixed background reads as intentional in both themes. */
+  .error-illustration {
+    display: block;
+    margin: 2.5rem auto;
+    border-radius: 12px;
+    border: 1px solid var(--hairline);
+    max-width: 100%;
+    height: auto;
   }
 
   .section-heading {

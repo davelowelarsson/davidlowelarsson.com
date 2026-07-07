@@ -1,0 +1,19 @@
+---
+import { Image } from 'astro:assets';
+import notFound from '../assets/error-404.png';
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="404 — David Lowe Larsson" description="Page not found.">
+  <p class="post-meta"><span class="badge badge-warning">404</span> <span>not found</span></p>
+  <h1>404 — nothing at this address</h1>
+  <p>The page you're after moved, never existed, or the link is just wrong.</p>
+  <Image
+    src={notFound}
+    alt="Pixel-art David looking puzzled next to a broken chain link and the text 404 not found"
+    width={340}
+    densities={[1, 2]}
+    class="error-illustration"
+  />
+  <p class="all-posts"><a href="/">← Home</a> · <a href="/posts/">Posts →</a></p>
+</Base>

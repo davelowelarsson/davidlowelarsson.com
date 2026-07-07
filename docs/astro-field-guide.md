@@ -79,3 +79,27 @@ how the project actually grew.
 - **Layout props as the SEO surface**: Base.astro takes ogType/ogImage/
   publishedTime/jsonLd so each page declares its own semantics — pages stay
   dumb, the layout owns the head.
+
+## Site hygiene (2026-07-07, issue #12)
+
+- **`src/pages/404.astro` is the whole convention**: Astro builds it to
+  `dist/404.html` automatically, no routing config needed. Workers static
+  assets needs one extra nudge — `assets.not_found_handling: "404-page"` in
+  `wrangler.jsonc` — to serve that file (with a real 404 status) for any
+  unmatched request instead of a generic platform error.
+  Docs: https://docs.astro.build/en/basics/astro-components/#page-templates
+- **`public/_headers`**: Cloudflare Workers static assets reads this file
+  natively and applies the rules at the edge on every request — it is
+  invisible to `astro dev`/`astro preview`, so header behavior can only be
+  verified against a deployed URL (e.g. securityheaders.com). Kept the CSP
+  honest against what the site actually ships: `'unsafe-inline'` for
+  `style-src` (Astro's scoped `<style>` tags) and `script-src` (inline
+  JSON-LD), plus an explicit allowance for the Cloudflare Web Analytics
+  beacon host.
+- **Optional client env vars**: `envField.string({ context: 'client',
+  access: 'public', optional: true })` in `astro.config.mjs` gives a var
+  that's `undefined` when unset, importable from `astro:env/client` inside
+  a component's frontmatter. `CLOUDFLARE_ANALYTICS_TOKEN` uses this so the beacon
+  `<script>` in Base.astro is skipped entirely (not just empty) in local
+  dev and CI, where the token is never configured.
+  Docs: https://docs.astro.build/en/guides/environment-variables/
