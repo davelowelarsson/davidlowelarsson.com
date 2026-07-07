@@ -140,3 +140,4 @@ that would otherwise vanish on a dark page.
 - `docs/adr/` — architecture decisions (Workers over Pages, static-with-SSR-hatch, category-as-data, self-renewing publishing loop)
 - `docs/astro-field-guide.md` — running ledger of Astro concepts, PR by PR
 - `docs/publishing-routine.md` — the editorial cadence: cycles, the self-renewing issue loop, vault mining
+- `.github/paths-filter.yml` — which changes count as "affects the built site"; docs-only changes skip build/test/deploy
