@@ -1,5 +1,6 @@
 <svg viewBox="0 0 400 220" xmlns="http://www.w3.org/2000/svg">
   <title>A single solid grounded shape surrounded by faded, drifting shapes</title>
+  <style>svg { color: #3f3f46; } @media (prefers-color-scheme: dark) { svg { color: #d4d4d8; } }</style>
   <g opacity="0.25" fill="currentColor">
     <rect x="280" y="40" width="26" height="26" rx="6" transform="rotate(12 293 53)" />
     <circle cx="330" cy="110" r="14" />

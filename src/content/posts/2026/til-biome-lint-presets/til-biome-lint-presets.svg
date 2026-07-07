@@ -1,5 +1,6 @@
 <svg viewBox="0 0 400 220" xmlns="http://www.w3.org/2000/svg">
   <title>Stacked translucent bars representing a lint rule preset</title>
+  <style>svg { color: #3f3f46; } @media (prefers-color-scheme: dark) { svg { color: #d4d4d8; } }</style>
   <defs>
     <linearGradient id="g4" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" stop-color="#2fbf71" stop-opacity="0.55" />

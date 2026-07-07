@@ -1,5 +1,6 @@
 <svg viewBox="0 0 400 220" xmlns="http://www.w3.org/2000/svg">
   <title>A beam of light sweeping across a dark field, illuminating a small area</title>
+  <style>svg { color: #3f3f46; } @media (prefers-color-scheme: dark) { svg { color: #d4d4d8; } }</style>
   <defs>
     <radialGradient id="g5" cx="35%" cy="45%" r="55%">
       <stop offset="0%" stop-color="#ffd166" stop-opacity="0.6" />
