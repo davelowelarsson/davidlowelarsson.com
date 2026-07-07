@@ -23,7 +23,7 @@ export async function GET(context: APIContext) {
   return rss({
     title: 'David Lowe Larsson',
     description:
-      'Notes and essays on technical leadership, DORA metrics, platform engineering, and the occasional experiment.',
+      'Notes, Essays, TILs, and home-lab experiments from David Lowe Larsson — platform engineering, flow, and roots in 3D art.',
     site,
     xmlns: { media: 'http://search.yahoo.com/mrss/' },
     items: toFeedItems(posts, SHOW_DRAFTS, site, imageManifest),

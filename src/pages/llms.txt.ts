@@ -13,9 +13,9 @@ export async function GET(context: APIContext) {
   const lines = [
     `# ${AUTHOR.name}`,
     '',
-    '> Personal site: engineering leadership, DORA metrics, platform engineering,',
-    '> and creative roots in 3D digital art. Posts are categorized as essay, til',
-    '> (Today I Learned), or experiment.',
+    '> The notebook, not the résumé: essays, TILs, and home-lab experiments from',
+    '> a platform engineer with roots in visual effects, 3D, and digital art.',
+    '> Posts are categorized as essay, til (Today I Learned), or experiment.',
     '',
     '## Posts',
     '',

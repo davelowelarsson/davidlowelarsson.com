@@ -197,3 +197,13 @@ how the project actually grew.
   `mermaid.initialize()` *before* rendering
   (`matchMedia('(prefers-color-scheme: dark)').matches`), not styling the
   output after the fact.
+
+## Whitespace collapse at tag boundaries (2026-07-07, PR #31)
+
+- **Astro strips the newline between text and an inline element boundary**:
+  `I write\n<a>essays</a>` renders as "writeessays", and `</a>\ncaptured`
+  renders as "notescaptured". Prose with inline links must keep each anchor
+  fully mid-line (line breaks only between plain words). An e2e test asserts
+  the rendered spacing on the landing page so copy edits can't silently
+  reintroduce it. This differs from plain HTML, where such newlines collapse
+  to a single space.
