@@ -207,3 +207,25 @@ how the project actually grew.
   the rendered spacing on the landing page so copy edits can't silently
   reintroduce it. This differs from plain HTML, where such newlines collapse
   to a single space.
+
+## Flash-free text swap: inline `define:vars` script (2026-07-07)
+
+- **Bundled vs inline decides *when* a script runs.** A bare `<script>` is
+  processed/bundled by Astro into a **deferred module** — it runs *after* first
+  paint, which makes a client-side text swap visibly flash (canonical → random).
+  A `<script define:vars={{…}}>` is rendered **inline** (`define:vars` implies
+  `is:inline`): a classic, parser-blocking script. Placed immediately after the
+  target element, it executes *before the browser paints that element*, so the
+  swap is invisible — the same anti-FOUC trick theme-toggle scripts use.
+- **`define:vars` passes server data into an inline script** (JSON-serializable
+  only), so `BYLINES` stays the single source of truth in `src/lib/bylines.ts`
+  rather than being hand-copied into the markup. Only the trivial index math is
+  inlined; the pure `pickByline` + its Vitest coverage remain the spec.
+- **Progressive enhancement holds**: the canonical `BYLINES[0]` is
+  server-rendered, so crawlers and no-JS visitors get real content; randomness
+  lives in the browser because a static build is frozen per deploy — "different
+  on each reload" can only be a client concern.
+- **Cost**: an inline `define:vars` script is duplicated per component instance
+  and is not bundled/minified — fine for a one-per-page tagline, not for a
+  widely-reused component. Doc:
+  https://docs.astro.build/en/reference/directives-reference/#definevars

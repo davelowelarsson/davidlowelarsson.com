@@ -1,9 +1,13 @@
 import { expect, test } from '@playwright/test';
+import { BYLINES } from '../src/lib/bylines';
 
 test('landing page presents David and navigates to posts', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { level: 1 })).toContainText('David Lowe Larsson');
-  await expect(page.locator('.tagline')).toContainText('a notebook about how software gets made');
+  // The tagline rotates on each load; assert it is one of the known bylines
+  // rather than a fixed string. Rotation mechanics: e2e/byline-rotation.spec.ts.
+  const tagline = (await page.locator('.tagline').textContent())?.trim() ?? '';
+  expect(BYLINES).toContain(tagline);
 
   await page.getByRole('link', { name: 'Posts', exact: true }).click();
   await expect(page).toHaveURL(/\/posts\/$/);
