@@ -73,6 +73,37 @@ test('sitemap carries per-post lastmod and robots.txt points at it', async ({ re
   expect(robots).toContain('Sitemap: https://davidlowelarsson.com/sitemap-index.xml');
 });
 
+test('pages carry OpenGraph metadata and structured data', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
+    'content',
+    'https://davidlowelarsson.com/og-default.png',
+  );
+  const person = JSON.parse(
+    (await page.locator('script[type="application/ld+json"]').textContent()) ?? '{}',
+  );
+  expect(person['@type']).toBe('Person');
+
+  await page.goto('/posts/essay-dora-metrics-flashlight/');
+  await expect(page.locator('meta[property="og:type"]')).toHaveAttribute('content', 'article');
+  await expect(page.locator('meta[property="article:published_time"]')).toHaveCount(1);
+  const posting = JSON.parse(
+    (await page.locator('script[type="application/ld+json"]').textContent()) ?? '{}',
+  );
+  expect(posting['@type']).toBe('BlogPosting');
+  expect(posting.url).toBe('https://davidlowelarsson.com/posts/essay-dora-metrics-flashlight/');
+});
+
+test('llms.txt lists published posts for AI crawlers', async ({ request }) => {
+  const response = await request.get('/llms.txt');
+  expect(response.status()).toBe(200);
+
+  const text = await response.text();
+  expect(text).toContain('# David Lowe Larsson');
+  expect(text).toContain('DORA metrics are a flashlight');
+  expect(text).not.toContain('Hello, world (again)');
+});
+
 test('every page declares its canonical URL on the apex domain', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
