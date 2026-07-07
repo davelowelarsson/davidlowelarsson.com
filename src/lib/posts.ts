@@ -45,3 +45,21 @@ export function isVisible(data: PostVisibility, showDrafts: boolean): boolean {
 export function sortByPubDateDesc<T extends Dated>(posts: T[]): T[] {
   return [...posts].sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 }
+
+/**
+ * Year buckets for archive listings — the year divider is what tells a reader
+ * that a 2013 study is a 2013 study. Newest year first, newest post first.
+ */
+export function groupByYear<T extends Dated>(posts: T[]): Array<{ year: number; posts: T[] }> {
+  const groups = new Map<number, T[]>();
+  for (const post of sortByPubDateDesc(posts)) {
+    const year = post.data.pubDate.getFullYear();
+    const bucket = groups.get(year);
+    if (bucket) {
+      bucket.push(post);
+    } else {
+      groups.set(year, [post]);
+    }
+  }
+  return [...groups.entries()].map(([year, grouped]) => ({ year, posts: grouped }));
+}
