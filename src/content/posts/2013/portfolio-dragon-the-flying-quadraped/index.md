@@ -1,13 +1,17 @@
 ---
 title: "Dragon – the flying quadraped"
 description: "Portfolio page for the finished dragon model and animation — a companion piece to the journal write-up of the same project."
-pubDate: 2013-06-01
+pubDate: 2013-07-07
 category: experiment
 draft: true
 tags: ["archive", "3d", "portfolio", "rigging", "animation", "dragon"]
+cover: ./feature.png
+coverAlt: Dragon portfolio feature render
 ---
 
-> Recovered from the [Wayback Machine](https://web.archive.org/web/20160803042330id_/http://davidlowelarsson.com/portfolio/dragon-the-flying-quadraped/) — originally published circa Jun 2013 on the old WordPress site (the portfolio page itself carries no publish date; this is approximated from the asset upload date). Lightly reformatted; images preserved.
+> Recovered from the [Wayback Machine](https://web.archive.org/web/20160803042330id_/http://davidlowelarsson.com/portfolio/dragon-the-flying-quadraped/) — the portfolio page itself carries no publish date; dated to its journal counterpart (07 Jul 2013) on the old WordPress site. Lightly reformatted; images preserved.
+
+![Dragon portfolio feature render](./feature.png)
 
 **Project Name:** Dragon
 **What I did:** Everything

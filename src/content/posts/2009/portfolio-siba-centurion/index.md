@@ -1,13 +1,15 @@
 ---
 title: "Siba Centurion"
 description: "Modeling work during an internship at Bobby, including tracking down a stubborn reversed-normal bug."
-pubDate: 2009-09-01
+pubDate: 2009-09-08
 category: experiment
 draft: true
 tags: ["archive", "3d", "portfolio", "modeling"]
 ---
 
-> Recovered from the [Wayback Machine](https://web.archive.org/web/20131217211436id_/http://davidlowelarsson.com/portfolio/siba-centurion/) — originally published circa Sep 2009 on the old WordPress site (the portfolio page itself carries no publish date; this is approximated from the asset upload date). Lightly reformatted; images preserved.
+> Recovered from the [Wayback Machine](https://web.archive.org/web/20131217211436id_/http://davidlowelarsson.com/portfolio/siba-centurion/) — the portfolio page itself carries no publish date; dated to its journal counterpart (08 Sep 2009) on the old WordPress site. Lightly reformatted; images preserved.
+
+![Centurion render](./feature.png)
 
 ## Whats a Centurion?
 

@@ -1,13 +1,15 @@
 ---
 title: "Jet Explosion"
 description: "A school project experimenting with Maya fluids and particles to simulate a jet engine explosion."
-pubDate: 2009-08-01
+pubDate: 2009-08-02
 category: experiment
 draft: true
 tags: ["archive", "3d", "portfolio", "dynamics", "explosion"]
 ---
 
-> Recovered from the [Wayback Machine](https://web.archive.org/web/20131217213124id_/http://davidlowelarsson.com/portfolio/jet-explosion/) — originally published circa Aug 2009 on the old WordPress site (the portfolio page itself carries no publish date; this is approximated from the asset upload date). Lightly reformatted; images preserved.
+> Recovered from the [Wayback Machine](https://web.archive.org/web/20131217213124id_/http://davidlowelarsson.com/portfolio/jet-explosion/) — the portfolio page itself carries no publish date; dated to its journal counterpart (02 Aug 2009) on the old WordPress site. Lightly reformatted; images preserved.
+
+![Jet explosion render](./feature.png)
 
 **Project Name:** Jet Explosion
 **Software used:** Maya, After Effects, Photoshop

@@ -1,13 +1,15 @@
 ---
 title: "fitNclean"
 description: "Portfolio page for the Fit n' Clean bottle designs and animation — a companion piece to the journal write-up of the same project."
-pubDate: 2013-04-01
+pubDate: 2013-04-15
 category: experiment
 draft: true
 tags: ["archive", "3d", "portfolio", "product-visualization"]
 ---
 
-> Recovered from the [Wayback Machine](https://web.archive.org/web/20160803004553id_/http://davidlowelarsson.com/portfolio/fitnclean/) — originally published circa Apr 2013 on the old WordPress site (the portfolio page itself carries no publish date; this is approximated from the asset upload date). Lightly reformatted; images preserved.
+> Recovered from the [Wayback Machine](https://web.archive.org/web/20160803004553id_/http://davidlowelarsson.com/portfolio/fitnclean/) — the portfolio page itself carries no publish date; dated to its journal counterpart (15 Apr 2013) on the old WordPress site. Lightly reformatted; images preserved.
+
+![Fit N Clean feature banner](./feature.png)
 
 **Project Name:** Fit N Clean
 **What I did:** Everything

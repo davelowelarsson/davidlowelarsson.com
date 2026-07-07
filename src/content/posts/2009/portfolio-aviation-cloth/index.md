@@ -1,13 +1,17 @@
 ---
 title: "Aviation cloth"
 description: "Sculpting fine cloth detail on a plane covering during an internship at Bobby, for large-format print stills."
-pubDate: 2009-09-01
+pubDate: 2009-09-08
 category: experiment
 draft: true
 tags: ["archive", "3d", "portfolio", "sculpting", "mudbox"]
+cover: ./cloth-detail.jpg
+coverAlt: High-resolution render of the cloth-covered plane
 ---
 
-> Recovered from the [Wayback Machine](https://web.archive.org/web/20160818073927id_/http://davidlowelarsson.com/portfolio/aviation-cloth/) — originally published circa Sep 2009 on the old WordPress site (the portfolio page itself carries no publish date; this is approximated from the asset upload date). Lightly reformatted; images preserved.
+> Recovered from the [Wayback Machine](https://web.archive.org/web/20160818073927id_/http://davidlowelarsson.com/portfolio/aviation-cloth/) — the portfolio page itself carries no publish date; dated to its journal counterpart (08 Sep 2009) on the old WordPress site. Lightly reformatted; images preserved.
+
+![High-resolution render of the cloth-covered plane](./cloth-detail.jpg)
 
 **Project Name:** Malmö Aviation
 **Software used:** Maya, Mudbox

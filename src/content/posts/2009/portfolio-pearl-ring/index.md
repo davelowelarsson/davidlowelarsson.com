@@ -1,13 +1,15 @@
 ---
 title: "Pearl Ring"
 description: "A school project rendering a pearl ring, printed on canvas and given as a birthday present."
-pubDate: 2009-06-01
+pubDate: 2009-09-08
 category: experiment
 draft: true
 tags: ["archive", "3d", "portfolio", "shading", "maya"]
 ---
 
-> Recovered from the [Wayback Machine](https://web.archive.org/web/20160817225329id_/http://davidlowelarsson.com/portfolio/pearl-ring/) — originally published circa Jun 2009 on the old WordPress site (the portfolio page itself carries no publish date; this is approximated from the asset upload date). Lightly reformatted; images preserved.
+> Recovered from the [Wayback Machine](https://web.archive.org/web/20160817225329id_/http://davidlowelarsson.com/portfolio/pearl-ring/) — the portfolio page itself carries no publish date; dated to its journal counterpart (08 Sep 2009) on the old WordPress site. Lightly reformatted; images preserved.
+
+![Pearl ring project banner](./feature.png)
 
 **Project Name:** Pearl Ring
 **Software used:** Maya, Photoshop

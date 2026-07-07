@@ -1,13 +1,15 @@
 ---
 title: "Retrospelsmässan 8-bit FTW"
 description: "A free trailer made for a friend's growing annual retro-games conference."
-pubDate: 2011-03-01
+pubDate: 2011-03-23
 category: experiment
 draft: true
 tags: ["archive", "3d", "portfolio", "animation", "showreel"]
 ---
 
-> Recovered from the [Wayback Machine](https://web.archive.org/web/20160802224839id_/http://davidlowelarsson.com/portfolio/retrospelsmassan-8-bit-ftw/) — originally published circa Mar 2011 on the old WordPress site (the portfolio page itself carries no publish date; this is approximated from the asset upload date). Lightly reformatted; images preserved.
+> Recovered from the [Wayback Machine](https://web.archive.org/web/20160802224839id_/http://davidlowelarsson.com/portfolio/retrospelsmassan-8-bit-ftw/) — the portfolio page itself carries no publish date; dated to its journal counterpart (23 Mar 2011) on the old WordPress site. Lightly reformatted; images preserved.
+
+![Retrospelsmässan 2011 feature banner](./feature.png)
 
 **Project Name:** Retrospelsmässan 8-bit
 **What I did:** Everything
