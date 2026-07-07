@@ -34,6 +34,13 @@ needs to accept unsolicited inbound traffic at all.
 4. `cloudflared` proxies it to the right internal service by hostname and port, entirely on the
    LAN side.
 
+```mermaid
+flowchart LR
+    client[Client request] --> edge[Cloudflare edge]
+    edge --> tunnel[cloudflared tunnel]
+    tunnel --> service[Internal service]
+```
+
 ## What this buys me
 
 - One exposed surface (the tunnel daemon's outbound connection) instead of N forwarded ports

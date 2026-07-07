@@ -1,0 +1,57 @@
+---
+// Client-side, lazy, theme-aware Mermaid rendering (issue #6). Sätteri
+// (Astro 7's native markdown processor) doesn't run remark/rehype plugins,
+// so a mermaid block just passes through as plain text — astro.config.mjs's
+// `markdown.syntaxHighlight.excludeLangs: ['mermaid']` stops Shiki from
+// mangling it into highlighted spans, leaving a clean
+// `pre > code.language-mermaid` for this script to find.
+//
+// Rejected: `rehype-mermaid` (SSR) would force the whole pipeline back onto
+// unified/@astrojs/markdown-remark just for this one diagram type, plus a
+// Playwright dependency in the build. Not worth it unless client JS becomes
+// a real problem (see issue #6).
+//
+// The `import('mermaid')` below is a real ES module specifier, so Vite
+// bundles it into a local chunk under `/_astro/` at build time — the CSP
+// (`script-src 'self'`) is satisfied without a CDN allowance, and pages
+// with no mermaid block never fetch that chunk at all (the early return
+// below happens before the import is ever reached).
+---
+
+<script>
+  async function renderMermaid() {
+    const blocks = document.querySelectorAll<HTMLElement>('pre > code.language-mermaid');
+    if (blocks.length === 0) return;
+
+    const { default: mermaid } = await import('mermaid');
+    const theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'neutral';
+    mermaid.initialize({ startOnLoad: false, theme });
+
+    let i = 0;
+    for (const block of blocks) {
+      const pre = block.parentElement;
+      if (!pre) continue;
+      const { svg, bindFunctions } = await mermaid.render(`mermaid-${i++}`, block.textContent ?? '');
+      const figure = document.createElement('div');
+      figure.className = 'mermaid-diagram';
+      figure.innerHTML = svg;
+      pre.replaceWith(figure);
+      bindFunctions?.(figure);
+    }
+  }
+
+  renderMermaid();
+</script>
+
+<style is:global>
+  .mermaid-diagram {
+    margin: 2rem 0;
+    overflow-x: auto;
+  }
+
+  .mermaid-diagram svg {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+  }
+</style>
