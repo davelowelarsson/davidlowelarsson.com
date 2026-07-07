@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import { SHOW_DRAFTS } from 'astro:env/server';
 import PostList from '../components/PostList.astro';
 import Base from '../layouts/Base.astro';
+import { BYLINES } from '../lib/bylines';
 import { isVisible, sortByPubDateDesc } from '../lib/posts';
 import { profilePageJsonLd } from '../lib/seo';
 
@@ -15,7 +16,21 @@ const site = Astro.site?.href ?? 'https://davidlowelarsson.com';
 
 <Base title="David Lowe Larsson" jsonLd={profilePageJsonLd(site)}>
   <h1>David Lowe Larsson</h1>
-  <p class="tagline">a notebook about how software gets made</p>
+  <p class="tagline" id="tagline">{BYLINES[0]}</p>
+  {/*
+    No-flash contract — do not move or "clean up" this script.
+    Inline + parser-blocking (define:vars implies is:inline), placed RIGHT AFTER
+    the element, so it runs before the browser paints the tagline: the random
+    byline is chosen pre-paint, no flash. No JS → the server-rendered canonical
+    byline (bylines[0]) simply stays.
+    If this is ever bundled (bare <script>), moved away from the element, or the
+    site adopts <ClientRouter/>, the flash returns / rotation breaks. The guard
+    is e2e/byline-rotation.spec.ts; the reasoning is in docs/astro-field-guide.md.
+  */}
+  <script define:vars={{ bylines: BYLINES }}>
+    const el = document.getElementById('tagline');
+    if (el) el.textContent = bylines[Math.floor(Math.random() * bylines.length)];
+  </script>
   <p>
     I write <a href="/category/essay/">essays</a> — sometimes about how things were fifteen years ago,
     sometimes about where I think they're going — <a href="/category/til/">quick notes</a> captured the
