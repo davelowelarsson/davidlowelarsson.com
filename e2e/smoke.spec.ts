@@ -22,3 +22,17 @@ test('drafts are hidden when SHOW_DRAFTS is off (production behavior)', async ({
   await page.goto('/posts/');
   await expect(page.getByText('Hello, world (again)')).toHaveCount(0);
 });
+
+test('every page declares its canonical URL on the apex domain', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://davidlowelarsson.com/',
+  );
+
+  await page.goto('/posts/');
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://davidlowelarsson.com/posts/',
+  );
+});
