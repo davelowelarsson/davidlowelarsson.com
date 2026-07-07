@@ -54,13 +54,16 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: versions upload
+          # --preview-alias gives a STABLE per-PR URL (pr-N-...) that always
+          # points at the branch's newest version — open tabs never go stale.
+          command: versions upload --preview-alias pr-${{ github.event.pull_request.number }}
       - name: Comment preview URL on PR
         if: env.HAS_CLOUDFLARE_TOKEN == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           DEPLOYMENT_URL: ${{ steps.upload.outputs.deployment-url }}
           CMD_OUTPUT: ${{ steps.upload.outputs.command-output }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           URL="$DEPLOYMENT_URL"
           if [ -z "$URL" ]; then
@@ -70,10 +73,13 @@ jobs:
             echo "::warning::No preview URL found in wrangler output"
             exit 0
           fi
-          BODY="🔍 **Preview deployment** (drafts visible): $URL
+          # Stable alias URL: swap the per-version hash prefix for pr-N.
+          STABLE=$(printf '%s' "$URL" | sed -E "s|https://[a-z0-9]+-|https://pr-${PR_NUMBER}-|")
+          BODY="🔍 **Preview**: $STABLE
+          _Always shows the latest push on this PR — safe to keep open._
 
-          Built from \`${{ github.event.pull_request.head.sha }}\`. This comment is updated on every push."
-          gh pr comment "${{ github.event.pull_request.number }}" \
+          This exact commit (\`${{ github.event.pull_request.head.sha }}\`): $URL"
+          gh pr comment "$PR_NUMBER" \
             --repo "${{ github.repository }}" \
             --edit-last --create-if-none \
             --body "$BODY"
