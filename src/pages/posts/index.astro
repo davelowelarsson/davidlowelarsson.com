@@ -22,5 +22,11 @@ const site = Astro.site?.href ?? 'https://davidlowelarsson.com';
     <span aria-current="true">all</span>
     {CATEGORIES.map((category) => <a href={`/category/${category}/`}>{category}</a>)}
   </nav>
-  <PostList posts={posts} />
+  {
+    posts.length > 0 ? (
+      <PostList posts={posts} />
+    ) : (
+      <p>Nothing published yet — the first posts are still drafts.</p>
+    )
+  }
 </Base>

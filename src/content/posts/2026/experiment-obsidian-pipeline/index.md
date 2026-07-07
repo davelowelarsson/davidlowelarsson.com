@@ -3,7 +3,7 @@ title: "Publishing from Obsidian, demonstrated by this post"
 description: "The frontmatter contract is the interface: how a draft in my Obsidian vault becomes a post here, and how an Excalidraw sketch survives the trip as a plain SVG."
 pubDate: 2026-07-07
 category: experiment
-draft: false
+draft: true
 tags: ["obsidian", "workflow", "excalidraw", "publishing"]
 ---
 

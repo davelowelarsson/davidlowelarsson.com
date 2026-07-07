@@ -3,7 +3,7 @@ title: "TIL: Astro 7 moved zod to astro/zod"
 description: "Content collection schemas import zod from astro/zod now, not the zod package directly — and mixing them breaks type inference."
 pubDate: 2026-04-02
 category: til
-draft: false
+draft: true
 tags: ["astro", "zod", "typescript", "content-collections"]
 ---
 

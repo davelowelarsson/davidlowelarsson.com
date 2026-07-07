@@ -3,7 +3,7 @@ title: "Home lab topology"
 description: "No exposed ports on my home network — everything routes out through a Cloudflare Tunnel, and inbound traffic never touches my router's port forwarding table."
 pubDate: 2026-04-20
 category: experiment
-draft: false
+draft: true
 tags: ["homelab", "cloudflare", "networking", "self-hosting"]
 cover: ./experiment-home-lab-topology.svg
 coverAlt: Home lab topology diagram

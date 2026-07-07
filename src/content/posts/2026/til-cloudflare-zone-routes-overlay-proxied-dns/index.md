@@ -3,7 +3,7 @@ title: "TIL: Cloudflare zone routes overlay proxied DNS records"
 description: "A Worker route and a proxied DNS record can both claim the same hostname — and Cloudflare picks the route, silently."
 pubDate: 2026-03-04
 category: til
-draft: false
+draft: true
 tags: ["cloudflare", "dns", "workers", "networking"]
 ---
 

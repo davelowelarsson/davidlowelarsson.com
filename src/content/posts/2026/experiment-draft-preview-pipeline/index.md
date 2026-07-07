@@ -3,7 +3,7 @@ title: "The draft preview pipeline behind this site"
 description: "How a branch push becomes a preview URL, and how main becomes production, using Cloudflare Workers and a SHOW_DRAFTS flag instead of a second content repo."
 pubDate: 2026-03-18
 category: experiment
-draft: false
+draft: true
 tags: ["cloudflare", "ci", "astro", "workers"]
 ---
 

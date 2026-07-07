@@ -8,10 +8,12 @@ export default defineConfig({
   webServer: {
     command: 'npm run build && npm run preview',
     url: 'http://localhost:4321',
-    // Never reuse a running server: e2e asserts production behavior and must
-    // build fresh with drafts off, regardless of local .env or leftover servers.
+    // Never reuse a running server (leftover servers serve stale builds).
+    // e2e runs against the DRAFTS-VISIBLE build so content-dependent tests
+    // keep working while everything is in draft; the drafts-never-publish
+    // guarantee lives in src/lib/production-build.test.ts instead.
     reuseExistingServer: false,
     timeout: 120_000,
-    env: { SHOW_DRAFTS: 'false' },
+    env: { SHOW_DRAFTS: 'true' },
   },
 });
