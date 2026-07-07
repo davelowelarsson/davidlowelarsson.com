@@ -239,6 +239,14 @@ const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
 
   /* ── The meta rail (signature element) ── */
 
+  .tagline {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    letter-spacing: 0.03em;
+    color: var(--muted);
+    margin: -0.25rem 0 2rem;
+  }
+
   .post-meta {
     display: flex;
     align-items: baseline;

@@ -3,10 +3,23 @@ import { expect, test } from '@playwright/test';
 test('landing page presents David and navigates to posts', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { level: 1 })).toContainText('David Lowe Larsson');
+  await expect(page.locator('.tagline')).toContainText('a notebook about how software gets made');
 
   await page.getByRole('link', { name: 'Posts', exact: true }).click();
   await expect(page).toHaveURL(/\/posts\/$/);
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Posts');
+});
+
+test('inline links keep their surrounding spaces (Astro collapses newlines at tag boundaries)', async ({
+  page,
+}) => {
+  await page.goto('/');
+  const intro = (await page.locator('main p').nth(1).textContent()) ?? '';
+  expect(intro).toContain('I write essays');
+  expect(intro).toContain('quick notes captured');
+  expect(intro).toContain('and experiments from');
+  const outro = (await page.locator('main > p').last().textContent()) ?? '';
+  expect(outro).toContain('lives on LinkedIn');
 });
 
 test('landing page surfaces recent writing', async ({ page }) => {
