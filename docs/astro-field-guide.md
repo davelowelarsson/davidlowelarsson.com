@@ -54,3 +54,15 @@ how the project actually grew.
 - **SVG intrinsic size**: an SVG with only a `viewBox` has no intrinsic
   dimensions in an `<img>` — the browser can't reserve space and the layout
   shifts. Explicit `width`/`height` on the SVG root fixes it.
+
+## RSS + sitemap (2026-07-07, issue #5)
+
+- **Static endpoints**: any `src/pages/*.ts` exporting `GET` becomes a file at
+  build time — `rss.xml.ts` renders once into `dist/rss.xml`, no server.
+  Docs: https://docs.astro.build/en/guides/endpoints/
+- **`@astrojs/rss`** takes `{ title, description, site, items }`; items come
+  from `getCollection()` mapped through our pure `toFeedItems()` (same
+  `isVisible` filter as pages — one draft gate for everything).
+- **`@astrojs/sitemap`** is config-only: it walks the *built* pages, so drafts
+  are excluded in production automatically. Served at `/sitemap-index.xml`,
+  pointed to by `public/robots.txt`.
