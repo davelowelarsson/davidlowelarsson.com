@@ -20,7 +20,9 @@ const { Content } = await render(post);
       <time datetime={post.data.pubDate.toISOString()}>
         {post.data.pubDate.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' })}
       </time>
-      <span class="badge">{post.data.category}</span>
+      <a class={`badge badge-${post.data.category}`} href={`/category/${post.data.category}/`}>
+        {post.data.category}
+      </a>
       {post.data.draft && <span class="badge badge-warning">draft</span>}
     </p>
     <Content />

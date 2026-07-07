@@ -1,0 +1,37 @@
+---
+import { getCollection } from 'astro:content';
+import { SHOW_DRAFTS } from 'astro:env/server';
+import PostList from '../../components/PostList.astro';
+import Base from '../../layouts/Base.astro';
+import {
+  CATEGORIES,
+  CATEGORY_DESCRIPTIONS,
+  type Category,
+  filterByCategory,
+  isVisible,
+  sortByPubDateDesc,
+} from '../../lib/posts';
+
+export function getStaticPaths() {
+  return CATEGORIES.map((category) => ({ params: { category } }));
+}
+
+const category = Astro.params.category as Category;
+
+const posts = sortByPubDateDesc(
+  filterByCategory(
+    await getCollection('posts', ({ data }) => isVisible(data, SHOW_DRAFTS)),
+    category,
+  ),
+);
+---
+
+<Base
+  title={`${category} — David Lowe Larsson`}
+  description={CATEGORY_DESCRIPTIONS[category]}
+>
+  <h1>{category}</h1>
+  <p class="category-description">{CATEGORY_DESCRIPTIONS[category]}</p>
+  {posts.length > 0 ? <PostList posts={posts} /> : <p>Nothing here yet.</p>}
+  <p class="all-posts"><a href="/posts/">All posts →</a></p>
+</Base>

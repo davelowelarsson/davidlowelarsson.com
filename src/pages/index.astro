@@ -1,5 +1,13 @@
 ---
+import { getCollection } from 'astro:content';
+import { SHOW_DRAFTS } from 'astro:env/server';
+import PostList from '../components/PostList.astro';
 import Base from '../layouts/Base.astro';
+import { isVisible, sortByPubDateDesc } from '../lib/posts';
+
+const recent = sortByPubDateDesc(
+  await getCollection('posts', ({ data }) => isVisible(data, SHOW_DRAFTS)),
+).slice(0, 3);
 ---
 
 <Base title="David Lowe Larsson">
@@ -13,4 +21,10 @@ import Base from '../layouts/Base.astro';
     I write <a href="/posts/">notes and essays</a> here — thoughts on technical leadership,
     today-I-learned snippets, and the occasional experiment.
   </p>
+
+  <section aria-labelledby="recent-heading">
+    <h2 id="recent-heading" class="section-heading">Recent</h2>
+    <PostList posts={recent} />
+    <p class="all-posts"><a href="/posts/">All posts →</a></p>
+  </section>
 </Base>

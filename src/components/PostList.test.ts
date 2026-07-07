@@ -29,13 +29,14 @@ describe('PostList', () => {
     expect(html).toContain('href="/posts/second-note/"');
   });
 
-  it('shows the category of each post', async () => {
+  it('shows the category of each post with a category-specific class', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(PostList, {
       props: { posts: [entry('a-note', { category: 'essay' })] },
     });
 
     expect(html).toContain('essay');
+    expect(html).toContain('badge-essay');
   });
 
   it('marks drafts so previews are unmistakable', async () => {

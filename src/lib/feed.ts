@@ -26,25 +26,30 @@ export interface FeedItem {
   link: string;
   content: string;
   categories: string[];
+  customData?: string;
 }
 
 /**
  * Relative image paths (./diagram.svg) are rewritten to hashed URLs on the
  * page but do not exist as served files — in a feed they would be dead links,
- * so they are stripped. Absolute paths (like the processed cover) survive.
+ * so they are stripped. Absolute paths survive.
  */
-function renderContent(post: FeedSourcePost, site: string): string {
-  const body = sanitizeHtml(markdown.render(post.body ?? ''), {
+function renderContent(post: FeedSourcePost): string {
+  return sanitizeHtml(markdown.render(post.body ?? ''), {
     allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
     exclusiveFilter: (frame) =>
       frame.tag === 'img' && !/^(https?:)?\//.test(String(frame.attribs.src ?? '')),
   });
+}
 
-  const cover = post.data.cover
-    ? `<p><img src="${new URL(post.data.cover.src, site).href}" alt="${post.data.coverAlt ?? ''}" /></p>`
-    : '';
-
-  return cover + body;
+/**
+ * The cover travels as Media RSS metadata, NOT embedded in content — readers
+ * extract a featured image themselves, and an embedded copy shows up twice.
+ */
+function coverCustomData(post: FeedSourcePost, site: string): string | undefined {
+  if (!post.data.cover) return undefined;
+  const url = new URL(post.data.cover.src, site).href;
+  return `<media:content url="${url}" medium="image" />`;
 }
 
 export function toFeedItems(
@@ -58,8 +63,9 @@ export function toFeedItems(
       description: post.data.description,
       pubDate: post.data.pubDate,
       link: `/posts/${post.id}/`,
-      content: renderContent(post, site),
+      content: renderContent(post),
       categories: [post.data.category, ...post.data.tags],
+      customData: coverCustomData(post, site),
     }),
   );
 }

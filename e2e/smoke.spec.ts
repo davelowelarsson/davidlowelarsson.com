@@ -4,9 +4,38 @@ test('landing page presents David and navigates to posts', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { level: 1 })).toContainText('David Lowe Larsson');
 
-  await page.getByRole('link', { name: 'Posts' }).click();
+  await page.getByRole('link', { name: 'Posts', exact: true }).click();
   await expect(page).toHaveURL(/\/posts\/$/);
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Posts');
+});
+
+test('landing page surfaces recent writing', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByRole('heading', { name: 'Recent' })).toBeVisible();
+  await expect(page.locator('.post-list li')).toHaveCount(3);
+  await expect(page.getByRole('link', { name: 'All posts' })).toBeVisible();
+});
+
+test('category pages list only their category and explain the term', async ({ page }) => {
+  await page.goto('/category/til/');
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('til');
+  await expect(page.getByText('Today I Learned')).toBeVisible();
+  await expect(page.getByText('DORA metrics are a flashlight')).toHaveCount(0);
+
+  await page.goto('/category/essay/');
+  await expect(page.getByText('DORA metrics are a flashlight')).toBeVisible();
+});
+
+test('categories are reachable from the posts filter rail and from a post page', async ({
+  page,
+}) => {
+  await page.goto('/posts/');
+  await page.locator('.filter-rail').getByRole('link', { name: 'essay' }).click();
+  await expect(page).toHaveURL(/\/category\/essay\/$/);
+
+  await page.goto('/posts/essay-dora-metrics-flashlight/');
+  await page.locator('article').getByRole('link', { name: 'essay' }).click();
+  await expect(page).toHaveURL(/\/category\/essay\/$/);
 });
 
 test('footer links point at LinkedIn and GitHub', async ({ page }) => {

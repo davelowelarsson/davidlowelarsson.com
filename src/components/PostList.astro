@@ -49,7 +49,7 @@ const formatDate = (date: Date) =>
             {post.data.description && <span class="post-description">{post.data.description}</span>}
             <span class="post-meta">
               <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate)}</time>
-              <span class="badge">{post.data.category}</span>
+              <span class={`badge badge-${post.data.category}`}>{post.data.category}</span>
               {post.data.draft && <span class="badge badge-warning">draft</span>}
             </span>
           </span>

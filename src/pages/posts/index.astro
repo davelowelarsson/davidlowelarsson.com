@@ -3,7 +3,7 @@ import { getCollection } from 'astro:content';
 import { SHOW_DRAFTS } from 'astro:env/server';
 import PostList from '../../components/PostList.astro';
 import Base from '../../layouts/Base.astro';
-import { isVisible, sortByPubDateDesc } from '../../lib/posts';
+import { CATEGORIES, isVisible, sortByPubDateDesc } from '../../lib/posts';
 
 const posts = sortByPubDateDesc(
   await getCollection('posts', ({ data }) => isVisible(data, SHOW_DRAFTS)),
@@ -12,5 +12,9 @@ const posts = sortByPubDateDesc(
 
 <Base title="Posts — David Lowe Larsson">
   <h1>Posts</h1>
+  <nav class="filter-rail" aria-label="Filter by category">
+    <span aria-current="true">all</span>
+    {CATEGORIES.map((category) => <a href={`/category/${category}/`}>{category}</a>)}
+  </nav>
   <PostList posts={posts} />
 </Base>

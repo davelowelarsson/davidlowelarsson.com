@@ -55,12 +55,20 @@ describe('toFeedItems', () => {
     expect(item?.content).toContain('Before');
   });
 
-  it('embeds the cover image as an absolute URL when present', () => {
+  it('exposes the cover as media:content — never embedded in content (readers would show it twice)', () => {
     const cover = { src: '/_astro/cover.hash.png', width: 800, height: 500, format: 'png' };
     const [item] = toFeedItems([post('with-cover', { cover, coverAlt: 'A cover' })], false, SITE);
 
-    expect(item?.content).toContain(`src="${SITE}/_astro/cover.hash.png"`);
-    expect(item?.content).toContain('alt="A cover"');
+    expect(item?.content).not.toContain('<img');
+    expect(item?.customData).toContain(
+      `<media:content url="${SITE}/_astro/cover.hash.png" medium="image"`,
+    );
+  });
+
+  it('emits no media customData for posts without a cover', () => {
+    const [item] = toFeedItems([post('plain')], false, SITE);
+
+    expect(item?.customData).toBeUndefined();
   });
 
   it('never includes drafts when showDrafts is off (production feed)', () => {
