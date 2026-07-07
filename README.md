@@ -116,6 +116,13 @@ that would otherwise vanish on a dark page.
   and things nobody consented to being blogged about; copy-on-publish is a deliberate one-way step
   precisely so a bug in the sync path can't leak any of that.
 
+## License
+
+- **Code** (everything except `src/content/`): [MIT](./LICENSE) — build on it freely.
+- **Content** (`src/content/`, post images, and the writing on davidlowelarsson.com):
+  [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) —
+  share and adapt with attribution, non-commercial, same license.
+
 ## Where things are decided
 
 - `CONTEXT.md` — glossary (Post, Category, Draft, …)
