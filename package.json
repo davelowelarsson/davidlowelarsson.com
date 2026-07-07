@@ -21,13 +21,17 @@
   "dependencies": {
     "@astrojs/rss": "^4.0.19",
     "@astrojs/sitemap": "^3.7.3",
-    "astro": "^7.0.6"
+    "astro": "^7.0.6",
+    "markdown-it": "^14.3.0",
+    "sanitize-html": "^2.17.5"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
     "@biomejs/biome": "^2.5.2",
     "@playwright/test": "^1.61.1",
+    "@types/markdown-it": "^14.1.2",
     "@types/node": "^26.1.0",
+    "@types/sanitize-html": "^2.16.1",
     "typescript": "^6.0.3",
     "vitest": "^4.1.10",
     "wrangler": "^4.107.0"
