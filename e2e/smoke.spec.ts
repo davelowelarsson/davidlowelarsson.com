@@ -40,11 +40,12 @@ test('categories are reachable from the posts filter rail and from a post page',
 
 test('footer links point at LinkedIn and GitHub', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('link', { name: 'LinkedIn' })).toHaveAttribute(
+  const footer = page.locator('footer');
+  await expect(footer.getByRole('link', { name: 'LinkedIn' })).toHaveAttribute(
     'href',
     /linkedin\.com/,
   );
-  await expect(page.getByRole('link', { name: 'GitHub' })).toHaveAttribute('href', /github\.com/);
+  await expect(footer.getByRole('link', { name: 'GitHub' })).toHaveAttribute('href', /github\.com/);
 });
 
 test('drafts are hidden when SHOW_DRAFTS is off (production behavior)', async ({ page }) => {
