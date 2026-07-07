@@ -200,6 +200,42 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     letter-spacing: 0.05em;
   }
 
+  a.badge {
+    text-decoration: none;
+  }
+
+  a.badge:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .filter-rail {
+    display: flex;
+    gap: 1rem;
+    margin: 0.75rem 0 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    letter-spacing: 0.03em;
+  }
+
+  .filter-rail a {
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  .filter-rail a:hover {
+    color: var(--ink);
+  }
+
+  .filter-rail [aria-current] {
+    color: var(--ink);
+  }
+
+  .category-description {
+    color: var(--muted);
+    margin-top: -0.25rem;
+  }
+
   /* Quiet category tints — legible as monochrome, scannable as color */
   .badge-essay {
     color: light-dark(#4338ca, #a5b4fc);

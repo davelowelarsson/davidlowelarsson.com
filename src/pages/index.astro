@@ -7,7 +7,7 @@ import { isVisible, sortByPubDateDesc } from '../lib/posts';
 
 const recent = sortByPubDateDesc(
   await getCollection('posts', ({ data }) => isVisible(data, SHOW_DRAFTS)),
-).slice(0, 5);
+).slice(0, 3);
 ---
 
 <Base title="David Lowe Larsson">

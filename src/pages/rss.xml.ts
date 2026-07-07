@@ -13,6 +13,7 @@ export async function GET(context: APIContext) {
     description:
       'Notes and essays on technical leadership, DORA metrics, platform engineering, and the occasional experiment.',
     site,
+    xmlns: { media: 'http://search.yahoo.com/mrss/' },
     items: toFeedItems(posts, SHOW_DRAFTS, site),
     customData: '<language>en</language>',
   });

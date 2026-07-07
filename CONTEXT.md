@@ -8,10 +8,17 @@ collection as one markdown file with frontmatter. A Post's identity (its URL,
 
 ## Category
 
-A frontmatter attribute of a Post describing its kind: `essay` (polished,
-long-form), `til` (fast, unpolished today-I-learned note), or `experiment`
-(write-up of a hands-on experiment). Categories drive presentation and
-filtering, never identity. Default is `til` — the lowest-friction kind.
+A frontmatter attribute of a Post describing its kind. Categories drive
+presentation and filtering, never identity. Default is `til` — the
+lowest-friction kind. Each Category has a listing page (`/category/<name>/`)
+whose one-line description **teaches the term** — jargon is allowed in
+category names because the page that collects them explains them.
+
+- **essay** — longer, opinionated long-form (the personal-essay tradition:
+  Graham, Reilly), not "articles" (journalism) or "blog posts" (says nothing).
+- **til** — Today I Learned: a same-day, unpolished note. A genre term from
+  dev culture (Willison's TILs); kept because the audience is engineers.
+- **experiment** — a write-up from the lab, with measurements and honest notes.
 
 ## Draft
 

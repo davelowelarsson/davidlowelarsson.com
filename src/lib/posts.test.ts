@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { isVisible, postIdFromEntry, sortByPubDateDesc } from './posts';
+import {
+  CATEGORIES,
+  CATEGORY_DESCRIPTIONS,
+  filterByCategory,
+  isVisible,
+  postIdFromEntry,
+  sortByPubDateDesc,
+} from './posts';
 
 const post = (overrides: Partial<{ pubDate: Date; draft: boolean }> = {}) => ({
   data: {
@@ -21,6 +28,27 @@ describe('isVisible', () => {
 
   it('shows drafts in previews (showDrafts = true)', () => {
     expect(isVisible(post({ draft: true }).data, true)).toBe(true);
+  });
+});
+
+describe('filterByCategory', () => {
+  const til = { data: { category: 'til' as const } };
+  const essay = { data: { category: 'essay' as const } };
+
+  it('keeps only posts of the given category', () => {
+    expect(filterByCategory([til, essay, til], 'til')).toEqual([til, til]);
+  });
+
+  it('returns empty for a category with no posts', () => {
+    expect(filterByCategory([essay], 'experiment')).toEqual([]);
+  });
+});
+
+describe('CATEGORY_DESCRIPTIONS', () => {
+  it('has a description for every category — category pages teach the term', () => {
+    for (const category of CATEGORIES) {
+      expect(CATEGORY_DESCRIPTIONS[category], `missing description for ${category}`).toBeTruthy();
+    }
   });
 });
 

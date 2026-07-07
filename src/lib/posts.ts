@@ -2,6 +2,21 @@ export const CATEGORIES = ['essay', 'til', 'experiment'] as const;
 
 export type Category = (typeof CATEGORIES)[number];
 
+/** Shown on each category page — the page teaches the term. */
+export const CATEGORY_DESCRIPTIONS: Record<Category, string> = {
+  essay:
+    'Longer, opinionated pieces on engineering leadership, delivery, and how software gets made.',
+  til: 'Today I Learned — quick, unpolished notes captured while building. Written the same day, kept forever.',
+  experiment: 'Write-ups from the lab: trying things out, measuring, and keeping honest notes.',
+};
+
+export function filterByCategory<T extends { data: { category: Category } }>(
+  posts: T[],
+  category: Category,
+): T[] {
+  return posts.filter((post) => post.data.category === category);
+}
+
 export interface PostVisibility {
   draft: boolean;
 }
