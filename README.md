@@ -21,6 +21,13 @@ Individually: `npm run lint`, `npm run typecheck`, `npm test`, `npm run e2e`.
 
 ## Write a post
 
+Start from the template — it is CI-tested against the frontmatter schema, so
+it is always a valid post:
+
+```sh
+cp -r templates/new-post src/content/posts/2026/my-post-slug
+```
+
 A post is a **bundle**: a folder named after its slug, holding `index.md` plus
 everything that belongs to it (images, diagrams). Parent folders organize by
 year and never appear in URLs — the folder name IS the slug, and moving a

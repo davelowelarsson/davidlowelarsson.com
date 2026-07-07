@@ -1,7 +1,8 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
-import { CATEGORIES, postIdFromEntry } from './lib/posts';
+import { postFrontmatterSchema } from './lib/post-schema';
+import { postIdFromEntry } from './lib/posts';
 
 const posts = defineCollection({
   loader: glob({
@@ -10,14 +11,7 @@ const posts = defineCollection({
     generateId: ({ entry }) => postIdFromEntry(entry),
   }),
   schema: ({ image }) =>
-    z.object({
-      title: z.string(),
-      description: z.string().optional(),
-      pubDate: z.coerce.date(),
-      updatedDate: z.coerce.date().optional(),
-      category: z.enum(CATEGORIES).default('til'),
-      draft: z.boolean().default(false),
-      tags: z.array(z.string()).default([]),
+    postFrontmatterSchema.extend({
       cover: image().optional(),
       coverAlt: z.string().optional(),
     }),
