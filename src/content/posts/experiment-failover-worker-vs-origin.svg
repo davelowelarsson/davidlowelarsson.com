@@ -1,0 +1,30 @@
+<svg viewBox="0 0 480 220" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">
+  <title>A request checks the origin first, then falls back to a cached Worker response on failure</title>
+  <defs>
+    <marker id="arrow3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="currentColor" />
+    </marker>
+  </defs>
+
+  <rect x="10" y="87" width="80" height="46" rx="10" fill="currentColor" fill-opacity="0.08" stroke="currentColor" stroke-width="1.5" />
+  <text x="50" y="115" font-size="11.5" text-anchor="middle" fill="currentColor">request</text>
+
+  <line x1="90" y1="110" x2="138" y2="110" stroke="currentColor" stroke-width="1.5" marker-end="url(#arrow3)" />
+
+  <rect x="140" y="80" width="100" height="60" rx="10" fill="currentColor" fill-opacity="0.1" stroke="currentColor" stroke-width="1.5" />
+  <text x="190" y="106" font-size="11.5" text-anchor="middle" fill="currentColor">worker</text>
+  <text x="190" y="122" font-size="9.5" text-anchor="middle" fill="currentColor" fill-opacity="0.7">2s timeout</text>
+
+  <line x1="240" y1="98" x2="298" y2="55" stroke="currentColor" stroke-width="1.5" marker-end="url(#arrow3)" />
+  <text x="270" y="60" font-size="9.5" text-anchor="middle" fill="currentColor" fill-opacity="0.75">ok</text>
+
+  <rect x="300" y="25" width="90" height="46" rx="10" fill="currentColor" fill-opacity="0.16" stroke="currentColor" stroke-width="1.5" />
+  <text x="345" y="53" font-size="11" text-anchor="middle" fill="currentColor">origin</text>
+
+  <line x1="240" y1="122" x2="298" y2="165" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arrow3)" />
+  <text x="270" y="170" font-size="9.5" text-anchor="middle" fill="currentColor" fill-opacity="0.75">timeout / 5xx</text>
+
+  <rect x="300" y="142" width="110" height="46" rx="10" fill="currentColor" fill-opacity="0.2" stroke="currentColor" stroke-width="1.5" />
+  <text x="355" y="164" font-size="10.5" text-anchor="middle" fill="currentColor">cached fallback</text>
+  <text x="355" y="179" font-size="8.5" text-anchor="middle" fill="currentColor" fill-opacity="0.7">Stale-Fallback: true</text>
+</svg>

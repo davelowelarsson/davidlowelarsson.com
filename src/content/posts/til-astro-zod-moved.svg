@@ -1,0 +1,15 @@
+<svg viewBox="0 0 400 220" xmlns="http://www.w3.org/2000/svg">
+  <title>Abstract shape splitting into two aligned paths</title>
+  <defs>
+    <linearGradient id="g3" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#7c5cff" stop-opacity="0.5" />
+      <stop offset="100%" stop-color="#7c5cff" stop-opacity="0.08" />
+    </linearGradient>
+  </defs>
+  <rect x="40" y="90" width="80" height="40" rx="10" fill="url(#g3)" />
+  <path d="M120 110 H180" fill="none" stroke="currentColor" stroke-width="2" opacity="0.6" />
+  <rect x="180" y="40" width="90" height="40" rx="10" fill="none" stroke="currentColor" stroke-width="2" opacity="0.7" />
+  <rect x="180" y="140" width="90" height="40" rx="10" fill="none" stroke="currentColor" stroke-width="2" opacity="0.35" />
+  <path d="M150 110 C165 110 165 60 180 60" fill="none" stroke="currentColor" stroke-width="2" opacity="0.7" />
+  <path d="M150 110 C165 110 165 160 180 160" fill="none" stroke="currentColor" stroke-width="2" opacity="0.35" />
+</svg>
