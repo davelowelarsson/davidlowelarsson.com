@@ -3,7 +3,7 @@ title: "From 3D digital art to platform engineering"
 description: "A decade in 3D pipelines taught me more about platform engineering than any infra job did on its own — both are about making other people's work possible."
 pubDate: 2026-06-05
 category: essay
-draft: false
+draft: true
 tags: ["career", "platform-engineering", "3d-art", "tooling"]
 cover: ./essay-3d-art-pipeline.svg
 coverAlt: Render pipeline sketch

@@ -61,18 +61,15 @@ test('footer links point at LinkedIn and GitHub', async ({ page }) => {
   await expect(footer.getByRole('link', { name: 'GitHub' })).toHaveAttribute('href', /github\.com/);
 });
 
-test('drafts are hidden when SHOW_DRAFTS is off (production behavior)', async ({ page }) => {
-  await page.goto('/posts/');
-  await expect(page.getByText('Hello, world (again)')).toHaveCount(0);
-});
+// Draft-exclusion in production builds is covered by
+// src/lib/production-build.test.ts — the e2e build runs with drafts visible.
 
-test('rss feed serves rich items for published posts and never drafts', async ({ request }) => {
+test('rss feed serves rich items', async ({ request }) => {
   const response = await request.get('/rss.xml');
   expect(response.status()).toBe(200);
 
   const xml = await response.text();
   expect(xml).toContain('DORA metrics are a flashlight');
-  expect(xml).not.toContain('Hello, world (again)');
   expect(xml).toContain('<content:encoded>');
   expect(xml).toContain('<category>');
 });
@@ -132,7 +129,6 @@ test('llms.txt lists published posts for AI crawlers', async ({ request }) => {
   const text = await response.text();
   expect(text).toContain('# David Lowe Larsson');
   expect(text).toContain('DORA metrics are a flashlight');
-  expect(text).not.toContain('Hello, world (again)');
 });
 
 test('every page declares its canonical URL on the apex domain', async ({ page }) => {

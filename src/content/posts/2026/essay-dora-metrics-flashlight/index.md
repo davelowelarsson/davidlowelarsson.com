@@ -3,7 +3,7 @@ title: "DORA metrics are a flashlight, not a scoreboard"
 description: "Deployment frequency, lead time, change failure rate, and MTTR tell you where to look. They are a poor basis for ranking teams against each other."
 pubDate: 2026-05-08
 category: essay
-draft: false
+draft: true
 tags: ["dora", "platform-engineering", "leadership", "metrics"]
 ---
 
