@@ -12,7 +12,11 @@ export const syncFlowConfig = parseProcessRailConfig({
       sample: {
         operation: 'Extract track IDs from channel links',
         leftLabel: 'Slack links',
-        left: ['3Oc66...d10', '00syd...4e40', '3ZOEy...b42'],
+        left: [
+          'open.spotify.com/track/3Oc66...d10 · I’m In The Band',
+          'open.spotify.com/track/00syd...4e40 · Search and Destroy',
+          'open.spotify.com/track/3ZOEy...b42 · Can’t Stop',
+        ],
         resultLabel: 'Parsed track IDs',
         result: ['track:3Oc66...d10', 'track:00syd...4e40', 'track:3ZOEy...b42'],
       },
@@ -42,7 +46,7 @@ export const syncFlowConfig = parseProcessRailConfig({
         leftLabel: 'Payload',
         left: ['00syd...4e40', '3ZOEy...b42'],
         resultLabel: 'Playlist tail after write',
-        result: ['...existing tracks', '00syd...4e40', '3ZOEy...b42'],
+        result: ['302 · I’m In The Band', '303 · Search and Destroy', '304 · Can’t Stop'],
       },
     },
   ],

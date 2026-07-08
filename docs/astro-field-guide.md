@@ -270,6 +270,9 @@ how the project actually grew.
 - **Post-local data, shared component:** `flow.ts` owns the Slack/Spotify sample
   arrays for this story, while `src/lib/process-rail.ts` owns validation and
   reusable types for future MDX explainers.
+- **Redraw sensitive screenshots:** when real screenshots contain people, names,
+  or avatars, the post uses anonymized UI-shaped cards instead of committing
+  masked screenshots. The point is to teach the workflow, not preserve pixels.
   Docs: https://github.com/dorny/paths-filter
 
 ## YouTube embed facade + MDX support (2026-07-08, issue #37)
