@@ -39,3 +39,14 @@ test('process visuals remain readable in the mobile article flow', async ({ page
   expect(firstCardBox.width).toBeGreaterThan(300);
   expect(firstCardBox.width).toBeLessThanOrEqual(390);
 });
+
+test('wrapped snapshot renders aggregate stats with the skew caveat', async ({ page }) => {
+  await page.goto(POST_PATH);
+
+  const wrapped = page.locator('.wrapped-snapshot');
+  await expect(wrapped).toBeVisible();
+  await expect(wrapped).toContainText('Fredagslistan wrapped, carefully');
+  await expect(wrapped).toContainText('1,974');
+  await expect(wrapped).toContainText('playlist spans more than one calendar year');
+  await expect(wrapped).toContainText('swedish pop');
+});

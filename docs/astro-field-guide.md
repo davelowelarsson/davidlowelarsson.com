@@ -273,7 +273,10 @@ how the project actually grew.
 - **Redraw sensitive screenshots:** when real screenshots contain people, names,
   or avatars, the post uses anonymized UI-shaped cards instead of committing
   masked screenshots. The point is to teach the workflow, not preserve pixels.
-  Docs: https://github.com/dorny/paths-filter
+- **Static CSS charts before chart libraries:** `WrappedSnapshot.astro` renders
+  aggregate-only bars/tags from typed post-local data. No client JS is needed
+  for a small explanatory visualization, and caveats (like a skewed playlist
+  year) live in the component data next to the numbers.
 
 ## YouTube embed facade + MDX support (2026-07-08, issue #37)
 

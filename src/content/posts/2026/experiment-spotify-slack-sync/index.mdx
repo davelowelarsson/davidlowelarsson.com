@@ -8,21 +8,22 @@ tags: ["automation", "spotify", "slack", "python", "cron"]
 ---
 
 import ProcessStepCard from '../../../../components/ProcessStepCard.astro';
-import { syncSteps, wrappedSnapshot } from './flow';
+import WrappedSnapshot from '../../../../components/WrappedSnapshot.astro';
+import { syncSteps, wrappedStats } from './flow';
 
 fredagslistan started as a Slack ritual: every Friday, someone sets a theme in the morning, people drop songs that fit it, and the playlist grows.
 
 "Fit" is doing generous work there. Free interpretation is not a loophole. It is basically the rule.
 
-A few anonymized openings, stripped of Slack links and names, give the shape better than architecture prose can:
+A few anonymized and translated openings, stripped of Slack links and names, give the shape better than architecture prose can:
 
-> Match så dagens tema är **dina bästa match-/träningspepplåtar**! ⚽ 🥵 🤸‍♀️ Fri tolkning!
+> There is a match today, so the theme is **your best match/training hype songs**! ⚽ 🥵 🤸‍♀️ Free interpretation!
 
-> Fredag! Dagens tema på listan är **flashbacks från högstadiet**. Nu kör vi en mix av tonårspersonligheter och årtionden. Let's go!
+> Friday! Today's theme is **flashbacks from lower secondary school**. Time for a mix of teenage personalities and decades. Let's go!
 
-> Ingen har väl missat de musikskapande frysarna i England? Tydligen fantastisk musik i C#. Så idag kör vi på tema **instrumental musik**! 🥁 🎸
+> Surely nobody missed the music-making freezers in England? Apparently fantastic music in C#. So today the theme is **instrumental music**! 🥁 🎸
 
-> Tut tuuut! Dagens tema på Fredagslistan är **tåg**. Go go go.
+> Toot toooot! Today's Fredagslistan theme is **trains**. Go go go.
 
 For a while the playlist was maintained by hand. That worked about as well as hand-maintained shared state usually works: fine when someone remembered, wrong the moment they did not.
 
@@ -60,10 +61,7 @@ That six-day rolling window is enough to catch the current Friday and late addit
 
 For this write-up I only want aggregate signals. No names. No leaderboard. No accidental coworker analytics.
 
-- Tracks in the playlist: {wrappedSnapshot.totals.playlistTracks}
-- Approximate listening time: {wrappedSnapshot.totals.listeningDays} days
-- Busiest Friday additions: {wrappedSnapshot.totals.busiestFridayAdds}
-- Longest theme streak (weeks): {wrappedSnapshot.totals.longestThemeStreakWeeks}
+<WrappedSnapshot stats={wrappedStats} />
 
 The honest footnote is that some of the operational stats I now want are not historical, because I did not log every run from the start. If I want to say "auto-added over the years" later, I need the job to write that number down from here on instead of pretending a current playlist snapshot is the same thing as a run log.
 

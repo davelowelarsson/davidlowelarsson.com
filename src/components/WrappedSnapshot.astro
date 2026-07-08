@@ -1,0 +1,228 @@
+---
+import type { WrappedStats } from '../lib/wrapped-stats';
+
+interface Props {
+  stats: WrappedStats;
+}
+
+const { stats } = Astro.props;
+const maxShares = Math.max(...stats.years.map((year) => year.slack_shares), 1);
+const recurringGenres = [...new Set(stats.years.flatMap((year) => year.top_genres))].filter(
+  (genre) => stats.years.every((year) => year.top_genres.includes(genre)),
+);
+const persistentGenre = recurringGenres[0];
+const numberFormat = new Intl.NumberFormat('en-GB');
+---
+
+<figure class="wrapped-snapshot" aria-labelledby="wrapped-snapshot-title">
+  <div class="wrapped-snapshot__header">
+    <p class="wrapped-snapshot__eyebrow">Aggregate-only</p>
+    <h3 id="wrapped-snapshot-title">Fredagslistan wrapped, carefully</h3>
+    <p>
+      The privacy-safe version is less “who listened to what” and more “what shape did the ritual have?”
+    </p>
+  </div>
+
+  <div class="wrapped-snapshot__totals" aria-label="Aggregate totals">
+    <div>
+      <strong>{numberFormat.format(stats.totals.total_slack_shares)}</strong>
+      <span>Slack shares scanned</span>
+    </div>
+    <div>
+      <strong>{numberFormat.format(stats.totals.total_tracks)}</strong>
+      <span>playlist tracks, caveats included</span>
+    </div>
+    <div>
+      <strong>{stats.totals.peak_year_contributors}</strong>
+      <span>peak yearly contributors</span>
+    </div>
+  </div>
+
+  {persistentGenre && (
+    <p class="wrapped-snapshot__callout">
+      Most persistent genre: <strong>{persistentGenre}</strong>. Apparently not even time can make it leave the room.
+    </p>
+  )}
+
+  <div class="wrapped-snapshot__years">
+    {stats.years.map((year) => {
+      const shareRatio = Math.round((year.slack_shares / maxShares) * 100);
+      return (
+        <section class="wrapped-snapshot__year" data-share-ratio={shareRatio}>
+          <div class="wrapped-snapshot__year-topline">
+            <strong>{year.year}</strong>
+            <span>{year.contributors} contributors</span>
+          </div>
+
+          <div class="wrapped-snapshot__bar" aria-label={`${year.slack_shares} Slack track shares`}>
+            <span style={`width: ${shareRatio}%`}></span>
+          </div>
+
+          <div class="wrapped-snapshot__year-metrics">
+            <span>{numberFormat.format(year.slack_shares)} Slack shares</span>
+            <span>{numberFormat.format(year.tracks)} playlist tracks</span>
+          </div>
+
+          {year.caveat && <p class="wrapped-snapshot__caveat">{year.caveat}</p>}
+
+          <div class="wrapped-snapshot__tags" aria-label={`${year.year} top genres`}>
+            {year.top_genres.slice(0, 3).map((genre) => (
+              <span>{genre}</span>
+            ))}
+          </div>
+
+          <p class="wrapped-snapshot__artists">
+            artists that surfaced: {year.top_artists.slice(0, 3).join(' · ')}
+          </p>
+        </section>
+      );
+    })}
+  </div>
+</figure>
+
+<style>
+  .wrapped-snapshot {
+    margin: 1.5rem 0 2rem;
+    border: 1px solid var(--hairline);
+    border-radius: 0.5rem;
+    background:
+      linear-gradient(135deg, light-dark(rgb(30 215 96 / 10%), rgb(30 215 96 / 13%)), transparent 34%),
+      light-dark(#fbfbfd, #18181c);
+    padding: 1rem;
+    box-shadow: 0 0.85rem 2rem rgb(0 0 0 / 10%);
+  }
+
+  .wrapped-snapshot__header {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .wrapped-snapshot__eyebrow,
+  .wrapped-snapshot__header p,
+  .wrapped-snapshot__artists,
+  .wrapped-snapshot__caveat {
+    color: var(--muted);
+  }
+
+  .wrapped-snapshot__eyebrow {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    line-height: 1.3;
+    text-transform: uppercase;
+  }
+
+  .wrapped-snapshot__header h3 {
+    margin: 0;
+  }
+
+  .wrapped-snapshot__header p {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .wrapped-snapshot__totals {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+    gap: 0.55rem;
+    margin-top: 1rem;
+  }
+
+  .wrapped-snapshot__totals div {
+    border: 1px solid var(--hairline);
+    border-radius: 0.45rem;
+    background: light-dark(rgb(255 255 255 / 72%), rgb(255 255 255 / 5%));
+    padding: 0.65rem;
+  }
+
+  .wrapped-snapshot__totals strong {
+    display: block;
+    font-size: 1.2rem;
+    line-height: 1.1;
+  }
+
+  .wrapped-snapshot__totals span {
+    display: block;
+    margin-top: 0.2rem;
+    color: var(--muted);
+    font-size: 0.72rem;
+    line-height: 1.35;
+  }
+
+  .wrapped-snapshot__callout {
+    margin: 1rem 0 0;
+    border-left: 3px solid #1ed760;
+    padding-left: 0.75rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .wrapped-snapshot__years {
+    display: grid;
+    gap: 0.8rem;
+    margin-top: 1rem;
+  }
+
+  .wrapped-snapshot__year {
+    border: 1px solid var(--hairline);
+    border-radius: 0.45rem;
+    background: light-dark(#ffffff, #111216);
+    padding: 0.75rem;
+  }
+
+  .wrapped-snapshot__year-topline,
+  .wrapped-snapshot__year-metrics {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .wrapped-snapshot__year-topline span,
+  .wrapped-snapshot__year-metrics {
+    color: var(--muted);
+    font-size: 0.75rem;
+  }
+
+  .wrapped-snapshot__bar {
+    height: 0.65rem;
+    overflow: hidden;
+    border-radius: 999px;
+    background: light-dark(rgb(0 0 0 / 8%), rgb(255 255 255 / 9%));
+    margin: 0.55rem 0 0.35rem;
+  }
+
+  .wrapped-snapshot__bar span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #36c5f0, #1ed760);
+  }
+
+  .wrapped-snapshot__caveat {
+    margin: 0.55rem 0 0;
+    font-size: 0.76rem;
+    line-height: 1.4;
+  }
+
+  .wrapped-snapshot__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-top: 0.65rem;
+  }
+
+  .wrapped-snapshot__tags span {
+    border-radius: 999px;
+    background: var(--chip);
+    padding: 0.12rem 0.45rem;
+    font-size: 0.72rem;
+    line-height: 1.5;
+  }
+
+  .wrapped-snapshot__artists {
+    margin: 0.5rem 0 0;
+    font-size: 0.76rem;
+    line-height: 1.4;
+  }
+</style>

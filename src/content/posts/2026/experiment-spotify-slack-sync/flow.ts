@@ -1,4 +1,5 @@
 import { parseProcessRailConfig } from '../../../../lib/process-rail';
+import { parseWrappedStats } from '../../../../lib/wrapped-stats';
 
 export const syncFlowConfig = parseProcessRailConfig({
   id: 'spotify-slack-sync',
@@ -64,12 +65,54 @@ export const syncSteps = {
   addSpotify: requireStep('add-spotify'),
 };
 
-export const wrappedSnapshot = {
-  generatedAt: '2026-07-08',
+export const wrappedStats = parseWrappedStats({
+  years: [
+    {
+      year: 2024,
+      playlist: 'Fredagslistan! 2024!',
+      tracks: 55,
+      top_genres: [
+        'swedish pop',
+        'underground hip hop',
+        'hardcore hip hop',
+        'stoner rock',
+        'stoner metal',
+      ],
+      top_artists: [
+        'The Tallest Man On Earth',
+        'Petter',
+        'Queens of the Stone Age',
+        'Thirty Seconds To Mars',
+        'kent',
+      ],
+      contributors: 25,
+      slack_shares: 1145,
+    },
+    {
+      year: 2025,
+      playlist: 'Fredagslistan ! 2024-25 !',
+      tracks: 1284,
+      top_genres: ['swedish pop', 'dansband', 'classic rock', 'metal', 'punk'],
+      top_artists: ['Bob Dylan', 'Håkan Hellström', 'In Flames', 'BTS', 'Hofmästarn'],
+      contributors: 21,
+      slack_shares: 462,
+      caveat: 'playlist spans more than one calendar year, so tracks are context, not a race',
+    },
+    {
+      year: 2026,
+      playlist: 'Fredagslistan 2026 🎶',
+      tracks: 311,
+      top_genres: ['swedish pop', 'rock', 'classic rock', 'punk', 'proto-punk'],
+      top_artists: ['Robyn', 'Bob Dylan', 'kent', 'Galenskaparna & After Shave', 'Rihanna'],
+      contributors: 20,
+      slack_shares: 367,
+    },
+  ],
   totals: {
-    playlistTracks: 304,
-    listeningDays: 1.2,
-    busiestFridayAdds: 22,
-    longestThemeStreakWeeks: 17,
+    years_covered: 3,
+    total_tracks: 1650,
+    total_slack_shares: 1974,
+    peak_year_contributors: 25,
+    biggest_year_tracks: 1284,
   },
-} as const;
+});
