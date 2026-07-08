@@ -1,57 +1,152 @@
 ---
-title: "Home lab topology"
-description: "No exposed ports on my home network — everything routes out through a Cloudflare Tunnel, and inbound traffic never touches my router's port forwarding table."
-pubDate: 2026-04-20
+title: "Home lab topology: DNS as my service registry"
+description: "I stopped port-forwarding my home lab, pushed ingress out through Cloudflare Tunnel, and ended up using my DNS zone as the one registry the dashboard could trust."
+pubDate: 2026-07-08
 category: experiment
-draft: true
+draft: false
 tags: ["homelab", "cloudflare", "networking", "self-hosting"]
 cover: ./experiment-home-lab-topology.svg
 coverAlt: Home lab topology diagram
 ---
 
-> **WIP/TEST** — placeholder content while the site's design is under construction.
+I wanted a boring outcome: publish a service, get a real URL, have it appear on the dashboard,
+and avoid opening inbound ports on my home router.
 
-My home lab has zero forwarded ports on the router. Every service that's reachable from the
-internet gets there through an outbound-only tunnel, which turns "how do I expose this safely"
-into a solved problem I don't have to re-solve per service.
+The topology changed to match that goal. Instead of port-forwarding and hand-maintained routing,
+Cloudflare handles the public edge, `cloudflared` holds an outbound tunnel from inside the
+network, and DNS became the registry of what should be reachable.
 
 ![Diagram showing internet traffic passing through Cloudflare, into a tunnel, and out to home lab services](./experiment-home-lab-topology.svg)
 
-## Why no port forwarding
+## TL;DR
 
-Port forwarding means the router accepts inbound connections and hands them to something on the
-LAN — every forwarded port is a hole in the perimeter that has to be individually reasoned about,
-patched, and monitored. A Cloudflare Tunnel flips the direction: a daemon inside the network
-opens an *outbound* connection to Cloudflare's edge and keeps it alive. Nothing on the router
-needs to accept unsolicited inbound traffic at all.
+- I no longer decide cluster placement and routing up front before each deploy.
+- I deploy where it makes sense now, then move services later if needed.
+- Routing follows DNS and tunnel config, so moves are operational work, not redesign work.
+- Apps can announce themselves via `external-dns`, so publish and registration happen together.
+- Cloudflare is the implementation I use today, but the pattern is: edge + tunnel + DNS as source
+   of truth.
 
-## The path a request takes
+## The shift that actually mattered
 
-1. A request hits a hostname on the zone, e.g. `grafana.example.com`.
-2. Cloudflare terminates TLS at the edge and matches the hostname to a tunnel.
-3. The tunnel daemon (`cloudflared`), already holding an outbound connection from inside the
-   network, receives the request over that existing connection.
-4. `cloudflared` proxies it to the right internal service by hostname and port, entirely on the
-   LAN side.
+The big win was not "I use a tunnel now." The big win was removing placement anxiety.
+
+Before, I had to know exactly where something would run and how traffic would split before I could
+ship it. That made small experiments feel bigger than they were. A quick app stopped being quick
+because every deploy dragged routing and topology decisions behind it.
+
+Now I can deploy first, move later, and move back again if I want. As long as DNS catches up,
+routing keeps working. That sounds small in theory and huge in practice. It means I spend less
+time fiddling with IPs and ingress glue, and more time actually testing ideas.
+
+| Before | After |
+| --- | --- |
+| Pick cluster first | Deploy where convenient |
+| Hand-plan traffic split | Let DNS + tunnel route it |
+| Moves feel risky | Moves become routine |
+| Router config keeps growing | Router stays boring |
+
+## Before vs after traffic path
+
+This is the visual version of what changed for tunnel-served apps.
+
+### Before
 
 ```mermaid
 flowchart LR
-    client[Client request] --> edge[Cloudflare edge]
-    edge --> tunnel[cloudflared tunnel]
-    tunnel --> service[Internal service]
+   client[Client] --> dns[DNS]
+   dns --> router[Router ports 80 and 443]
+   router --> pfsense[pfSense + firewall rules]
+   pfsense --> haproxy[HAProxy routing and load balancing]
+   haproxy --> vip[Cluster VIP: cluster1 or cluster2]
+   vip --> ingress[Ingress or Gateway + HTTPRoute]
+   ingress --> svc[Service]
+   svc --> app[Application]
 ```
+
+### After
+
+```mermaid
+flowchart LR
+   client[Client] --> dns[DNS record]
+   dns --> edge[Cloudflare edge]
+   edge --> tunnel[cloudflared tunnel]
+   tunnel --> gateway[Gateway + HTTPRoute]
+   gateway --> svc[Service]
+   svc --> app[Application]
+```
+
+In this "after" model, the app-side registration step is simple: the app config (via
+`DNSEndpoint` and `external-dns`) announces the DNS record, and that registration is what makes it
+show up in routing and on the dashboard.
+
+The practical difference is that router forwarding, pfSense path rules, and HAProxy are no longer
+in the request path for these services.
+
+Security note: fewer exposed layers does not mean no security work. App auth, authorization,
+patching, and cluster hardening are still required.
+
+## What fought me on the way there
+
+Short version: almost every failure was about control-plane assumptions, not raw network
+connectivity.
+
+The first rude lesson was that a healthy-looking gateway can still be dead in exactly the way that
+hurts. My Kubernetes `Gateway` looked green and old routes still worked, but new ones silently
+failed because the `GatewayClass` controller had vanished after a reboot.
+
+The tunnel also had a moment. `cloudflared` wanted QUIC over UDP 7844, my firewall had no
+interest in that arrangement, and then it tried IPv6. Forcing IPv4 plus HTTP/2 fixed it.
+
+Then there was the part where a pod could not reliably reach its own gateway. The connector lived
+inside the cluster, but the gateway behaved like a LAN-facing north-south entrypoint. The fix was
+to let `cloudflared` leave through the node, hit the gateway VIP like an external client, and come
+right back in.
+
+The final gotcha was configuration authority. My tunnel was remotely managed, so the local
+catch-all config was ignored and new DNS records returned 404. The fix was to set the catch-all in
+the remote tunnel config, not as a wildcard public hostname that would hijack half the zone.
 
 ## What this buys me
 
-- One exposed surface (the tunnel daemon's outbound connection) instead of N forwarded ports
-- Cloudflare's edge absorbs scanning and abuse traffic before it reaches home internet at all
-- Adding a new internal service is a config entry in `cloudflared`, not a router change
-- The router's WAN-facing attack surface stays exactly as small as an ISP modem with nothing
-  forwarded
+- No inbound ports on the router for these services. The lab dials out; the internet does not dial
+   in.
+- One registry I can trust. If the zone says a service exists and is marked for the dashboard,
+   the dashboard can show it without any parallel config.
+- A cleaner publishing path. For the Kubernetes case, creating the DNS record is effectively the
+   act of making the service public, while still letting me keep certain records out of the
+   dashboard.
+- An edge-hosted dashboard that can stay up and tell the truth even when the lab itself is having
+   a bad day.
 
 ## What it doesn't solve
 
-The tunnel protects the network perimeter, not the services behind it. Grafana still needs its
-own auth, Home Assistant still needs its own auth, and a compromised service on the LAN is still
-a compromised service — the tunnel just means an attacker has to get in through an application,
-not through a scanned-and-found open port.
+Closing the perimeter does not remove the need to secure what sits behind it. The tunnel protects
+the network perimeter, not the services themselves. App auth still matters, and a compromised LAN
+service is still compromised.
+
+It also leans hard on Cloudflare. That is a real dependency, not an implementation detail. In this
+case I am fine with that trade-off because I am explicitly choosing a boring home-lab edge over a
+perfectly portable one. I am not permanently locked in, but moving away later would mean replacing
+several conveniences at once, so that migration cost is real and should be acknowledged.
+
+And there is still a little manual taste involved in the dashboard. DNS can tell me what is
+reachable. It cannot decide what deserves a card, a title, or a nicer explanation. That part is
+still mine, which is probably correct.
+
+## The part I am keeping
+
+The strongest idea here is not really the tunnel. It is that deployment and placement became
+decoupled.
+
+I no longer pre-plan cluster routing for every launch. I can deploy, observe, move it, and move it
+back. If DNS stays current, the path still resolves.
+
+The DNS zone is already the list of things I mean to make reachable. Once I accepted that, the
+rest got easier to reason about: Cloudflare owns the edge, the tunnel carries traffic inward, the
+gateway handles routing, and the dashboard reads from the one place that already has to stay
+correct.
+
+That feels like the right kind of homelab solution. Slightly over-engineered in the way that made
+me learn something, but simple enough that I can still explain it to myself later without needing
+an archaeological dig through old configs.
