@@ -67,8 +67,8 @@ export const syncSteps = {
 export const wrappedSnapshot = {
   generatedAt: '2026-07-08',
   totals: {
-    runs: 524,
-    autoAddedTracks: 1839,
+    playlistTracks: 304,
+    listeningDays: 1.2,
     busiestFridayAdds: 22,
     longestThemeStreakWeeks: 17,
   },
