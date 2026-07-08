@@ -2,7 +2,8 @@
 title: "Raspberry Pi cluster vs Ubuntu server"
 pubDate: 2020-09-26
 category: experiment
-draft: true
+draft: false
+liveFrom: 2026-07-09
 tags: ["raspberry-pi", "cluster", "rancher", "k3s", "kubernetes"]
 cover: ./raw-rpi-home-cluster-combined-2.jpg
 coverAlt: "Raspberry Pi cluster vs Ubuntu server"

@@ -37,6 +37,17 @@ describe('postFrontmatterSchema', () => {
     }
   });
 
+  it('normalizes a YAML Date (unquoted bare date) to its calendar string', () => {
+    // YAML parses `liveFrom: 2026-07-09` into a Date; the schema converts it back.
+    expect(
+      postFrontmatterSchema.parse({
+        title: 'Hi',
+        pubDate: '2026-07-07',
+        liveFrom: new Date(Date.UTC(2026, 6, 9)),
+      }).liveFrom,
+    ).toBe('2026-07-09');
+  });
+
   it('rejects impossible or malformed liveFrom values', () => {
     for (const liveFrom of [
       '2026-13-40', // no month 13 / day 40
