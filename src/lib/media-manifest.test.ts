@@ -160,6 +160,11 @@ describe('extractMediaRefs', () => {
     expect(extractMediaRefs(body)).toEqual([]);
   });
 
+  it('normalizes a leading-slash src to the canonical key (matches manifest/local keys)', () => {
+    const body = `<Video src="/2026/my-post/clip.mp4" poster={poster} />`;
+    expect(extractMediaRefs(body)).toEqual(['2026/my-post/clip.mp4']);
+  });
+
   it('finds every reference across multiple embeds', () => {
     const body = `
       <Video src="2026/a/clip.mp4" poster={poster} />

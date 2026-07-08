@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { MEDIA_ORIGIN, mediaUrl } from './media';
+import { MEDIA_ORIGIN, mediaUrl, normalizeMediaKey } from './media';
+
+describe('normalizeMediaKey', () => {
+  it('strips leading slashes so a key has one canonical form', () => {
+    expect(normalizeMediaKey('2026/x.mp4')).toBe('2026/x.mp4');
+    expect(normalizeMediaKey('/2026/x.mp4')).toBe('2026/x.mp4');
+    expect(normalizeMediaKey('///2026/x.mp4')).toBe('2026/x.mp4');
+  });
+});
 
 describe('mediaUrl', () => {
   it('prefixes an R2 key with the media origin', () => {

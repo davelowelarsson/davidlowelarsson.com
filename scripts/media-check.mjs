@@ -1,7 +1,9 @@
 // Thin CLI wrapper around the pure logic in src/lib/media-manifest.ts
 // (issue #10). Reconciles every media key referenced by a `<Video|Audio
-// src="...">` in a post against three sources: the committed manifest,
-// local files on disk, and R2 (a HEAD request against MEDIA_ORIGIN).
+// src="...">` in a post against the two sources that decide whether it will
+// actually work: R2 (a HEAD against MEDIA_ORIGIN — authoritative) and the
+// local disk (is it here to sync?). The manifest is media:sync's record for
+// hash-diffing/orphans; the check needs only R2 + local.
 //
 // WARN-ONLY, ALWAYS EXITS 0. This is the local pre-commit safety net, not a
 // CI gate — R2 is the source of truth, and CI must never fail a build
@@ -16,7 +18,6 @@ import { categorizeMediaKey, extractMediaRefs, isMediaFile } from '../src/lib/me
 
 const REPO_ROOT = new URL('..', import.meta.url).pathname;
 const POSTS_ROOT = join(REPO_ROOT, 'src/content/posts');
-const MANIFEST_PATH = join(REPO_ROOT, 'media-manifest.json');
 
 function walk(dir) {
   const out = [];
@@ -26,11 +27,6 @@ function walk(dir) {
     else out.push(full);
   }
   return out;
-}
-
-function readManifest() {
-  if (!existsSync(MANIFEST_PATH)) return {};
-  return JSON.parse(readFileSync(MANIFEST_PATH, 'utf8'));
 }
 
 /** The one function that ever hits the network — never called by tests. */
@@ -63,7 +59,6 @@ async function main() {
     return;
   }
 
-  const manifest = readManifest();
   const localFiles = new Set(
     walk(POSTS_ROOT)
       .map((path) => relative(POSTS_ROOT, path))
@@ -75,7 +70,7 @@ async function main() {
     const inR2 = await existsInR2(key);
     const localFile = localFiles.has(key);
     const status = categorizeMediaKey({ inR2, localFile });
-    results.push({ key, status, inManifest: key in manifest });
+    results.push({ key, status });
   }
 
   const broken = results.filter((r) => r.status === 'broken');
@@ -101,4 +96,9 @@ async function main() {
   process.exitCode = 0;
 }
 
-main();
+// Any unexpected error must still exit 0 — media:check is never allowed to
+// block a commit or a human, even on a bug or a transient R2/network failure.
+main().catch((error) => {
+  console.warn(`media:check — skipped after an unexpected error (never blocks): ${error.message}`);
+  process.exitCode = 0;
+});

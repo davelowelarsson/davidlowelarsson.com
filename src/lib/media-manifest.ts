@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { normalizeMediaKey } from './media';
 
 /**
  * Pure logic for `scripts/media-sync.mjs` and `scripts/media-check.mjs`
@@ -113,7 +114,10 @@ export function extractMediaRefs(source: string): string[] {
   const refs: string[] = [];
   for (const match of source.matchAll(MEDIA_TAG_SRC)) {
     const src = match[1];
-    if (src && !/^https?:\/\//.test(src)) refs.push(src);
+    // Normalize to the same key form used everywhere else, so a leading-slash
+    // src reconciles against the manifest/local keys instead of falsely reading
+    // as broken/orphan.
+    if (src && !/^https?:\/\//.test(src)) refs.push(normalizeMediaKey(src));
   }
   return refs;
 }
