@@ -19,6 +19,12 @@ export function filterByCategory<T extends { data: { category: Category } }>(
 
 export interface PostVisibility {
   draft: boolean;
+  /**
+   * Optional scheduled go-live, as Swedish local wall-clock ("YYYY-MM-DD" or
+   * "YYYY-MM-DDTHH:mm"). Absent = live as soon as it is not a draft. See
+   * `liveFromHasPassed`.
+   */
+  liveFrom?: string;
 }
 
 export interface Dated {
@@ -41,8 +47,50 @@ export function postIdFromEntry(entry: string): string {
   return segments.at(-2) as string;
 }
 
-export function isVisible(data: PostVisibility, showDrafts: boolean): boolean {
-  return showDrafts || !data.draft;
+/**
+ * `now` as an Europe/Stockholm wall-clock string "YYYY-MM-DDTHH:mm". We compare
+ * wall-clock to wall-clock so `liveFrom` is always read as Swedish local time —
+ * DST included, no offset math — because Intl yields the correct Stockholm
+ * components for the actual instant.
+ */
+function stockholmWallClock(now: Date): string {
+  const parts = new Intl.DateTimeFormat('sv-SE', {
+    timeZone: 'Europe/Stockholm',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(now);
+  const get = (type: string): string => parts.find((p) => p.type === type)?.value ?? '';
+  return `${get('year')}-${get('month')}-${get('day')}T${get('hour')}:${get('minute')}`;
+}
+
+/**
+ * Has a post's scheduled go-live arrived? `liveFrom` is Swedish local:
+ * "YYYY-MM-DD" means the start of that day; "YYYY-MM-DDTHH:mm" a specific
+ * minute. Undefined = no schedule (publish once not a draft). The lexical
+ * comparison is sound because both sides are zero-padded wall-clock strings.
+ */
+export function liveFromHasPassed(liveFrom: string | undefined, now: Date): boolean {
+  if (!liveFrom) return true;
+  const target = liveFrom.length === 10 ? `${liveFrom}T00:00` : liveFrom.slice(0, 16);
+  return stockholmWallClock(now) >= target;
+}
+
+/**
+ * Production visibility gate, shared by every surface (pages, RSS, sitemap,
+ * llms.txt) so nothing leaks in one place but not another. Previews
+ * (`showDrafts`) show everything, including drafts and not-yet-live posts.
+ */
+export function isVisible(
+  data: PostVisibility,
+  showDrafts: boolean,
+  now: Date = new Date(),
+): boolean {
+  if (showDrafts) return true;
+  return !data.draft && liveFromHasPassed(data.liveFrom, now);
 }
 
 export function sortByPubDateDesc<T extends Dated>(posts: T[]): T[] {

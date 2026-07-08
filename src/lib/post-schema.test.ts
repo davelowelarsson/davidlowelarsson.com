@@ -28,6 +28,31 @@ describe('postFrontmatterSchema', () => {
       postFrontmatterSchema.parse({ title: 'Hi', pubDate: '2026-07-07', category: 'rant' }),
     ).toThrow();
   });
+
+  it('accepts a valid liveFrom (bare date and with a time)', () => {
+    for (const liveFrom of ['2026-07-20', '2026-07-20T09:00', '2026-12-31T23:59']) {
+      expect(
+        postFrontmatterSchema.parse({ title: 'Hi', pubDate: '2026-07-07', liveFrom }).liveFrom,
+      ).toBe(liveFrom);
+    }
+  });
+
+  it('rejects impossible or malformed liveFrom values', () => {
+    for (const liveFrom of [
+      '2026-13-40', // no month 13 / day 40
+      '2026-02-31', // Feb has no 31st
+      '2026-07-20T99:99', // out-of-range time
+      '2026-07-20T24:00', // hour 24 not allowed
+      '2026-7-2', // not zero-padded
+      '2026/07/20', // wrong separators
+      '2026-07-20 09:00', // space instead of T
+      '2026-07-20T09:00:00', // seconds not supported
+    ]) {
+      expect(() =>
+        postFrontmatterSchema.parse({ title: 'Hi', pubDate: '2026-07-07', liveFrom }),
+      ).toThrow();
+    }
+  });
 });
 
 describe('templates/new-post', () => {
