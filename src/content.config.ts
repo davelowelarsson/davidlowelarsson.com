@@ -1,14 +1,14 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
+import { postIdFromBundleEntry } from './lib/post-bundle-id';
 import { postFrontmatterSchema } from './lib/post-schema';
-import { postIdFromEntry } from './lib/posts';
 
 const posts = defineCollection({
   loader: glob({
-    pattern: '**/index.md',
+    pattern: '**/index.{md,mdx}',
     base: './src/content/posts',
-    generateId: ({ entry }) => postIdFromEntry(entry),
+    generateId: ({ entry }) => postIdFromBundleEntry(entry),
   }),
   schema: ({ image }) =>
     postFrontmatterSchema.extend({

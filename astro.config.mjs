@@ -1,6 +1,7 @@
 // @ts-check
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import { defineConfig, envField } from 'astro/config';
 
@@ -47,6 +48,10 @@ export default defineConfig({
       excludeLangs: ['mermaid'],
     },
   },
+  // `mdx()` adds no UI framework — MDX files get JSX-in-markdown syntax so
+  // Astro components (like `<YouTube />`) can be dropped straight into post
+  // bodies, while plain `.md` posts keep working unchanged.
+  // Docs: https://docs.astro.build/en/guides/integrations-guide/mdx/
   integrations: [
     sitemap({
       serialize(item) {
@@ -56,6 +61,7 @@ export default defineConfig({
         return item;
       },
     }),
+    mdx(),
   ],
   env: {
     schema: {

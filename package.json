@@ -19,6 +19,7 @@
     "verify": "npm run lint && npm run typecheck && npm run test && npm run e2e"
   },
   "dependencies": {
+    "@astrojs/mdx": "^7.0.2",
     "@astrojs/rss": "^4.0.19",
     "@astrojs/sitemap": "^3.7.3",
     "astro": "^7.0.6",
