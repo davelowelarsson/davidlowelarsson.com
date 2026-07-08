@@ -8,14 +8,30 @@ describe('parseProcessRailConfig', () => {
       title: 'Friday sync flow',
       steps: [
         { id: 'fetch-slack', label: 'Fetch Slack messages' },
-        { id: 'diff', label: 'Compute missing tracks', hint: 'Only add what is missing' },
+        {
+          id: 'diff',
+          label: 'Compute missing tracks',
+          hint: 'Only add what is missing',
+          system: 'diff',
+          sample: {
+            operation: 'missing = slack - spotify',
+            leftLabel: 'slack',
+            left: ['track-a', 'track-b'],
+            rightLabel: 'spotify',
+            right: ['track-b'],
+            resultLabel: 'missing',
+            result: ['track-a'],
+          },
+        },
       ],
     });
 
     expect(parsed.id).toBe('spotify-sync');
     expect(parsed.steps).toHaveLength(2);
+    expect(parsed.steps[0]?.system).toBe('job');
     expect(parsed.steps[0]?.hint).toBeUndefined();
     expect(parsed.steps[1]?.hint).toBe('Only add what is missing');
+    expect(parsed.steps[1]?.sample?.operation).toBe('missing = slack - spotify');
   });
 
   it('rejects duplicate step ids', () => {

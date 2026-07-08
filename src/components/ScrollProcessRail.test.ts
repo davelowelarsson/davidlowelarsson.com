@@ -4,9 +4,27 @@ import ScrollProcessRail from './ScrollProcessRail.astro';
 
 describe('ScrollProcessRail', () => {
   const steps = [
-    { id: 'fetch-slack', label: 'Fetch Slack messages', hint: 'Read channel posts for the day' },
-    { id: 'diff', label: 'Compute diff' },
-    { id: 'add-spotify', label: 'Add missing songs' },
+    {
+      id: 'fetch-slack',
+      label: 'Fetch Slack messages',
+      hint: 'Read channel posts for the day',
+      system: 'slack' as const,
+    },
+    {
+      id: 'diff',
+      label: 'Compute diff',
+      system: 'diff' as const,
+      sample: {
+        operation: 'missing = slack - spotify',
+        leftLabel: 'slack',
+        left: ['a', 'b'],
+        rightLabel: 'spotify',
+        right: ['b'],
+        resultLabel: 'missing',
+        result: ['a'],
+      },
+    },
+    { id: 'add-spotify', label: 'Add missing songs', system: 'spotify' as const },
   ];
 
   it('renders rail metadata and all steps', async () => {
@@ -29,6 +47,9 @@ describe('ScrollProcessRail', () => {
     expect(html).toContain('data-process-step-id="fetch-slack"');
     expect(html).toContain('data-process-step-id="diff"');
     expect(html).toContain('data-process-step-id="add-spotify"');
+    expect(html).toContain('Slack');
+    expect(html).toContain('Spotify');
+    expect(html).toContain('missing = slack - spotify');
   });
 
   it('marks the first step active by default', async () => {

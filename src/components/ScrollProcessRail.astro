@@ -8,9 +8,33 @@ interface Props {
 const { config: rawConfig } = Astro.props;
 const config = parseProcessRailConfig(rawConfig);
 const firstStepId = config.steps[0]?.id ?? '';
+
+const SYSTEM_META = {
+  job: { label: 'Job' },
+  slack: { label: 'Slack' },
+  spotify: { label: 'Spotify' },
+  diff: { label: 'Diff' },
+} as const;
+
+const withMeta = config.steps.map((step) => ({
+  ...step,
+  systemMeta: SYSTEM_META[step.system],
+}));
+
+function formatList(items: string[]) {
+  return `['${items.join("', '")}']`;
+}
 ---
 
-<div class="process-rail-layout" data-process-layout={config.id}>
+<div
+  class="process-rail-layout"
+  data-process-layout={config.id}
+  data-process-enhanced="false"
+  data-process-floating="false">
+  <div class="process-rail__content" data-process-content>
+    <slot />
+  </div>
+
   <aside
     class="process-rail"
     data-process-rail
@@ -19,21 +43,84 @@ const firstStepId = config.steps[0]?.id ?? '';
     aria-label={config.title ?? 'Process steps'}>
     {config.title && <h3 class="process-rail__title">{config.title}</h3>}
     <ol class="process-rail__list">
-      {config.steps.map((step, index) => (
+      {withMeta.map((step, index) => (
         <li
           class="process-rail__item"
           data-process-step-id={step.id}
           data-process-active={index === 0 ? 'true' : 'false'}>
+          <span class={`process-rail__system process-rail__system--${step.system}`} aria-hidden="true">
+            {step.system === 'spotify' && (
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M5 8.6c4.8-1.5 9.7-1.1 14.2 1" />
+                <path d="M6.1 12c4-1.2 8-0.9 11.7 0.9" />
+                <path d="M7.2 15.2c3.1-0.9 6.1-0.6 9 0.7" />
+              </svg>
+            )}
+            {step.system === 'slack' && (
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M8.2 3v5.1a2.1 2.1 0 1 1-2.1-2.1" />
+                <path d="M3 8.2h5.1a2.1 2.1 0 1 1-2.1 2.1" />
+                <path d="M20.9 8.2h-5.1a2.1 2.1 0 1 1 2.1-2.1" />
+                <path d="M15.8 21v-5.1a2.1 2.1 0 1 1 2.1 2.1" />
+              </svg>
+            )}
+            {step.system === 'diff' && (
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M5 12h14" />
+                <path d="M12 5v14" />
+              </svg>
+            )}
+            {step.system === 'job' && (
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M12 3v3" />
+                <path d="M12 18v3" />
+                <path d="M3 12h3" />
+                <path d="M18 12h3" />
+                <circle cx="12" cy="12" r="4" />
+              </svg>
+            )}
+          </span>
+          <span class="process-rail__system-label">{step.systemMeta.label}</span>
           <span class="process-rail__item-label">{step.label}</span>
           {step.hint && <span class="process-rail__item-hint">{step.hint}</span>}
         </li>
       ))}
     </ol>
-  </aside>
 
-  <div class="process-rail__content" data-process-content>
-    <slot />
-  </div>
+    <div class="process-rail__showcase" aria-live="polite">
+      {withMeta.map((step, index) => (
+        <section
+          class="process-rail__sample"
+          data-process-sample-id={step.id}
+          data-process-active={index === 0 ? 'true' : 'false'}>
+          {step.sample?.operation && <p class="process-rail__sample-operation">{step.sample.operation}</p>}
+
+          {step.sample?.left && (
+            <div class="process-rail__sample-block">
+              <p class="process-rail__sample-label">{step.sample.leftLabel ?? 'Input'}</p>
+              <pre class="process-rail__sample-array">{formatList(step.sample.left)}</pre>
+            </div>
+          )}
+
+          {step.sample?.right && (
+            <div class="process-rail__sample-block">
+              <p class="process-rail__sample-label">{step.sample.rightLabel ?? 'Current state'}</p>
+              <pre class="process-rail__sample-array">{formatList(step.sample.right)}</pre>
+            </div>
+          )}
+
+          {step.sample?.result && (
+            <div class="process-rail__sample-block">
+              <p class="process-rail__sample-label">{step.sample.resultLabel ?? 'Result'}</p>
+              <pre class="process-rail__sample-array process-rail__sample-array--result">
+                {formatList(step.sample.result)}
+              </pre>
+            </div>
+          )}
+        </section>
+      ))}
+    </div>
+  </aside>
 </div>
 
 <script>
@@ -42,10 +129,18 @@ const firstStepId = config.steps[0]?.id ?? '';
     const content = layout.querySelector<HTMLElement>('[data-process-content]');
     if (!rail || !content) continue;
 
+    layout.dataset.processEnhanced = 'true';
+
     const itemsById = new Map<string, HTMLElement>();
     for (const item of rail.querySelectorAll<HTMLElement>('[data-process-step-id]')) {
       const id = item.dataset.processStepId;
       if (id) itemsById.set(id, item);
+    }
+
+    const samplesById = new Map<string, HTMLElement>();
+    for (const sample of rail.querySelectorAll<HTMLElement>('[data-process-sample-id]')) {
+      const id = sample.dataset.processSampleId;
+      if (id) samplesById.set(id, sample);
     }
 
     const stages = content.querySelectorAll<HTMLElement>('[data-process-step]');
@@ -56,10 +151,34 @@ const firstStepId = config.steps[0]?.id ?? '';
       for (const [id, item] of itemsById.entries()) {
         item.dataset.processActive = id === activeId ? 'true' : 'false';
       }
+      for (const [id, sample] of samplesById.entries()) {
+        sample.dataset.processActive = id === activeId ? 'true' : 'false';
+      }
+    };
+
+    const syncFloatingMode = () => {
+      const contentRect = content.getBoundingClientRect();
+      const gap = 24;
+      const available = window.innerWidth - contentRect.right - gap;
+      const shouldFloat = available >= 272;
+
+      layout.dataset.processFloating = shouldFloat ? 'true' : 'false';
+      if (!shouldFloat) {
+        rail.style.removeProperty('left');
+        rail.style.removeProperty('top');
+        rail.style.removeProperty('width');
+        return;
+      }
+
+      const width = Math.max(272, Math.min(360, Math.floor(available)));
+      rail.style.left = `${Math.floor(contentRect.right + gap)}px`;
+      rail.style.top = '5.5rem';
+      rail.style.width = `${width}px`;
     };
 
     const initial = rail.dataset.processActiveStep ?? stages[0]?.dataset.processStep;
     if (initial) setActive(initial);
+    syncFloatingMode();
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -78,21 +197,30 @@ const firstStepId = config.steps[0]?.id ?? '';
     );
 
     for (const stage of stages) observer.observe(stage);
+    window.addEventListener('resize', syncFloatingMode, { passive: true });
   }
 </script>
 
 <style>
   .process-rail-layout {
-    display: grid;
-    gap: 1.5rem;
     margin: 2rem 0;
   }
 
+  .process-rail__content {
+    min-width: 0;
+  }
+
+  .process-rail__content :global([data-process-step]) {
+    scroll-margin-top: 5rem;
+  }
+
   .process-rail {
+    margin-top: 1.25rem;
     border: 1px solid var(--hairline);
     border-radius: 0.5rem;
     background: var(--chip);
     padding: 0.9rem;
+    box-shadow: 0 8px 26px rgb(0 0 0 / 17%);
   }
 
   .process-rail__title {
@@ -110,17 +238,70 @@ const firstStepId = config.steps[0]?.id ?? '';
   }
 
   .process-rail__item {
+    position: relative;
     border-radius: 0.4rem;
     border: 1px solid var(--hairline);
     background: light-dark(#ffffff, #151518);
-    padding: 0.55rem 0.65rem;
+    padding: 0.55rem 0.65rem 0.55rem 2.75rem;
     opacity: 0.6;
-    transition: opacity 160ms ease, border-color 160ms ease;
+    transition: opacity 160ms ease, border-color 160ms ease, transform 160ms ease;
   }
 
   .process-rail__item[data-process-active='true'] {
     opacity: 1;
     border-color: var(--focus);
+    transform: translateY(-1px);
+  }
+
+  .process-rail__system {
+    position: absolute;
+    left: 0.6rem;
+    top: 0.58rem;
+    width: 1.55rem;
+    height: 1.55rem;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .process-rail__system svg {
+    width: 0.98rem;
+    height: 0.98rem;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .process-rail__system--job {
+    background: light-dark(#dbeafe, #1f2a44);
+    color: light-dark(#1e3a8a, #bfdbfe);
+  }
+
+  .process-rail__system--slack {
+    background: light-dark(#f5d9ff, #3d1f4e);
+    color: light-dark(#6b21a8, #e9d5ff);
+  }
+
+  .process-rail__system--spotify {
+    background: light-dark(#d9fbe4, #173524);
+    color: light-dark(#166534, #86efac);
+  }
+
+  .process-rail__system--diff {
+    background: light-dark(#f9e0cf, #442814);
+    color: light-dark(#9a3412, #fdba74);
+  }
+
+  .process-rail__system-label {
+    display: block;
+    color: var(--muted);
+    font-size: 0.68rem;
+    line-height: 1.2;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
   }
 
   .process-rail__item-label {
@@ -138,30 +319,90 @@ const firstStepId = config.steps[0]?.id ?? '';
     line-height: 1.35;
   }
 
-  .process-rail__content :global([data-process-step]) {
-    scroll-margin-top: 5rem;
+  .process-rail__showcase {
+    margin-top: 0.75rem;
+    border-top: 1px solid var(--hairline);
+    padding-top: 0.7rem;
   }
 
-  @media (min-width: 62rem) {
-    .process-rail-layout {
-      grid-template-columns: minmax(0, 1fr) 17.5rem;
-      align-items: start;
+  .process-rail__sample {
+    display: none;
+    animation: process-sample-in 180ms ease;
+  }
+
+  .process-rail__sample[data-process-active='true'] {
+    display: block;
+  }
+
+  .process-rail__sample-operation {
+    margin: 0 0 0.45rem;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+  }
+
+  .process-rail__sample-block + .process-rail__sample-block {
+    margin-top: 0.45rem;
+  }
+
+  .process-rail__sample-label {
+    margin: 0 0 0.2rem;
+    color: var(--muted);
+    font-size: 0.72rem;
+  }
+
+  .process-rail__sample-array {
+    margin: 0;
+    border-radius: 0.4rem;
+    border: 1px solid var(--hairline);
+    background: light-dark(#f4f6fb, #17181d);
+    padding: 0.45rem 0.52rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    line-height: 1.45;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .process-rail__sample-array--result {
+    border-color: light-dark(#86efac, #14532d);
+  }
+
+  .process-rail-layout[data-process-enhanced='true'][data-process-floating='true'] .process-rail {
+    position: fixed;
+    max-height: calc(100vh - 7rem);
+    overflow: auto;
+    margin-top: 0;
+    z-index: 20;
+  }
+
+  @keyframes process-sample-in {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
     }
 
-    .process-rail {
-      order: 2;
-      position: sticky;
-      top: 1rem;
+    to {
+      opacity: 1;
+      transform: translateY(0);
     }
+  }
 
-    .process-rail__content {
-      order: 1;
+  @media (min-width: 72rem) {
+    .process-rail-layout[data-process-enhanced='false'] .process-rail,
+    .process-rail-layout[data-process-enhanced='true'][data-process-floating='false'] .process-rail {
+      max-width: 22rem;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .process-rail__item {
       transition: none;
+    }
+
+    .process-rail__sample {
+      animation: none;
     }
   }
 </style>

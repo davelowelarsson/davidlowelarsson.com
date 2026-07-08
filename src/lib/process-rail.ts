@@ -1,9 +1,23 @@
 import { z } from 'astro/zod';
 
+const processRailSystemSchema = z.enum(['job', 'slack', 'spotify', 'diff']);
+
+const processRailSampleSchema = z.object({
+  operation: z.string().min(1).optional(),
+  leftLabel: z.string().min(1).optional(),
+  left: z.array(z.string()).min(1).optional(),
+  rightLabel: z.string().min(1).optional(),
+  right: z.array(z.string()).min(1).optional(),
+  resultLabel: z.string().min(1).optional(),
+  result: z.array(z.string()).min(1).optional(),
+});
+
 const processRailStepSchema = z.object({
   id: z.string().min(1),
   label: z.string().min(1),
   hint: z.string().min(1).optional(),
+  system: processRailSystemSchema.default('job'),
+  sample: processRailSampleSchema.optional(),
 });
 
 export const processRailConfigSchema = z
