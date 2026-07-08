@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 const POST_PATH = '/posts/experiment-spotify-slack-sync/';
+const REPO_URL = 'https://github.com/davelowelarsson/spotify-slack-sync-fredagslistan';
 
 function requireBox<T>(box: T | null): T {
   expect(box).toBeTruthy();
@@ -49,4 +50,12 @@ test('wrapped snapshot renders aggregate stats with the skew caveat', async ({ p
   await expect(wrapped).toContainText('1,974');
   await expect(wrapped).toContainText('playlist spans more than one calendar year');
   await expect(wrapped).toContainText('swedish pop');
+});
+
+test('post exposes its source repository as a main link', async ({ page }) => {
+  await page.goto(POST_PATH);
+
+  const sourceLink = page.getByRole('link', { name: /source repository/i });
+  await expect(sourceLink).toBeVisible();
+  await expect(sourceLink).toHaveAttribute('href', REPO_URL);
 });

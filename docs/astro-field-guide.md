@@ -277,6 +277,11 @@ how the project actually grew.
   aggregate-only bars/tags from typed post-local data. No client JS is needed
   for a small explanatory visualization, and caveats (like a skewed playlist
   year) live in the component data next to the numbers.
+- **Main article links as a component:** `ArticleLinks.astro` gives posts one
+  consistent place for source repos, demos, references, or project pages. It
+  keeps important outbound links scannable without turning prose paragraphs into
+  link dumps, and external links get `target="_blank" rel="noreferrer"` in one
+  reusable component.
 
 ## YouTube embed facade + MDX support (2026-07-08, issue #37)
 

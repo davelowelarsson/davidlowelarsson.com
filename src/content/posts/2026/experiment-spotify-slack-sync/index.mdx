@@ -7,6 +7,7 @@ draft: true
 tags: ["automation", "spotify", "slack", "python", "cron"]
 ---
 
+import ArticleLinks from '../../../../components/ArticleLinks.astro';
 import ProcessStepCard from '../../../../components/ProcessStepCard.astro';
 import WrappedSnapshot from '../../../../components/WrappedSnapshot.astro';
 import { syncSteps, wrappedStats } from './flow';
@@ -30,6 +31,16 @@ For a while the playlist was maintained by hand. That worked about as well as ha
 Most people dropped tracks where the conversation already was, in Slack, and never made the second hop into Spotify. So the playlist was always a little wrong.
 
 I wrote a small Python cronjob to do the transfer for us. It has been running for years now. Quietly. No heroics. Exactly what I wanted.
+
+<ArticleLinks
+	links={[
+		{
+			label: 'Source repository',
+			href: 'https://github.com/davelowelarsson/spotify-slack-sync-fredagslistan',
+			description: 'The Python cronjob that syncs Slack track shares into Spotify.',
+		},
+	]}
+/>
 
 At some point it escaped work, too. At Friday dinners with friends I started asking them to guess the theme from the playlist. A normal person might call that small talk. I apparently turned it into an integration problem.
 
