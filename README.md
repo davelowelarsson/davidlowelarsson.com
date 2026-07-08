@@ -81,6 +81,61 @@ import poster from './poster.jpg';
 pipeline) or a plain path served as-is. `id` is the YouTube video id; an
 optional `start` prop sets a start offset in seconds.
 
+### Embedding video/audio (self-hosted on R2)
+
+Longer explanations can be self-hosted instead of pushed to YouTube: media
+lives in a Cloudflare R2 bucket at `assets.davidlowelarsson.com`, never in
+the repo (Workers static assets cap at 25 MiB/file — R2 is the source of
+truth, and `<Video>`/`<Audio>` work fine even with nothing local at all).
+
+**1. Encode locally.** A short h264/aac mp4 plays everywhere:
+
+```sh
+ffmpeg -i source.mov -c:v libx264 -crf 23 -preset slow -c:a aac -b:a 128k clip.mp4
+```
+
+**2. Co-locate it in the post bundle**, same as an image:
+
+```
+src/content/posts/2026/my-post-slug/
+  index.mdx
+  clip.mp4        → gitignored, never committed
+  poster.jpg      → committed, goes through the image pipeline
+```
+
+**3. Sync to R2** — scans every post bundle, uploads anything new or changed
+(by content hash), and updates the committed `media-manifest.json`:
+
+```sh
+npm run media:sync
+```
+
+**4. Reference it** in an `.mdx` post — `src` is the file's path relative to
+`src/content/posts/` (here, `2026/my-post-slug/clip.mp4`):
+
+```mdx
+import Video from '../../../components/Video.astro';
+import poster from './poster.jpg';
+
+<Video src="2026/my-post-slug/clip.mp4" poster={poster} />
+```
+
+`<Audio src="..." />` works the same way for audio-only clips. Both accept
+an optional `type` (defaults to `video/mp4` / `audio/mpeg`) and a `<track
+kind="captions" .../>` child for captions.
+
+**Never blocks CI.** `npm run media:check` reconciles every embed against
+R2, the manifest, and local disk, but only ever warns (exit 0) — it runs
+from a local pre-commit hook, not `.github/workflows/ci.yml`. Install the
+hook once per clone:
+
+```sh
+git config core.hooksPath .githooks
+```
+
+A post referencing media that hasn't been synced yet just gets a local
+warning; the build and deploy never fail because of it.
+
 ## The publish loop
 
 1. Write a post with `draft: true`, push a branch, open a PR
@@ -159,7 +214,7 @@ that would otherwise vanish on a dark page.
 
 - `CONTEXT.md` — glossary (Post, Category, Draft, …)
 - `docs/prd.md` — v1 scope and working agreement
-- `docs/adr/` — architecture decisions (Workers over Pages, static-with-SSR-hatch, category-as-data, self-renewing publishing loop)
+- `docs/adr/` — architecture decisions (Workers over Pages, static-with-SSR-hatch, category-as-data, self-renewing publishing loop, self-hosted media on R2)
 - `docs/astro-field-guide.md` — running ledger of Astro concepts, PR by PR
 - `docs/publishing-routine.md` — the editorial cadence: cycles, the self-renewing issue loop, vault mining
 - `.github/paths-filter.yml` — which changes count as "affects the built site"; docs-only changes skip build/test/deploy

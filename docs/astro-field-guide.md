@@ -315,3 +315,30 @@ how the project actually grew.
   onward (bump the cron to hourly for same-day timing). `liveFrom` is validated
   as a *real* calendar date/time (`isRealWallClock`), so `2026-13-40` fails the
   build rather than silently never publishing.
+
+## Self-hosted media that never gates the build (2026-07-08, issue #10)
+
+- **`<Video>`/`<Audio>` need no framework and no bundled script at all** —
+  unlike `YouTube.astro`'s click-to-load facade, native `<video controls
+  preload="metadata">`/`<audio controls preload="metadata">` already defer
+  the actual media fetch until the reader presses play; Astro's job is just
+  to resolve `src` to an absolute R2 URL (`mediaUrl()` in `src/lib/media.ts`)
+  and pass through a `<slot />` so a post can add `<track kind="captions">`
+  children. A page with no `<Video>`/`<Audio>` ships zero extra bytes.
+  Docs: https://docs.astro.build/en/basics/astro-components/#component-props
+- **The image pipeline and the media pipeline are deliberately separate.**
+  `Video`'s `poster` prop reuses the same `ImageMetadata | string` shape as
+  `YouTube.astro`'s poster (an `<Image />` for real optimization, or a raw
+  path) — but the video/audio file itself never goes through Astro's asset
+  pipeline; it is a plain URL string resolved at render time, because Astro
+  has no story for optimizing or bundling files that live outside the repo.
+- **A committed manifest is the astro-adjacent glue, not an Astro feature.**
+  `src/lib/media-manifest.ts` is pure Node/TS with no Astro imports, run by
+  two plain scripts (`media:sync`, `media:check`) via `node
+  --experimental-strip-types` — no `tsx`/`ts-node` dependency needed since
+  Node 22.6+ ships TypeScript type-stripping behind that flag. This keeps
+  the R2 lifecycle tooling outside the Vite/Astro build entirely, which is
+  exactly why it can never accidentally become a build-time dependency.
+- **CSP got one more narrow directive.** `media-src https://assets.davidlowelarsson.com`
+  was added to `public/_headers`, same pattern as issue #37's `frame-src`
+  addition — nothing else changed.
