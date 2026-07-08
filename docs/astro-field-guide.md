@@ -258,6 +258,19 @@ how the project actually grew.
   step-level `if: needs.changes.outputs.app == 'true'`, and has a guard step
   that `exit 1`s when `needs.changes.result != 'success'`. `deploy-preview`/
   `deploy-production` aren't required checks, so a job-level `if` is fine there.
+
+## Scroll-linked MDX process rail (2026-07-08)
+
+- **One reusable Astro component in MDX** can carry the whole interaction:
+  the post provides stage content (`data-process-step`) while the shared rail
+  receives a typed config object. That keeps story copy local and behavior
+  reusable for future write-ups.
+- **Layout pattern:** one grid wrapper, with content + a rail that is inline on
+  mobile and sticky on wider screens. This keeps readability first while still
+  giving desktop readers a side-by-side process view.
+- **State sync pattern:** `IntersectionObserver` maps visible content sections
+  to rail step IDs and toggles active state, with subtle fade transitions and a
+  `prefers-reduced-motion` fallback (no transition) for accessibility.
   Docs: https://github.com/dorny/paths-filter
 
 ## YouTube embed facade + MDX support (2026-07-08, issue #37)

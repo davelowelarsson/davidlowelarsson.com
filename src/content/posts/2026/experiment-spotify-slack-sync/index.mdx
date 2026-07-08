@@ -1,0 +1,54 @@
+---
+title: "spotify-slack-sync: a tiny cronjob that made Fridays easier"
+description: "The playlist was always behind because songs stayed in Slack. A small Python cronjob fixed the drift by reconciling Slack and Spotify every Friday."
+pubDate: 2026-07-08
+category: experiment
+draft: true
+tags: ["automation", "spotify", "slack", "python", "cron"]
+---
+
+import ScrollProcessRail from '../../../../components/ScrollProcessRail.astro';
+import { syncFlowConfig, wrappedSnapshot } from './flow';
+
+fredagslistan started as a Slack ritual: every Friday, a theme appears, people drop songs, and the playlist grows.
+
+The weak link was boring and human: many songs never made it from Slack into Spotify. So the playlist was always a little wrong.
+
+I wrote a small Python cronjob to do the transfer for us. It has been running for years now. Quietly. No heroics. Exactly what I wanted.
+
+<ScrollProcessRail config={syncFlowConfig}>
+  <section data-process-step="fetch-slack">
+    <h3>1. Fetch from Slack</h3>
+    <p>
+      The job reads the Friday channel, extracts track links, and normalizes IDs. This is mostly input hygiene,
+      because chat data is messy in ways APIs are not.
+    </p>
+  </section>
+
+  <section data-process-step="diff">
+    <h3>2. Compute the diff</h3>
+    <p>
+      Next step is simple set math: what exists in Slack but not yet in Spotify. No scoring model, no ranking, no
+      "smart" guesswork. Just the gap.
+    </p>
+  </section>
+
+  <section data-process-step="add-spotify">
+    <h3>3. Add missing songs</h3>
+    <p>
+      Missing tracks are appended to the playlist. If a song is already there, the run leaves it alone. Re-runs are
+      intentionally boring.
+    </p>
+  </section>
+</ScrollProcessRail>
+
+## Snapshot, not surveillance
+
+For this write-up I only want aggregate signals. No names. No leaderboard. No accidental coworker analytics.
+
+- Runs completed: {wrappedSnapshot.totals.runs}
+- Tracks auto-added: {wrappedSnapshot.totals.autoAddedTracks}
+- Busiest Friday additions: {wrappedSnapshot.totals.busiestFridayAdds}
+- Longest theme streak (weeks): {wrappedSnapshot.totals.longestThemeStreakWeeks}
+
+The interactive part here is intentionally small. If it helps the story, good. If not, I can remove it without touching the core post.

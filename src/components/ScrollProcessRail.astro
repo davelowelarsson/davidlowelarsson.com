@@ -1,0 +1,167 @@
+---
+import { type ProcessRailConfig, parseProcessRailConfig } from '../lib/process-rail';
+
+interface Props {
+  config: ProcessRailConfig;
+}
+
+const { config: rawConfig } = Astro.props;
+const config = parseProcessRailConfig(rawConfig);
+const firstStepId = config.steps[0]?.id ?? '';
+---
+
+<div class="process-rail-layout" data-process-layout={config.id}>
+  <aside
+    class="process-rail"
+    data-process-rail
+    data-process-rail-id={config.id}
+    data-process-active-step={firstStepId}
+    aria-label={config.title ?? 'Process steps'}>
+    {config.title && <h3 class="process-rail__title">{config.title}</h3>}
+    <ol class="process-rail__list">
+      {config.steps.map((step, index) => (
+        <li
+          class="process-rail__item"
+          data-process-step-id={step.id}
+          data-process-active={index === 0 ? 'true' : 'false'}>
+          <span class="process-rail__item-label">{step.label}</span>
+          {step.hint && <span class="process-rail__item-hint">{step.hint}</span>}
+        </li>
+      ))}
+    </ol>
+  </aside>
+
+  <div class="process-rail__content" data-process-content>
+    <slot />
+  </div>
+</div>
+
+<script>
+  for (const layout of document.querySelectorAll<HTMLElement>('[data-process-layout]')) {
+    const rail = layout.querySelector<HTMLElement>('[data-process-rail]');
+    const content = layout.querySelector<HTMLElement>('[data-process-content]');
+    if (!rail || !content) continue;
+
+    const itemsById = new Map<string, HTMLElement>();
+    for (const item of rail.querySelectorAll<HTMLElement>('[data-process-step-id]')) {
+      const id = item.dataset.processStepId;
+      if (id) itemsById.set(id, item);
+    }
+
+    const stages = content.querySelectorAll<HTMLElement>('[data-process-step]');
+    if (stages.length === 0) continue;
+
+    const setActive = (activeId: string) => {
+      rail.dataset.processActiveStep = activeId;
+      for (const [id, item] of itemsById.entries()) {
+        item.dataset.processActive = id === activeId ? 'true' : 'false';
+      }
+    };
+
+    const initial = rail.dataset.processActiveStep ?? stages[0]?.dataset.processStep;
+    if (initial) setActive(initial);
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+
+        const candidate = visible[0]?.target as HTMLElement | undefined;
+        const stepId = candidate?.dataset.processStep;
+        if (stepId) setActive(stepId);
+      },
+      {
+        threshold: [0.35, 0.55, 0.75],
+        rootMargin: '-20% 0px -45% 0px',
+      },
+    );
+
+    for (const stage of stages) observer.observe(stage);
+  }
+</script>
+
+<style>
+  .process-rail-layout {
+    display: grid;
+    gap: 1.5rem;
+    margin: 2rem 0;
+  }
+
+  .process-rail {
+    border: 1px solid var(--hairline);
+    border-radius: 0.5rem;
+    background: var(--chip);
+    padding: 0.9rem;
+  }
+
+  .process-rail__title {
+    margin: 0 0 0.8rem;
+    font-size: 0.95rem;
+    line-height: 1.35;
+  }
+
+  .process-rail__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 0.45rem;
+  }
+
+  .process-rail__item {
+    border-radius: 0.4rem;
+    border: 1px solid var(--hairline);
+    background: light-dark(#ffffff, #151518);
+    padding: 0.55rem 0.65rem;
+    opacity: 0.6;
+    transition: opacity 160ms ease, border-color 160ms ease;
+  }
+
+  .process-rail__item[data-process-active='true'] {
+    opacity: 1;
+    border-color: var(--focus);
+  }
+
+  .process-rail__item-label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 560;
+    line-height: 1.35;
+  }
+
+  .process-rail__item-hint {
+    display: block;
+    margin-top: 0.18rem;
+    color: var(--muted);
+    font-size: 0.77rem;
+    line-height: 1.35;
+  }
+
+  .process-rail__content :global([data-process-step]) {
+    scroll-margin-top: 5rem;
+  }
+
+  @media (min-width: 62rem) {
+    .process-rail-layout {
+      grid-template-columns: minmax(0, 1fr) 17.5rem;
+      align-items: start;
+    }
+
+    .process-rail {
+      order: 2;
+      position: sticky;
+      top: 1rem;
+    }
+
+    .process-rail__content {
+      order: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .process-rail__item {
+      transition: none;
+    }
+  }
+</style>
