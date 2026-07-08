@@ -26,14 +26,17 @@ export interface Dated {
 }
 
 /**
- * A post is a folder ("bundle") holding index.md plus its assets. The folder
- * name is the slug — parent folders (year, anything else) organize the tree
- * without ever appearing in URLs.
+ * A post is a folder ("bundle") holding index.md or index.mdx plus its assets.
+ * The folder name is the slug — parent folders (year, anything else) organize
+ * the tree without ever appearing in URLs.
  */
 export function postIdFromEntry(entry: string): string {
   const segments = entry.split('/');
-  if (segments.length < 2 || segments.at(-1) !== 'index.md') {
-    throw new Error(`Post entry "${entry}" is not a bundle — expected <folders>/<slug>/index.md`);
+  const filename = segments.at(-1);
+  if (segments.length < 2 || (filename !== 'index.md' && filename !== 'index.mdx')) {
+    throw new Error(
+      `Post entry "${entry}" is not a bundle — expected <folders>/<slug>/index.md(x)`,
+    );
   }
   return segments.at(-2) as string;
 }
