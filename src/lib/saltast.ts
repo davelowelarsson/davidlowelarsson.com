@@ -13,21 +13,10 @@ export interface ExperimentSummary {
   up: number;
   down: number;
   unknown: number;
-  /** Normalized to ms since epoch. */
-  checkedAt: number;
 }
 
 function isFiniteNumber(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value);
-}
-
-/**
- * saltast may send `checkedAt` in seconds or milliseconds — normalize to ms.
- * Anything below 1e12 is treated as seconds (1e12 ms ≈ year 33658; unix
- * seconds won't reach it for millennia, so the split is unambiguous).
- */
-export function normalizeCheckedAt(value: number): number {
-  return value < 1e12 ? value * 1000 : value;
 }
 
 /**
@@ -50,19 +39,24 @@ export function parseSummary(data: unknown): ExperimentSummary | null {
     up: d.up,
     down: d.down,
     unknown: d.unknown,
-    checkedAt: isFiniteNumber(d.checkedAt) ? normalizeCheckedAt(d.checkedAt) : Number.NaN,
   };
 }
 
-/** Footer: a compact one-glance tally. */
-export function formatCompact(summary: ExperimentSummary): string {
-  return `${summary.total} experiment${summary.total === 1 ? '' : 's'} · ${summary.up} up`;
+export type StatKey = 'up' | 'down' | 'unknown';
+
+/**
+ * The non-empty status buckets in a stable order (up, down, unknown) — the
+ * client renders each as a colored dot + label. Structured rather than a
+ * formatted string so the coloring lives in CSS and this stays unit-testable.
+ */
+export function experimentStats(
+  summary: ExperimentSummary,
+): Array<{ key: StatKey; count: number }> {
+  const keys: StatKey[] = ['up', 'down', 'unknown'];
+  return keys.map((key) => ({ key, count: summary[key] })).filter((stat) => stat.count > 0);
 }
 
-/** Experiments page: fuller breakdown, omitting empty buckets to stay calm. */
-export function formatTally(summary: ExperimentSummary): string {
-  const parts = [`${summary.up} up`];
-  if (summary.down > 0) parts.push(`${summary.down} down`);
-  if (summary.unknown > 0) parts.push(`${summary.unknown} unknown`);
-  return parts.join(' · ');
+/** "4 experiments" / "1 experiment" — the muted lead above the colored stats. */
+export function totalLabel(summary: ExperimentSummary): string {
+  return `${summary.total} experiment${summary.total === 1 ? '' : 's'}`;
 }

@@ -35,6 +35,8 @@ const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     <link rel="alternate" type="application/rss+xml" title="David Lowe Larsson" href="/rss.xml" />
+    {/* Warm the connection to saltast.com so the footer tally fetch is quicker. */}
+    <link rel="preconnect" href="https://saltast.com" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -86,51 +88,85 @@ const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
         ><a href={SALTAST_URL}>saltast.com</a><span
           class="saltast-tally"
           data-saltast-tally
-          data-saltast-format="compact"
           aria-live="polite"></span></span>
     </footer>
     <Lightbox />
     <Mermaid />
     <script>
       import {
+        type ExperimentSummary,
         SALTAST_SUMMARY_URL,
-        formatCompact,
-        formatTally,
+        experimentStats,
         parseSummary,
+        totalLabel,
       } from '../lib/saltast';
 
       const elements = document.querySelectorAll('[data-saltast-tally]');
       if (elements.length > 0) {
+        const CACHE_KEY = 'saltast:summary';
+
+        const readCache = () => {
+          try {
+            const raw = sessionStorage.getItem(CACHE_KEY);
+            return raw ? parseSummary(JSON.parse(raw)) : null;
+          } catch {
+            return null;
+          }
+        };
+
+        const render = (el: Element, summary: ExperimentSummary) => {
+          el.textContent = '';
+          el.setAttribute('data-saltast-state', 'loaded');
+
+          const total = document.createElement('span');
+          total.className = 'saltast-total';
+          total.textContent = totalLabel(summary);
+          el.append(total);
+
+          const stats = document.createElement('span');
+          stats.className = 'saltast-stats';
+          for (const { key, count } of experimentStats(summary)) {
+            const stat = document.createElement('span');
+            stat.className = `saltast-stat saltast-stat--${key}`;
+            const dot = document.createElement('span');
+            dot.className = 'saltast-dot';
+            dot.setAttribute('aria-hidden', 'true');
+            stat.append(dot, document.createTextNode(`${count} ${key}`));
+            stats.append(stat);
+          }
+          el.append(stats);
+        };
+
+        const offline = (el: Element) => {
+          el.textContent = 'offline';
+          el.setAttribute('data-saltast-state', 'offline');
+        };
+
+        // Stale-while-revalidate: paint the cached tally instantly on repeat views
+        // (no waiting on the network), then refresh in the background. Briefly
+        // stale is fine — saltast.com is the real dashboard one click away.
+        const cached = readCache();
+        if (cached) for (const el of elements) render(el, cached);
+
         (async () => {
-          let summary = null;
+          let fresh = null;
           try {
             const response = await fetch(SALTAST_SUMMARY_URL, {
               headers: { accept: 'application/json' },
             });
-            if (response.ok) summary = parseSummary(await response.json());
+            if (response.ok) fresh = parseSummary(await response.json());
           } catch {
-            // Unreachable / offline — fall through to the "offline" state.
+            // offline / CORS-blocked — keep any cached render.
           }
-
-          for (const el of elements) {
-            const compact = el.getAttribute('data-saltast-format') !== 'full';
-            if (!summary) {
-              el.textContent = compact ? ' · offline' : 'offline';
-              el.setAttribute('data-saltast-state', 'offline');
-              continue;
+          if (fresh) {
+            try {
+              sessionStorage.setItem(CACHE_KEY, JSON.stringify(fresh));
+            } catch {
+              /* storage unavailable — non-fatal */
             }
-            if (compact) {
-              el.textContent = ` · ${formatCompact(summary)}`;
-            } else {
-              const asOf = Number.isNaN(summary.checkedAt)
-                ? ''
-                : ` · as of ${new Date(summary.checkedAt).toLocaleDateString(undefined, {
-                    month: 'short',
-                    day: 'numeric',
-                  })}`;
-              el.textContent = `${formatTally(summary)}${asOf}`;
-            }
-            el.setAttribute('data-saltast-state', 'loaded');
+            for (const el of elements) render(el, fresh);
+          } else if (!cached) {
+            for (const el of elements) offline(el);
           }
         })();
       }
@@ -152,6 +188,8 @@ const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
     --bg: light-dark(#ffffff, #111113);
     --warn: light-dark(#a16207, #fbbf24);
     --focus: light-dark(#2563eb, #93b4ff);
+    --status-up: light-dark(#15803d, #4ade80);
+    --status-down: light-dark(#b91c1c, #f87171);
   }
 
   * {
@@ -295,13 +333,60 @@ const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
     color: var(--ink);
   }
 
-  /* saltast link + live tally sit on their own full-width row, so filling the
-     tally grows the row downward — the link never jumps, nothing above shifts. */
+  /* saltast link pushed to the far right; its live tally stacks underneath it,
+     right-aligned. The tally is below the link and the footer is the last
+     content on the page, so filling it never moves the link or anything above. */
   .saltast-footer {
-    flex-basis: 100%;
+    margin-left: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+    gap: 0.15rem;
   }
 
   .saltast-tally {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: baseline;
+    gap: 0.15rem 0.6rem;
+    color: var(--muted);
+  }
+
+  /* Colored status breakdown — shared by the footer tally and the experiments
+     callout (JS-created nodes, so these live in the global sheet, not scoped). */
+  .saltast-stats {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 0.15rem 0.7rem;
+  }
+
+  .saltast-stat {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    color: var(--stat-color, var(--muted));
+  }
+
+  .saltast-stat--up {
+    --stat-color: var(--status-up);
+  }
+  .saltast-stat--down {
+    --stat-color: var(--status-down);
+  }
+  .saltast-stat--unknown {
+    --stat-color: var(--warn);
+  }
+
+  .saltast-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .saltast-total {
     color: var(--muted);
   }
 

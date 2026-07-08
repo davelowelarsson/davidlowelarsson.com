@@ -50,7 +50,7 @@ const site = Astro.site?.href ?? 'https://davidlowelarsson.com';
           breakdown (or "offline") in the same footprint, so the post list
           below never shifts. Filled by the global saltast script in Base.astro.
         */}
-        <p class="saltast-callout__tally" data-saltast-tally data-saltast-format="full" aria-live="polite">
+        <p class="saltast-callout__tally" data-saltast-tally aria-live="polite">
           <span class="saltast-skeleton" aria-hidden="true">· · ·</span>
         </p>
       </aside>
@@ -72,7 +72,14 @@ const site = Astro.site?.href ?? 'https://davidlowelarsson.com';
 </Base>
 
 <style>
+  /* Full-width horizontal band: lead on the left, live tally on the right.
+     Wraps to two stacked lines on narrow screens. */
   .saltast-callout {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.35rem 1.5rem;
     margin: 0 0 2rem;
     padding: 0.75rem 1rem;
     border: 1px solid var(--hairline);
@@ -85,11 +92,16 @@ const site = Astro.site?.href ?? 'https://davidlowelarsson.com';
     font-size: 0.9rem;
   }
 
-  /* Reserve ~2 lines so the live tally (which may wrap on mobile) replaces the
-     skeleton without shifting the post list below — no CLS. */
+  /* Reserve one line so swapping the skeleton for the live tally never shifts
+     the post list below — no CLS. The content is a single compact line. */
   .saltast-callout__tally {
-    margin: 0.35rem 0 0;
-    min-height: 2.4em;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: baseline;
+    gap: 0.15rem 0.6rem;
+    margin: 0;
+    min-height: 1.4em;
     color: var(--muted);
     font-family: var(--font-mono);
     font-size: 0.8125rem;

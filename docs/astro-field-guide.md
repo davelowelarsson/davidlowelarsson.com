@@ -362,4 +362,14 @@ how the project actually grew.
 - **CSP `connect-src`.** A client fetch to another origin must be allow-listed —
   added `https://saltast.com` (David's own domain) beside `'self'`; the script is
   same-origin so `script-src 'self'` is untouched. `aria-live="polite"` lets a
-  screen reader announce the update without interrupting.
+  screen reader announce the update without interrupting. **CORS caveat:** the
+  browser also needs the *response* to carry `Access-Control-Allow-Origin` — a
+  200 that `curl` reads fine is still blocked in-page without it (degrades to
+  "offline").
+- **Feel-fast without lying.** Two latency tricks: `<link rel="preconnect">` warms
+  the TLS/DNS to saltast before the fetch, and a **stale-while-revalidate**
+  `sessionStorage` cache paints the previous tally instantly on repeat views then
+  refreshes in the background — so only the first view waits. Colors are
+  reinforcement, never the sole signal: each status is a colored dot *plus* its
+  count and word ("2 up"), so it stays legible to colorblind readers and in a
+  screen reader.
