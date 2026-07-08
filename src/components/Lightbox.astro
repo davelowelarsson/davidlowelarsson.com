@@ -1,13 +1,20 @@
 ---
-// Dependency-free progressive enhancement: click an in-article image to see
-// it full-size in a native <dialog>. No JS → images stay plain images, no
-// broken affordance (there's no "click to zoom" chrome that would then do
-// nothing). Escape and backdrop-click both close the dialog.
+// Dependency-free progressive enhancement: click an in-article image OR a
+// Mermaid diagram to see it full-size in a native <dialog>. No JS → images and
+// diagrams stay inline, no broken affordance (there's no "click to zoom" chrome
+// that would then do nothing). Escape and backdrop-click both close the dialog.
+//
+// Images open a copy of themselves (capped to the viewport). Diagrams open a
+// clone of their inline SVG with the fit-to-container cap stripped, so it
+// renders at natural size and can be panned by scrolling the dialog — the
+// "really examine it" escape hatch for wide diagrams that read small inline.
+// Deliberately minimal: no pan/zoom library, native <dialog> gives us Escape,
+// focus trapping and the backdrop for free. See ADR 0006.
 // Docs: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog
 ---
 
-<dialog id="lightbox" aria-label="Enlarged image">
-  <img alt="" />
+<dialog id="lightbox" aria-label="Enlarged view">
+  <div class="lightbox-content"></div>
 </dialog>
 
 <style>
@@ -19,35 +26,75 @@
     max-width: 92vw;
     max-height: 92vh;
     background: transparent;
+    /* A natural-size diagram can exceed the dialog box — scroll to pan it. */
+    overflow: auto;
+    overscroll-behavior: contain;
   }
 
   #lightbox::backdrop {
     background: rgb(0 0 0 / 75%);
   }
 
-  #lightbox img {
+  /* An image fits the viewport (as before). A diagram SVG keeps its natural
+     size so it stays sharp and legible; the dialog scrolls to reach the edges. */
+  .lightbox-content img {
     display: block;
     max-width: 92vw;
     max-height: 92vh;
+  }
+
+  .lightbox-content svg {
+    display: block;
   }
 </style>
 
 <script>
   const dialog = document.querySelector<HTMLDialogElement>('#lightbox');
-  const preview = dialog?.querySelector('img');
+  const content = dialog?.querySelector<HTMLElement>('.lightbox-content');
 
-  if (dialog && preview) {
-    for (const img of document.querySelectorAll<HTMLImageElement>('article img')) {
-      img.addEventListener('click', () => {
-        preview.src = img.src;
-        preview.alt = img.alt;
-        dialog.showModal();
-      });
-    }
+  if (dialog && content) {
+    const open = (node: Node) => {
+      content.replaceChildren(node);
+      dialog.showModal();
+    };
+
+    // One delegated listener on the article covers both media types — and,
+    // crucially, diagrams that Mermaid.astro swaps in *after* this script runs
+    // (its render is async), which a one-shot querySelectorAll would miss.
+    document.querySelector('article')?.addEventListener('click', (event) => {
+      const target = event.target as Element | null;
+
+      const img = target?.closest?.<HTMLImageElement>('img');
+      if (img) {
+        const clone = document.createElement('img');
+        clone.src = img.src;
+        clone.alt = img.alt;
+        open(clone);
+        return;
+      }
+
+      const diagram = target?.closest?.('.mermaid-diagram');
+      const svg = diagram?.querySelector('svg');
+      if (svg) {
+        const clone = svg.cloneNode(true) as SVGSVGElement;
+        // Strip the fit-to-container cap Mermaid applies (useMaxWidth) and pin
+        // the intrinsic dimensions from the viewBox, so the clone renders at
+        // full size inside the scrollable dialog instead of shrinking again.
+        clone.style.maxWidth = 'none';
+        clone.style.width = '';
+        clone.style.height = '';
+        const box = clone.viewBox?.baseVal;
+        if (box?.width) {
+          clone.setAttribute('width', String(box.width));
+          clone.setAttribute('height', String(box.height));
+        }
+        open(clone);
+      }
+    });
 
     // A click that lands on the backdrop reports the <dialog> itself as the
     // target (the backdrop isn't a real descendant node) — that's how we
-    // tell it apart from a click on the image. Escape already closes a
+    // tell it apart from a click on the content. Escape already closes a
     // showModal() dialog natively, so it needs no handler here.
     dialog.addEventListener('click', (event) => {
       if (event.target === dialog) dialog.close();

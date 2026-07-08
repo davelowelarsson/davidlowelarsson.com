@@ -290,6 +290,21 @@ const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
     cursor: zoom-in;
   }
 
+  /* Break a figure out wider than the 42rem prose measure, centred on the
+     viewport, without restructuring the single-column <body> (which also holds
+     the header/footer). The `left: 50%` + `translateX(-50%)` pair re-centres a
+     child that's wider than its parent; `min(60rem, 100vw - 2rem)` is the
+     gentle first-pass cap — clearly wider than the text on desktop, full-width
+     (minus a small gutter) on mobile, and never wide enough to push the page
+     into horizontal scroll. A deliberate full-bleed language can come later in
+     the #11 design pass by raising this one number. See ADR 0006. */
+  .breakout {
+    width: min(60rem, 100vw - 2rem);
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
   /* ── Header / footer ── */
 
   header nav {
