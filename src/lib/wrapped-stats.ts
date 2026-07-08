@@ -8,6 +8,7 @@ const wrappedYearSchema = z.object({
   top_artists: z.array(z.string().min(1)).min(1),
   contributors: z.number().int().nonnegative(),
   slack_shares: z.number().int().nonnegative(),
+  note: z.string().min(1).optional(),
   caveat: z.string().min(1).optional(),
 });
 

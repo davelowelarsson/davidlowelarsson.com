@@ -87,6 +87,7 @@ export const wrappedStats = parseWrappedStats({
       ],
       contributors: 25,
       slack_shares: 1145,
+      note: 'initial archive scan pulled in more historical Slack shares than a normal year',
     },
     {
       year: 2025,
@@ -96,6 +97,7 @@ export const wrappedStats = parseWrappedStats({
       top_artists: ['Bob Dylan', 'Håkan Hellström', 'In Flames', 'BTS', 'Hofmästarn'],
       contributors: 21,
       slack_shares: 462,
+      note: 'steady participation, messy playlist boundary',
       caveat: 'playlist spans more than one calendar year, so tracks are context, not a race',
     },
     {
@@ -106,6 +108,7 @@ export const wrappedStats = parseWrappedStats({
       top_artists: ['Robyn', 'Bob Dylan', 'kent', 'Galenskaparna & After Shave', 'Rihanna'],
       contributors: 20,
       slack_shares: 367,
+      note: 'partial/current year snapshot',
     },
   ],
   totals: {

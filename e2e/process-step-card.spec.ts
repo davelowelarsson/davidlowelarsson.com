@@ -48,8 +48,21 @@ test('wrapped snapshot renders aggregate stats with the skew caveat', async ({ p
   await expect(wrapped).toBeVisible();
   await expect(wrapped).toContainText('Fredagslistan wrapped, carefully');
   await expect(wrapped).toContainText('1,974');
+  await expect(wrapped).toContainText('not a perfect interest graph');
+  await expect(wrapped).toContainText('initial archive scan');
   await expect(wrapped).toContainText('playlist spans more than one calendar year');
   await expect(wrapped).toContainText('swedish pop');
+});
+
+test('post credits Agnes and the first theme without exposing raw Slack details', async ({
+  page,
+}) => {
+  await page.goto(POST_PATH);
+
+  await expect(page.locator('article')).toContainText('Agnes made a playlist');
+  await expect(page.locator('article')).toContainText(/Today.s theme is sun/);
+  await expect(page.locator('article')).not.toContainText('agnesforsell');
+  await expect(page.locator('article')).not.toContainText('U06LM2VJ8');
 });
 
 test('post exposes its source repository as a main link', async ({ page }) => {

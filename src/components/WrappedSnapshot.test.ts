@@ -13,6 +13,7 @@ const stats = parseWrappedStats({
       top_artists: ['kent', 'Petter'],
       contributors: 25,
       slack_shares: 1145,
+      note: 'initial archive scan pulled in historical shares',
     },
     {
       year: 2025,
@@ -42,8 +43,10 @@ describe('WrappedSnapshot', () => {
     });
 
     expect(html).toContain('Fredagslistan wrapped, carefully');
+    expect(html).toContain('not a perfect interest graph');
     expect(html).toContain('1,607');
     expect(html).toContain('swedish pop');
+    expect(html).toContain('initial archive scan pulled in historical shares');
     expect(html).toContain('spans more than one calendar year');
     expect(html).toContain('data-share-ratio="100"');
     expect(html).not.toContain('top contributors');

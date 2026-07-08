@@ -19,7 +19,8 @@ const numberFormat = new Intl.NumberFormat('en-GB');
     <p class="wrapped-snapshot__eyebrow">Aggregate-only</p>
     <h3 id="wrapped-snapshot-title">Fredagslistan wrapped, carefully</h3>
     <p>
-      The privacy-safe version is less “who listened to what” and more “what shape did the ritual have?”
+      The privacy-safe version is less “who listened to what” and more “what shape did the archive scan have?”
+      These bars are not a perfect interest graph.
     </p>
   </div>
 
@@ -63,6 +64,7 @@ const numberFormat = new Intl.NumberFormat('en-GB');
             <span>{numberFormat.format(year.tracks)} playlist tracks</span>
           </div>
 
+          {year.note && <p class="wrapped-snapshot__note">{year.note}</p>}
           {year.caveat && <p class="wrapped-snapshot__caveat">{year.caveat}</p>}
 
           <div class="wrapped-snapshot__tags" aria-label={`${year.year} top genres`}>
@@ -100,6 +102,7 @@ const numberFormat = new Intl.NumberFormat('en-GB');
   .wrapped-snapshot__eyebrow,
   .wrapped-snapshot__header p,
   .wrapped-snapshot__artists,
+  .wrapped-snapshot__note,
   .wrapped-snapshot__caveat {
     color: var(--muted);
   }
@@ -199,10 +202,16 @@ const numberFormat = new Intl.NumberFormat('en-GB');
     background: linear-gradient(90deg, #36c5f0, #1ed760);
   }
 
+  .wrapped-snapshot__note,
   .wrapped-snapshot__caveat {
     margin: 0.55rem 0 0;
     font-size: 0.76rem;
     line-height: 1.4;
+  }
+
+  .wrapped-snapshot__caveat {
+    border-left: 2px solid var(--hairline);
+    padding-left: 0.55rem;
   }
 
   .wrapped-snapshot__tags {
