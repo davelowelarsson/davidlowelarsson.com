@@ -3,10 +3,10 @@ import { expect, test } from '@playwright/test';
 // Guards issue #6: mermaid code blocks render as diagrams client-side, and
 // — the point of doing this client-side instead of via rehype-mermaid SSR —
 // pages with no mermaid block never pay for the mermaid chunk at all. The
-// proof-post (experiment-home-lab-topology) carries one `mermaid` block
-// (a flowchart of the request path) specifically to exercise this; it's
-// published (draft: false), so it's built and served the same way in dev,
-// preview, and this e2e run against the production build.
+// proof-post (experiment-home-lab-topology) carries one or more `mermaid`
+// blocks specifically to exercise this; it's published (draft: false), so it's
+// built and served the same way in dev, preview, and this e2e run against the
+// production build. The test is count-agnostic — a post may grow more diagrams.
 
 const MERMAID_POST_PATH = '/posts/experiment-home-lab-topology/';
 
@@ -19,11 +19,13 @@ test('a mermaid block in a post renders as an inline SVG diagram', async ({ page
   // stand in its place.
   await expect(page.locator('pre > code.language-mermaid')).toHaveCount(0);
 
-  const diagram = page.locator('.mermaid-diagram svg');
-  await expect(diagram).toBeVisible();
+  // At least one diagram rendered (the post may carry several — assert on the
+  // first rather than the set, so adding diagrams never trips strict mode).
+  const diagrams = page.locator('.mermaid-diagram svg');
+  await expect(diagrams.first()).toBeVisible();
   // A real mermaid render, not just an empty wrapper: flowchart nodes are
   // SVG <g class="node"> elements.
-  await expect(diagram.locator('g.node').first()).toBeVisible();
+  await expect(diagrams.first().locator('g.node').first()).toBeVisible();
 });
 
 test('a page without a mermaid block never fetches the mermaid chunk', async ({ page }) => {
