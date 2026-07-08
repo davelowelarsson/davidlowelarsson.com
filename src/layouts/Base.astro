@@ -2,6 +2,7 @@
 import { CLOUDFLARE_ANALYTICS_TOKEN } from 'astro:env/client';
 import Lightbox from '../components/Lightbox.astro';
 import Mermaid from '../components/Mermaid.astro';
+import { SALTAST_URL } from '../lib/saltast';
 import { AUTHOR } from '../lib/seo';
 
 interface Props {
@@ -75,9 +76,65 @@ const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
       <a href={AUTHOR.linkedin}>LinkedIn</a>
       <a href={AUTHOR.github}>GitHub</a>
       <a href="/rss.xml">RSS</a>
+      {/*
+        saltast.com link renders immediately; the tally span sits AFTER it and
+        is the last content on the page, so the script filling it grows only
+        downward — the link never moves, nothing above shifts (no CLS). No JS →
+        just the link. See the saltast script below + docs/astro-field-guide.md.
+      */}
+      <span class="saltast-footer"
+        ><a href={SALTAST_URL}>saltast.com</a><span
+          class="saltast-tally"
+          data-saltast-tally
+          data-saltast-format="compact"
+          aria-live="polite"></span></span>
     </footer>
     <Lightbox />
     <Mermaid />
+    <script>
+      import {
+        SALTAST_SUMMARY_URL,
+        formatCompact,
+        formatTally,
+        parseSummary,
+      } from '../lib/saltast';
+
+      const elements = document.querySelectorAll('[data-saltast-tally]');
+      if (elements.length > 0) {
+        (async () => {
+          let summary = null;
+          try {
+            const response = await fetch(SALTAST_SUMMARY_URL, {
+              headers: { accept: 'application/json' },
+            });
+            if (response.ok) summary = parseSummary(await response.json());
+          } catch {
+            // Unreachable / offline — fall through to the "offline" state.
+          }
+
+          for (const el of elements) {
+            const compact = el.getAttribute('data-saltast-format') !== 'full';
+            if (!summary) {
+              el.textContent = compact ? ' · offline' : 'offline';
+              el.setAttribute('data-saltast-state', 'offline');
+              continue;
+            }
+            if (compact) {
+              el.textContent = ` · ${formatCompact(summary)}`;
+            } else {
+              const asOf = Number.isNaN(summary.checkedAt)
+                ? ''
+                : ` · as of ${new Date(summary.checkedAt).toLocaleDateString(undefined, {
+                    month: 'short',
+                    day: 'numeric',
+                  })}`;
+              el.textContent = `${formatTally(summary)}${asOf}`;
+            }
+            el.setAttribute('data-saltast-state', 'loaded');
+          }
+        })();
+      }
+    </script>
   </body>
 </html>
 
@@ -220,7 +277,8 @@ const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
 
   footer {
     display: flex;
-    gap: 1.5rem;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
     margin-top: 5rem;
     padding-top: 1.25rem;
     border-top: 1px solid var(--hairline);
@@ -235,6 +293,16 @@ const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
 
   footer a:hover {
     color: var(--ink);
+  }
+
+  /* saltast link + live tally sit on their own full-width row, so filling the
+     tally grows the row downward — the link never jumps, nothing above shifts. */
+  .saltast-footer {
+    flex-basis: 100%;
+  }
+
+  .saltast-tally {
+    color: var(--muted);
   }
 
   /* ── The meta rail (signature element) ── */

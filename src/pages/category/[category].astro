@@ -12,6 +12,7 @@ import {
   isVisible,
   sortByPubDateDesc,
 } from '../../lib/posts';
+import { SALTAST_URL } from '../../lib/saltast';
 import { collectionPageJsonLd } from '../../lib/seo';
 
 export function getStaticPaths() {
@@ -39,6 +40,23 @@ const site = Astro.site?.href ?? 'https://davidlowelarsson.com';
   <h1>{category}</h1>
   <p class="category-description">{CATEGORY_DESCRIPTIONS[category]}</p>
   {
+    category === 'experiment' && (
+      <aside class="saltast-callout">
+        <p class="saltast-callout__lead">
+          <a href={SALTAST_URL}>Experiments run live on saltast.com</a>
+        </p>
+        {/*
+          Reserved-height tally: the script swaps the skeleton for the live
+          breakdown (or "offline") in the same footprint, so the post list
+          below never shifts. Filled by the global saltast script in Base.astro.
+        */}
+        <p class="saltast-callout__tally" data-saltast-tally data-saltast-format="full" aria-live="polite">
+          <span class="saltast-skeleton" aria-hidden="true">· · ·</span>
+        </p>
+      </aside>
+    )
+  }
+  {
     years.length > 0 ? (
       years.map(({ year, posts: yearPosts }) => (
         <>
@@ -52,3 +70,33 @@ const site = Astro.site?.href ?? 'https://davidlowelarsson.com';
   }
   <p class="all-posts"><a href="/posts/">All posts →</a></p>
 </Base>
+
+<style>
+  .saltast-callout {
+    margin: 0 0 2rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--hairline);
+    border-radius: 8px;
+  }
+
+  .saltast-callout__lead {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+  }
+
+  /* Reserve ~2 lines so the live tally (which may wrap on mobile) replaces the
+     skeleton without shifting the post list below — no CLS. */
+  .saltast-callout__tally {
+    margin: 0.35rem 0 0;
+    min-height: 2.4em;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+  }
+
+  .saltast-skeleton {
+    opacity: 0.4;
+    letter-spacing: 0.3em;
+  }
+</style>
