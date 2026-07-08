@@ -7,7 +7,11 @@ name: Scheduled publish
 # run self-heals on the next day. Independent of the PR/push path-filter CI.
 on:
   schedule:
-    - cron: '0 5 * * *' # 05:00 UTC ≈ 06:00 CET / 07:00 CEST (Stockholm morning)
+    # 05:00 UTC ≈ 06:00 CET / 07:00 CEST (Stockholm morning). Daily = date-level
+    # precision: a post's `liveFrom` time-of-day only takes effect from this run
+    # onward, so a same-day time before ~07:00 CE(S)T goes live the next morning.
+    # For tighter timing, change to hourly: '0 * * * *' (still idempotent).
+    - cron: '0 5 * * *'
   workflow_dispatch:
 
 concurrency:

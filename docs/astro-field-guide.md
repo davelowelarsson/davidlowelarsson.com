@@ -280,4 +280,8 @@ how the project actually grew.
   `wrangler deploy`; re-running it changes nothing if no post crossed its
   `liveFrom`, and a missed day is caught by the next run. `production-build.test`
   gained a live guard that fails if a not-yet-live scheduled post reaches any
-  output — the same safety net that already guards drafts.
+  output — the same safety net that already guards drafts. Daily cadence means
+  date-level precision: a `liveFrom` time only takes effect from the morning run
+  onward (bump the cron to hourly for same-day timing). `liveFrom` is validated
+  as a *real* calendar date/time (`isRealWallClock`), so `2026-13-40` fails the
+  build rather than silently never publishing.
