@@ -1,0 +1,43 @@
+name: Scheduled publish
+
+# "Poor man's" scheduled publishing for a static site: rebuild + redeploy daily
+# so any post whose `liveFrom` has passed (Europe/Stockholm) becomes visible on
+# its date. The date gate lives in `isVisible` (production build only), so this
+# job is a plain unconditional prod build + deploy — idempotent, and a missed
+# run self-heals on the next day. Independent of the PR/push path-filter CI.
+on:
+  schedule:
+    - cron: '0 5 * * *' # 05:00 UTC ≈ 06:00 CET / 07:00 CEST (Stockholm morning)
+  workflow_dispatch:
+
+concurrency:
+  group: scheduled-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      HAS_CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - name: Build for production
+        run: npm run build
+        env:
+          SHOW_DRAFTS: 'false'
+          CLOUDFLARE_ANALYTICS_TOKEN: ${{ vars.CLOUDFLARE_ANALYTICS_TOKEN || '' }}
+      - name: Deploy to Cloudflare Workers
+        if: env.HAS_CLOUDFLARE_TOKEN == 'true'
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy
+      - name: Skipped deploy notice
+        if: env.HAS_CLOUDFLARE_TOKEN != 'true'
+        run: echo "::notice::CLOUDFLARE_API_TOKEN not configured — scheduled deploy skipped."
