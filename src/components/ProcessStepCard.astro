@@ -1,0 +1,237 @@
+---
+import type { ProcessRailStep } from '../lib/process-rail';
+
+interface Props {
+  step: ProcessRailStep;
+}
+
+const { step } = Astro.props;
+
+const SYSTEM_META = {
+  job: { label: 'Job', tone: 'job' },
+  slack: { label: 'Slack', tone: 'slack' },
+  spotify: { label: 'Spotify', tone: 'spotify' },
+  diff: { label: 'Diff', tone: 'diff' },
+} as const;
+
+const system = SYSTEM_META[step.system];
+const sample = step.sample;
+
+function formatList(items: string[]) {
+  return `[
+${items.map((item) => `  '${item}'`).join(',\n')}
+]`;
+}
+---
+
+<figure class={`process-step-card process-step-card--${system.tone}`} data-process-step-card-id={step.id}>
+  <figcaption class="process-step-card__header">
+    <span class={`process-step-card__system process-step-card__system--${system.tone}`} aria-hidden="true">
+      {step.system === 'spotify' && (
+        <svg viewBox="0 0 24 24" focusable="false">
+          <path d="M5 8.6c4.8-1.5 9.7-1.1 14.2 1" />
+          <path d="M6.1 12c4-1.2 8-0.9 11.7 0.9" />
+          <path d="M7.2 15.2c3.1-0.9 6.1-0.6 9 0.7" />
+        </svg>
+      )}
+      {step.system === 'slack' && (
+        <svg viewBox="0 0 24 24" focusable="false">
+          <path d="M8.2 3v5.1a2.1 2.1 0 1 1-2.1-2.1" />
+          <path d="M3 8.2h5.1a2.1 2.1 0 1 1-2.1 2.1" />
+          <path d="M20.9 8.2h-5.1a2.1 2.1 0 1 1 2.1-2.1" />
+          <path d="M15.8 21v-5.1a2.1 2.1 0 1 1 2.1 2.1" />
+        </svg>
+      )}
+      {step.system === 'diff' && (
+        <svg viewBox="0 0 24 24" focusable="false">
+          <path d="M5 12h14" />
+          <path d="M12 5v14" />
+        </svg>
+      )}
+      {step.system === 'job' && (
+        <svg viewBox="0 0 24 24" focusable="false">
+          <path d="M12 3v3" />
+          <path d="M12 18v3" />
+          <path d="M3 12h3" />
+          <path d="M18 12h3" />
+          <circle cx="12" cy="12" r="4" />
+        </svg>
+      )}
+    </span>
+    <span class="process-step-card__header-copy">
+      <span class="process-step-card__system-label">{system.label}</span>
+      <strong>{step.label}</strong>
+      {step.hint && <span>{step.hint}</span>}
+    </span>
+  </figcaption>
+
+  {sample && (
+    <div class="process-step-card__sample">
+      {sample.operation && <code class="process-step-card__operation">{sample.operation}</code>}
+
+      <div class="process-step-card__grid">
+        {sample.left && (
+          <section class="process-step-card__block">
+            <p>{sample.leftLabel ?? 'Input'}</p>
+            <pre><code>{formatList(sample.left)}</code></pre>
+          </section>
+        )}
+
+        {sample.right && (
+          <section class="process-step-card__block">
+            <p>{sample.rightLabel ?? 'Current state'}</p>
+            <pre><code>{formatList(sample.right)}</code></pre>
+          </section>
+        )}
+
+        {sample.result && (
+          <section class="process-step-card__block process-step-card__block--result">
+            <p>{sample.resultLabel ?? 'Result'}</p>
+            <pre><code>{formatList(sample.result)}</code></pre>
+          </section>
+        )}
+      </div>
+    </div>
+  )}
+</figure>
+
+<style>
+  .process-step-card {
+    --card-accent: var(--focus);
+    --card-accent-bg: var(--chip);
+
+    margin: 1.1rem 0 1.75rem;
+    border: 1px solid var(--hairline);
+    border-left: 3px solid var(--card-accent);
+    border-radius: 0.5rem;
+    background: light-dark(#fbfbfd, #19191d);
+    padding: 0.8rem;
+    box-shadow: 0 0.75rem 1.8rem rgb(0 0 0 / 10%);
+  }
+
+  .process-step-card--slack {
+    --card-accent: light-dark(#7c3aed, #c084fc);
+    --card-accent-bg: light-dark(#f4e8ff, #321943);
+  }
+
+  .process-step-card--spotify {
+    --card-accent: light-dark(#15803d, #4ade80);
+    --card-accent-bg: light-dark(#ddfbe7, #123322);
+  }
+
+  .process-step-card--diff {
+    --card-accent: light-dark(#c2410c, #fb923c);
+    --card-accent-bg: light-dark(#ffedd5, #3e2412);
+  }
+
+  .process-step-card__header {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.65rem;
+    align-items: start;
+  }
+
+  .process-step-card__system {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--card-accent-bg);
+    color: var(--card-accent);
+  }
+
+  .process-step-card__system svg {
+    width: 1.1rem;
+    height: 1.1rem;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .process-step-card__header-copy {
+    display: grid;
+    gap: 0.08rem;
+    min-width: 0;
+  }
+
+  .process-step-card__system-label {
+    color: var(--muted);
+    font-size: 0.68rem;
+    line-height: 1.2;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .process-step-card__header-copy strong {
+    font-size: 0.98rem;
+    line-height: 1.35;
+  }
+
+  .process-step-card__header-copy span:last-child:not(.process-step-card__system-label) {
+    color: var(--muted);
+    font-size: 0.84rem;
+    line-height: 1.45;
+  }
+
+  .process-step-card__sample {
+    margin-top: 0.8rem;
+    border-top: 1px solid var(--hairline);
+    padding-top: 0.75rem;
+  }
+
+  .process-step-card__operation {
+    display: block;
+    margin-bottom: 0.65rem;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    line-height: 1.4;
+    white-space: normal;
+  }
+
+  .process-step-card__grid {
+    display: grid;
+    gap: 0.55rem;
+  }
+
+  .process-step-card__block {
+    min-width: 0;
+  }
+
+  .process-step-card__block p {
+    margin: 0 0 0.25rem;
+    color: var(--muted);
+    font-size: 0.72rem;
+    line-height: 1.3;
+  }
+
+  .process-step-card__block pre {
+    margin: 0;
+    border: 1px solid var(--hairline);
+    border-radius: 0.4rem;
+    background: light-dark(#f3f5f9, #111216);
+    padding: 0.55rem;
+    overflow-x: auto;
+    font-size: 0.72rem;
+    line-height: 1.5;
+  }
+
+  .process-step-card__block code {
+    font-family: var(--font-mono);
+  }
+
+  .process-step-card__block--result pre {
+    border-color: var(--card-accent);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--card-accent) 20%, transparent);
+  }
+
+  @media (min-width: 38rem) {
+    .process-step-card__grid {
+      grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    }
+  }
+</style>

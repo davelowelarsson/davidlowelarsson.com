@@ -48,6 +48,18 @@ export const syncFlowConfig = parseProcessRailConfig({
   ],
 });
 
+function requireStep(id: string) {
+  const step = syncFlowConfig.steps.find((candidate) => candidate.id === id);
+  if (!step) throw new Error(`Missing process step: ${id}`);
+  return step;
+}
+
+export const syncSteps = {
+  fetchSlack: requireStep('fetch-slack'),
+  diff: requireStep('diff'),
+  addSpotify: requireStep('add-spotify'),
+};
+
 export const wrappedSnapshot = {
   generatedAt: '2026-07-08',
   totals: {

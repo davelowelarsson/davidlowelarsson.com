@@ -41,6 +41,7 @@ export const processRailConfigSchema = z
   });
 
 export type ProcessRailConfig = z.infer<typeof processRailConfigSchema>;
+export type ProcessRailStep = ProcessRailConfig['steps'][number];
 
 export function parseProcessRailConfig(input: unknown): ProcessRailConfig {
   return processRailConfigSchema.parse(input);

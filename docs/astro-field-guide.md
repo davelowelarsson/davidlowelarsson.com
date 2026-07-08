@@ -259,18 +259,17 @@ how the project actually grew.
   that `exit 1`s when `needs.changes.result != 'success'`. `deploy-preview`/
   `deploy-production` aren't required checks, so a job-level `if` is fine there.
 
-## Scroll-linked MDX process rail (2026-07-08)
+## Inline MDX process cards (2026-07-08)
 
-- **One reusable Astro component in MDX** can carry the whole interaction:
-  the post provides stage content (`data-process-step`) while the shared rail
-  receives a typed config object. That keeps story copy local and behavior
-  reusable for future write-ups.
-- **Layout pattern:** one grid wrapper, with content + a rail that is inline on
-  mobile and sticky on wider screens. This keeps readability first while still
-  giving desktop readers a side-by-side process view.
-- **State sync pattern:** `IntersectionObserver` maps visible content sections
-  to rail step IDs and toggles active state, with subtle fade transitions and a
-  `prefers-reduced-motion` fallback (no transition) for accessibility.
+- **A reusable Astro component inside MDX** works best when it explains the
+  paragraph it sits next to. `ProcessStepCard.astro` takes one typed step from
+  a post-local config and renders a visual insert without wrapping the article.
+- **Static before clever:** the card has no client script, observer, or scroll
+  state. The prose stays in the normal reading frame, and the visual appears
+  immediately after the related idea on desktop and mobile.
+- **Post-local data, shared component:** `flow.ts` owns the Slack/Spotify sample
+  arrays for this story, while `src/lib/process-rail.ts` owns validation and
+  reusable types for future MDX explainers.
   Docs: https://github.com/dorny/paths-filter
 
 ## YouTube embed facade + MDX support (2026-07-08, issue #37)
