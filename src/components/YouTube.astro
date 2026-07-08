@@ -1,0 +1,151 @@
+---
+import { Image } from 'astro:assets';
+
+// Click-to-load YouTube facade (issue #37): renders a static poster + play
+// button, loads the real iframe only once the reader clicks. Zero requests
+// to Google/YouTube until then — hand-rolled instead of the
+// lite-youtube-embed package to stay dependency-free, same posture as
+// Mermaid.astro/Lightbox.astro (a tiny bundled `<script>`, no CDN, nothing
+// framework-specific).
+//
+// `youtube-nocookie.com` only (never youtube.com) — the reduced-tracking
+// embed host — and the iframe is created by client JS after a real click, so
+// nothing third-party ever appears in the server-rendered HTML.
+interface Props {
+  /** YouTube video id, e.g. the `v=` param or the end of a youtu.be link. */
+  id: string;
+  /** Used for the button's aria-label and the eventual iframe's title. */
+  title: string;
+  /**
+   * A LOCAL poster image — either an `import poster from './poster.jpg'`
+   * (ImageMetadata, run through Astro's image pipeline for real
+   * optimization) or a plain path already served as-is (e.g. from
+   * `public/`). Never a remote/YouTube thumbnail URL.
+   */
+  poster: ImageMetadata | string;
+  /** Optional start offset in seconds. */
+  start?: number;
+}
+
+const { id, title, poster, start } = Astro.props;
+const isProcessedImage = typeof poster !== 'string';
+---
+
+<div class="youtube-embed" data-youtube-id={id} data-youtube-title={title} data-youtube-start={start}>
+  <button type="button" class="youtube-embed__play" aria-label={`Play video: ${title}`}>
+    {
+      isProcessedImage ? (
+        <Image
+          src={poster as ImageMetadata}
+          alt=""
+          class="youtube-embed__poster"
+          widths={[320, 640, 960, 1280]}
+          sizes="(min-width: 40rem) 40rem, 100vw"
+        />
+      ) : (
+        <img src={poster as string} alt="" class="youtube-embed__poster" />
+      )
+    }
+    <span class="youtube-embed__play-icon" aria-hidden="true"></span>
+  </button>
+</div>
+
+<style>
+  /* `aspect-ratio` reserves the 16:9 box before the poster (or the eventual
+     iframe) has loaded — that's the whole no-layout-shift trick, independent
+     of whatever intrinsic size the poster image itself has. */
+  .youtube-embed {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 8px;
+    border: 1px solid var(--hairline);
+    background: #000;
+  }
+
+  .youtube-embed__play {
+    all: unset;
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  .youtube-embed__poster {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .youtube-embed__play-icon {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+    background: rgb(0 0 0 / 65%);
+    transition: background 120ms ease;
+  }
+
+  .youtube-embed__play:hover .youtube-embed__play-icon,
+  .youtube-embed__play:focus-visible .youtube-embed__play-icon {
+    background: rgb(0 0 0 / 80%);
+  }
+
+  /* CSS triangle — no icon font, no extra asset. */
+  .youtube-embed__play-icon::after {
+    content: '';
+    margin-left: 0.3rem;
+    border-style: solid;
+    border-width: 0.9rem 0 0.9rem 1.4rem;
+    border-color: transparent transparent transparent #fff;
+  }
+
+  .youtube-embed :global(iframe) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+</style>
+
+<script>
+  // Bundled, same-origin `<script>` (Astro compiles this to a hashed
+  // /_astro/*.js chunk) — satisfies the CSP's `script-src 'self'` with no
+  // CDN allowance, same pattern as Mermaid.astro/Lightbox.astro. Runs once
+  // per page load and wires up every facade found, so pages without a
+  // <YouTube /> never execute anything beyond this cheap querySelectorAll.
+  for (const wrapper of document.querySelectorAll<HTMLElement>('.youtube-embed')) {
+    const button = wrapper.querySelector('button');
+    button?.addEventListener(
+      'click',
+      () => {
+        const id = wrapper.dataset.youtubeId;
+        const title = wrapper.dataset.youtubeTitle ?? '';
+        const start = wrapper.dataset.youtubeStart;
+        if (!id) return;
+
+        const params = new URLSearchParams({ autoplay: '1' });
+        if (start) params.set('start', start);
+
+        const iframe = document.createElement('iframe');
+        iframe.src = `https://www.youtube-nocookie.com/embed/${id}?${params.toString()}`;
+        iframe.title = title;
+        iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
+        iframe.allowFullscreen = true;
+
+        wrapper.replaceChildren(iframe);
+      },
+      { once: true },
+    );
+  }
+</script>

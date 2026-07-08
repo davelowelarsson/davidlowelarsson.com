@@ -1,0 +1,15 @@
+---
+title: "Embed test fixture"
+description: "Not a real post — exercises the click-to-load YouTube facade for e2e/embeds.spec.ts. Draft only, never ships to production."
+pubDate: 2026-07-08
+category: til
+draft: true
+---
+
+import YouTube from '../../../../components/YouTube.astro';
+
+This is a test fixture, not a real post — it exists so `e2e/embeds.spec.ts` has an
+`.mdx` page to load. It stays `draft: true` forever, so the production build (which
+excludes drafts) never ships it.
+
+<YouTube id="dQw4w9WgXcQ" title="Test" poster="/og-default.png" />

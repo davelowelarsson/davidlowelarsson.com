@@ -120,13 +120,18 @@ describe('postIdFromEntry', () => {
     expect(postIdFromEntry('2026/draft-preview-pipeline/index.md')).toBe('draft-preview-pipeline');
   });
 
+  it('accepts .mdx bundles too', () => {
+    expect(postIdFromEntry('2026/embed-test-fixture/index.mdx')).toBe('embed-test-fixture');
+  });
+
   it('ignores intermediate folders — organization never changes URLs', () => {
     expect(postIdFromEntry('2026/07/some-note/index.md')).toBe('some-note');
-    expect(postIdFromEntry('deep/nested/tree/some-note/index.md')).toBe('some-note');
+    expect(postIdFromEntry('deep/nested/tree/some-note/index.mdx')).toBe('some-note');
   });
 
   it('throws on a non-bundle entry instead of minting a broken id', () => {
     expect(() => postIdFromEntry('loose-file.md')).toThrow();
+    expect(() => postIdFromEntry('2026/some-note/notes.md')).toThrow();
   });
 });
 

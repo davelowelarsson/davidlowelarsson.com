@@ -6,7 +6,7 @@ import { postIdFromEntry } from './lib/posts';
 
 const posts = defineCollection({
   loader: glob({
-    pattern: '**/index.md',
+    pattern: '**/index.{md,mdx}',
     base: './src/content/posts',
     generateId: ({ entry }) => postIdFromEntry(entry),
   }),

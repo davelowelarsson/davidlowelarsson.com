@@ -59,6 +59,28 @@ draft: true     # visible in previews, hidden in production
 Open a PR — the preview deployment shows drafts; merging to `main` deploys
 production with drafts hidden.
 
+### Embedding a YouTube video
+
+Posts can be `index.mdx` instead of `index.md` when they need an Astro
+component — most commonly `<YouTube />`, a click-to-load facade that loads
+nothing from Google until the reader presses play:
+
+```mdx
+---
+title: Something with a video
+pubDate: 2026-07-07
+---
+
+import YouTube from '../../../components/YouTube.astro';
+import poster from './poster.jpg';
+
+<YouTube id="dQw4w9WgXcQ" title="Descriptive title for screen readers" poster={poster} />
+```
+
+`poster` is a local image — either an `import` (optimized by the image
+pipeline) or a plain path served as-is. `id` is the YouTube video id; an
+optional `start` prop sets a start offset in seconds.
+
 ## The publish loop
 
 1. Write a post with `draft: true`, push a branch, open a PR

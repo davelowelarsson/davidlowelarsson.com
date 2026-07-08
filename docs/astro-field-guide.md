@@ -260,6 +260,36 @@ how the project actually grew.
   `deploy-production` aren't required checks, so a job-level `if` is fine there.
   Docs: https://github.com/dorny/paths-filter
 
+## YouTube embed facade + MDX support (2026-07-08, issue #37)
+
+- **`@astrojs/mdx` adds no UI framework.** MDX is JSX-in-Markdown syntax, not
+  React/Vue/Svelte — `mdx()` just teaches Astro's compiler to parse `.mdx`
+  files and lets them import and use `.astro` components (like `<YouTube />`)
+  directly in the post body. `.md` and `.mdx` coexist in the same content
+  collection with zero change to plain-Markdown posts.
+  Docs: https://docs.astro.build/en/guides/integrations-guide/mdx/
+- **Widening the glob loader is one string** (`**/index.md` →
+  `**/index.{md,mdx}` in `content.config.ts`), but `generateId` still has to
+  turn an entry path into a slug — so `postIdFromEntry` in `src/lib/posts.ts`
+  now accepts `index.md` or `index.mdx` (one id function, no duplication).
+- **Click-to-load facade, not an eager iframe.** `YouTube.astro` renders a
+  static poster + `<button>` inside a `position: relative` box with
+  `aspect-ratio: 16/9` — the ratio reserves the box's height before any image
+  loads, so there's no layout shift regardless of the poster's own intrinsic
+  size. The real `<iframe>` (host: `youtube-nocookie.com`, the
+  reduced-tracking embed variant, never `youtube.com`) is created by a client
+  script only after a real click — nothing Google-owned is ever requested
+  until then. Same hand-rolled pattern as `Mermaid.astro`/`Lightbox.astro`: a
+  bundled, same-origin `<script>` (satisfies CSP `script-src 'self'` with no
+  CDN allowance), no `lite-youtube-embed` dependency.
+  Docs: https://docs.astro.build/en/guides/client-side-scripts/
+- **CSP needed exactly one new directive.** `default-src 'self'` has no
+  `frame-src`, so an embedded iframe was blocked at the edge outright. Added
+  `frame-src https://www.youtube-nocookie.com` to `public/_headers` and
+  changed nothing else — every other directive (and the CSP's general
+  "verify against the deployed URL" caveat, since `_headers` is invisible to
+  `astro dev`/`preview`) is unchanged from the site-hygiene entry above.
+
 ## Scheduled publishing without a server (2026-07-08)
 
 - **A static site can still "publish on a date"** by turning the go-live check

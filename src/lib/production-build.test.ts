@@ -15,7 +15,7 @@ function draftSlugs(): string[] {
   const slugs: string[] = [];
   for (const entry of readdirSync(base, { recursive: true }) as string[]) {
     const path = entry.toString();
-    if (!path.endsWith('index.md')) continue;
+    if (!path.endsWith('index.md') && !path.endsWith('index.mdx')) continue;
     const frontmatter = readFileSync(join(base, path), 'utf8');
     if (/^draft:\s*true/m.test(frontmatter)) {
       const slug = path.split('/').at(-2);
@@ -35,7 +35,7 @@ function futureScheduledSlugs(): string[] {
   const slugs: string[] = [];
   for (const entry of readdirSync(base, { recursive: true }) as string[]) {
     const path = entry.toString();
-    if (!path.endsWith('index.md')) continue;
+    if (!path.endsWith('index.md') && !path.endsWith('index.mdx')) continue;
     const frontmatter = readFileSync(join(base, path), 'utf8');
     if (/^draft:\s*true/m.test(frontmatter)) continue; // drafts covered above
     const match = frontmatter.match(/^liveFrom:\s*["']?([0-9T:-]+)["']?/m);
