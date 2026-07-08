@@ -16,6 +16,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "e2e": "playwright test",
+    "media:sync": "node --experimental-strip-types scripts/media-sync.mjs",
+    "media:check": "node --experimental-strip-types scripts/media-check.mjs",
     "verify": "npm run lint && npm run typecheck && npm run test && npm run e2e"
   },
   "dependencies": {

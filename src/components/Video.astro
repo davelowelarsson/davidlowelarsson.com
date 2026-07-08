@@ -1,0 +1,68 @@
+---
+import { Image } from 'astro:assets';
+import { mediaUrl } from '../lib/media';
+
+// Self-hosted video from Cloudflare R2 (issue #10). Native <video> — no
+// framework, no bundled script, same "no JS unless the reader opts in"
+// posture as YouTube.astro's click-to-load facade, just without even
+// needing a click: the browser's own controls handle playback, and
+// `preload="metadata"` means a page with a <Video /> ships no extra bytes
+// beyond a small metadata fetch until the reader presses play.
+interface Props {
+  /** An R2 key relative to MEDIA_ORIGIN, or an already-absolute http(s) URL. */
+  src: string;
+  /**
+   * A LOCAL poster image — either an `import poster from './poster.jpg'`
+   * (ImageMetadata, run through Astro's image pipeline) or a plain path
+   * served as-is. Never a remote URL — same rule as YouTube.astro's poster.
+   */
+  poster: ImageMetadata | string;
+  /** Optional intrinsic dimensions — when given they set the exact ratio; otherwise a 16/9 box is reserved so there is no layout shift either way. */
+  width?: number;
+  height?: number;
+  /** MIME type of the `<source>`. Defaults to the common h264/aac mp4 case. */
+  type?: string;
+}
+
+const { src, poster, width, height, type = 'video/mp4' } = Astro.props;
+const isProcessedImage = typeof poster !== 'string';
+const posterSrc = isProcessedImage ? (poster as ImageMetadata).src : (poster as string);
+// Reserve the box before the video loads: exact ratio when dimensions are
+// given, otherwise the 16/9 default that covers the common case — either way
+// no layout shift.
+const aspectRatio = width && height ? `${width} / ${height}` : '16 / 9';
+---
+
+<div class="video-embed" style={`aspect-ratio: ${aspectRatio};`}>
+  <!--
+    The poster is rendered twice on purpose: once through <Image> so the
+    optimized/responsive asset exists at all (Astro only emits it if
+    referenced), and as the plain `poster` attribute the browser actually
+    paints before playback — the <video> element does not accept an
+    Astro-processed <Image> as its poster, only a URL string.
+  -->
+  {isProcessedImage && <Image src={poster as ImageMetadata} alt="" style="display: none;" />}
+  <video controls preload="metadata" poster={posterSrc} width={width} height={height}>
+    <source src={mediaUrl(src)} type={type} />
+    <slot />
+  </video>
+</div>
+
+<style>
+  .video-embed {
+    width: 100%;
+  }
+
+  .video-embed video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    /* Fill the reserved aspect-ratio box without distorting or cropping the
+       frame — letterboxes against the black background if the real video
+       ratio differs from the box. */
+    object-fit: contain;
+    border-radius: 8px;
+    border: 1px solid var(--hairline);
+    background: #000;
+  }
+</style>

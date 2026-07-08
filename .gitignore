@@ -29,3 +29,19 @@ playwright-report/
 
 # wrangler
 .wrangler/
+
+# Self-hosted media (issue #10): large binaries live in Cloudflare R2, never
+# in the repo (Workers static assets cap at 25 MiB/file). Posters/thumbnails
+# (png/jpg/jpeg/svg/webp) are NOT ignored — they stay committed and go
+# through Astro's image pipeline like any other post asset.
+src/content/**/*.mp4
+src/content/**/*.webm
+src/content/**/*.mov
+src/content/**/*.m4v
+src/content/**/*.m4a
+src/content/**/*.mp3
+src/content/**/*.wav
+src/content/**/*.ogg
+
+# playwright-mcp scratch snapshots
+.playwright-mcp/

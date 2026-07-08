@@ -1,0 +1,21 @@
+---
+import { mediaUrl } from '../lib/media';
+
+// Self-hosted audio from Cloudflare R2 (issue #10). Native <audio> — no
+// framework, no bundled script; `preload="metadata"` means a page with an
+// <Audio /> ships no extra bytes beyond a small metadata fetch until the
+// reader presses play. Same MEDIA_ORIGIN resolution as Video.astro.
+interface Props {
+  /** An R2 key relative to MEDIA_ORIGIN, or an already-absolute http(s) URL. */
+  src: string;
+  /** MIME type of the `<source>`. Defaults to the common mp3 case. */
+  type?: string;
+}
+
+const { src, type = 'audio/mpeg' } = Astro.props;
+---
+
+<audio controls preload="metadata">
+  <source src={mediaUrl(src)} type={type} />
+  <slot />
+</audio>

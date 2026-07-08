@@ -1,0 +1,25 @@
+---
+title: "Self-hosted media fixture"
+description: "Not a real post — exercises <Video /> against the real, already-uploaded R2 file for manual playback review. Draft only, never ships to production."
+pubDate: 2026-07-08
+category: til
+draft: true
+---
+
+import Video from '../../../../components/Video.astro';
+
+This is a test fixture, not a real post — it exists so a human can eyeball
+real playback on the preview deployment (issue #10). It stays `draft: true`
+forever, so the production build (which excludes drafts) never ships it. No
+automated test loads the real R2 file — Container tests cover `<Video />`'s
+markup instead, and this fixture's own `<video>` attributes are what a
+human/Playwright would check without waiting on the network.
+
+{/*
+  Special case: `src` here is the root key `video_sample.mp4`, matching the
+  object that was uploaded to R2 by hand for this manual check. The normal
+  authoring flow colocates media in the bundle, where `media:sync` derives the
+  key from the file's path under src/content/posts (e.g.
+  2026/<slug>/clip.mp4) — see the README media section.
+*/}
+<Video src="video_sample.mp4" poster="/og-default.png" />

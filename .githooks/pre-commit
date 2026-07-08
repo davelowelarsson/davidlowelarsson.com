@@ -1,0 +1,10 @@
+#!/bin/sh
+# Warn-only local safety net for self-hosted media (issue #10). Never aborts
+# the commit — R2 is the source of truth and CI never gates on media, so
+# this is purely a heads-up for the author. Install once with:
+#   git config core.hooksPath .githooks
+# Bypass any time with `git commit --no-verify`.
+
+npm run --silent media:check
+
+exit 0
