@@ -42,3 +42,6 @@ src/content/**/*.m4a
 src/content/**/*.mp3
 src/content/**/*.wav
 src/content/**/*.ogg
+
+# playwright-mcp scratch snapshots
+.playwright-mcp/
