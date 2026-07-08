@@ -3,7 +3,9 @@ import {
   CATEGORIES,
   CATEGORY_DESCRIPTIONS,
   filterByCategory,
+  formatScheduleDate,
   groupByYear,
+  isScheduled,
   isVisible,
   liveFromHasPassed,
   postIdFromEntry,
@@ -154,5 +156,33 @@ describe('sortByPubDateDesc', () => {
     sortByPubDateDesc(posts);
 
     expect(posts).toEqual(original);
+  });
+});
+
+describe('isScheduled', () => {
+  const now = new Date('2026-07-20T00:00:00Z');
+
+  it('is true for a non-draft with a future liveFrom', () => {
+    expect(isScheduled({ draft: false, liveFrom: '2026-07-25' }, now)).toBe(true);
+  });
+
+  it('is false once liveFrom has passed (it is just live)', () => {
+    expect(isScheduled({ draft: false, liveFrom: '2026-07-01' }, now)).toBe(false);
+  });
+
+  it('is false with no liveFrom, and false for drafts (a draft is not "scheduled")', () => {
+    expect(isScheduled({ draft: false }, now)).toBe(false);
+    expect(isScheduled({ draft: true, liveFrom: '2026-07-25' }, now)).toBe(false);
+  });
+});
+
+describe('formatScheduleDate', () => {
+  it('renders a short month + day for the badge', () => {
+    expect(formatScheduleDate('2026-07-09')).toBe('Jul 9');
+    expect(formatScheduleDate('2026-12-31')).toBe('Dec 31');
+  });
+
+  it('ignores any time component', () => {
+    expect(formatScheduleDate('2026-07-09T09:00')).toBe('Jul 9');
   });
 });

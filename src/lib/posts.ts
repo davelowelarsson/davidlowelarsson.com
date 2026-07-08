@@ -93,6 +93,36 @@ export function isVisible(
   return !data.draft && liveFromHasPassed(data.liveFrom, now);
 }
 
+/**
+ * A non-draft post queued for a future `liveFrom` — it will publish itself
+ * later. Surfaced only in previews (in production it is simply hidden), so a
+ * scheduled post is distinguishable from a live one at a glance.
+ */
+export function isScheduled(data: PostVisibility, now: Date = new Date()): boolean {
+  return !data.draft && data.liveFrom !== undefined && !liveFromHasPassed(data.liveFrom, now);
+}
+
+const SHORT_MONTHS = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
+
+/** A `liveFrom` ("2026-07-09" or "2026-07-09T09:00") → "Jul 9" for the badge. */
+export function formatScheduleDate(liveFrom: string): string {
+  const [, month, day] = liveFrom.slice(0, 10).split('-');
+  return `${SHORT_MONTHS[Number(month) - 1] ?? ''} ${Number(day)}`;
+}
+
 export function sortByPubDateDesc<T extends Dated>(posts: T[]): T[] {
   return [...posts].sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 }

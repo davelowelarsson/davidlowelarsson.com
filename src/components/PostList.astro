@@ -1,5 +1,5 @@
 ---
-import type { Category } from '../lib/posts';
+import { type Category, formatScheduleDate, isScheduled } from '../lib/posts';
 
 interface CoverImage {
   src: string;
@@ -16,6 +16,7 @@ interface Props {
       pubDate: Date;
       category: Category;
       draft: boolean;
+      liveFrom?: string;
       cover?: CoverImage;
       coverAlt?: string;
     };
@@ -51,6 +52,9 @@ const formatDate = (date: Date) =>
               <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate)}</time>
               <span class={`badge badge-${post.data.category}`}>{post.data.category}</span>
               {post.data.draft && <span class="badge badge-warning">draft</span>}
+              {isScheduled(post.data) && post.data.liveFrom && (
+                <span class="badge badge-scheduled">scheduled · {formatScheduleDate(post.data.liveFrom)}</span>
+              )}
             </span>
           </span>
         </a>

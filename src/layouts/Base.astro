@@ -480,6 +480,12 @@ const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
     color: var(--warn);
   }
 
+  /* Preview-only: a non-draft post queued for a future liveFrom. Calm blue so
+     it reads as "coming", distinct from the amber "draft". */
+  .badge-scheduled {
+    color: var(--focus);
+  }
+
   /* Error-page illustrations keep their own gray plate — framed like a card
      so the fixed background reads as intentional in both themes. */
   .error-illustration {
