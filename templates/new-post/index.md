@@ -7,6 +7,12 @@ draft: true # previews show it, production hides it — flip to false to publish
 tags: []
 # Optional extras:
 # updatedDate: 2026-08-01        # set when you revise a published post
+# liveFrom: 2026-08-01           # schedule go-live (Swedish local). Non-draft posts stay hidden in
+#                                # production until this passes. pubDate is the displayed date; liveFrom
+#                                # only controls when it appears. A time (2026-08-01T09:00) is honoured,
+#                                # but the daily publish cron runs ~07:00 CE(S)T — so a same-day time
+#                                # earlier than that goes live the next morning (bump the cron to hourly
+#                                # for tighter timing). For most posts, a bare date is all you need.
 # cover: ./cover.png             # shown in lists + feeds; png/jpg also becomes the link-preview image
 # coverAlt: Describe the cover
 ---

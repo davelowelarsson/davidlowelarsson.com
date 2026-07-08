@@ -5,6 +5,7 @@ import {
   filterByCategory,
   groupByYear,
   isVisible,
+  liveFromHasPassed,
   postIdFromEntry,
   sortByPubDateDesc,
 } from './posts';
@@ -29,6 +30,49 @@ describe('isVisible', () => {
 
   it('shows drafts in previews (showDrafts = true)', () => {
     expect(isVisible(post({ draft: true }).data, true)).toBe(true);
+  });
+
+  it('hides a non-draft with a future liveFrom in production', () => {
+    const now = new Date('2026-07-20T00:00:00Z'); // Stockholm 02:00 (CEST)
+    expect(isVisible({ draft: false, liveFrom: '2026-07-21' }, false, now)).toBe(false);
+  });
+
+  it('shows a scheduled (future liveFrom) post in previews', () => {
+    const now = new Date('2026-07-20T00:00:00Z');
+    expect(isVisible({ draft: false, liveFrom: '2026-07-21' }, true, now)).toBe(true);
+  });
+
+  it('shows a non-draft once its liveFrom has passed', () => {
+    const now = new Date('2026-07-20T00:00:00Z');
+    expect(isVisible({ draft: false, liveFrom: '2026-07-19' }, false, now)).toBe(true);
+  });
+
+  it('still hides a draft even when its liveFrom has passed', () => {
+    const now = new Date('2026-07-20T00:00:00Z');
+    expect(isVisible({ draft: true, liveFrom: '2026-01-01' }, false, now)).toBe(false);
+  });
+});
+
+describe('liveFromHasPassed', () => {
+  it('treats an absent liveFrom as always passed', () => {
+    expect(liveFromHasPassed(undefined, new Date('2026-07-20T00:00:00Z'))).toBe(true);
+  });
+
+  it('reads a bare date as start-of-day Europe/Stockholm', () => {
+    // 2026-07-20T00:00Z is already 02:00 in Stockholm (CEST), so the 20th has begun.
+    expect(liveFromHasPassed('2026-07-20', new Date('2026-07-20T00:00:00Z'))).toBe(true);
+    // One second before Stockholm midnight of the 20th (21:59:59Z on the 19th) → not yet.
+    expect(liveFromHasPassed('2026-07-20', new Date('2026-07-19T21:59:59Z'))).toBe(false);
+  });
+
+  it('honours a wall-clock time in summer (CEST, UTC+2)', () => {
+    expect(liveFromHasPassed('2026-07-20T09:00', new Date('2026-07-20T06:59:00Z'))).toBe(false);
+    expect(liveFromHasPassed('2026-07-20T09:00', new Date('2026-07-20T07:00:00Z'))).toBe(true);
+  });
+
+  it('honours a wall-clock time in winter (CET, UTC+1)', () => {
+    expect(liveFromHasPassed('2026-01-15T09:00', new Date('2026-01-15T07:59:00Z'))).toBe(false);
+    expect(liveFromHasPassed('2026-01-15T09:00', new Date('2026-01-15T08:00:00Z'))).toBe(true);
   });
 });
 
