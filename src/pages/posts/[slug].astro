@@ -2,7 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import { SHOW_DRAFTS } from 'astro:env/server';
 import Base from '../../layouts/Base.astro';
-import { isVisible } from '../../lib/posts';
+import { formatScheduleDate, isScheduled, isVisible } from '../../lib/posts';
 import { blogPostingJsonLd } from '../../lib/seo';
 
 export async function getStaticPaths() {
@@ -38,6 +38,9 @@ const rasterCover =
         {post.data.category}
       </a>
       {post.data.draft && <span class="badge badge-warning">draft</span>}
+      {isScheduled(post.data) && post.data.liveFrom && (
+        <span class="badge badge-scheduled">scheduled · {formatScheduleDate(post.data.liveFrom)}</span>
+      )}
     </p>
     <Content />
   </article>

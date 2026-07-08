@@ -86,4 +86,24 @@ describe('PostList', () => {
 
     expect(html).not.toContain('<img');
   });
+
+  it('marks a scheduled (future liveFrom) post with its go-live date, not a draft', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(PostList, {
+      props: { posts: [entry('queued', { draft: false, liveFrom: '2999-01-15' })] },
+    });
+
+    expect(html).toContain('scheduled');
+    expect(html).toContain('Jan 15');
+    expect(html).not.toContain('>draft<');
+  });
+
+  it('does not mark a live post as scheduled', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(PostList, {
+      props: { posts: [entry('live', { draft: false })] },
+    });
+
+    expect(html).not.toContain('scheduled');
+  });
 });
