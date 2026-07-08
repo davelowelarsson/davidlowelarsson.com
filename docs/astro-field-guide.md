@@ -342,3 +342,34 @@ how the project actually grew.
 - **CSP got one more narrow directive.** `media-src https://assets.davidlowelarsson.com`
   was added to `public/_headers`, same pattern as issue #37's `frame-src`
   addition — nothing else changed.
+
+## Progressive-enhancement of live third-party data (2026-07-08)
+
+- **Live data on a static site, without a build-time coupling.** The saltast.com
+  experiment tally isn't known at build (it's live) and the site ships no
+  third-party runtime by default — so the `saltast.com` link renders statically
+  and a bundled same-origin `<script>` fetches `/api/summary` on load, filling
+  every `[data-saltast-tally]` element. No JS → just the link; fetch fails or the
+  payload is malformed (`parseSummary` returns null) → "offline". Validation +
+  formatting are pure in `src/lib/saltast.ts` (tested); the fetch/DOM is the edge.
+- **Two no-CLS strategies for "append live data", chosen by position.** In the
+  footer the tally is the LAST content on the page, so filling it grows only
+  downward — the link never moves and nothing above shifts (the saltast row is
+  forced full-width via `flex-basis: 100%` so it can't reflow onto/off another
+  line). Mid-page (the experiments-category callout) can't rely on that, so it
+  reserves `min-height` (~2 lines, mobile-safe) with a faint skeleton the script
+  swaps in place — same footprint, no shift.
+- **CSP `connect-src`.** A client fetch to another origin must be allow-listed —
+  added `https://saltast.com` (David's own domain) beside `'self'`; the script is
+  same-origin so `script-src 'self'` is untouched. `aria-live="polite"` lets a
+  screen reader announce the update without interrupting. **CORS caveat:** the
+  browser also needs the *response* to carry `Access-Control-Allow-Origin` — a
+  200 that `curl` reads fine is still blocked in-page without it (degrades to
+  "offline").
+- **Feel-fast without lying.** Two latency tricks: `<link rel="preconnect">` warms
+  the TLS/DNS to saltast before the fetch, and a **stale-while-revalidate**
+  `sessionStorage` cache paints the previous tally instantly on repeat views then
+  refreshes in the background — so only the first view waits. Colors are
+  reinforcement, never the sole signal: each status is a colored dot *plus* its
+  count and word ("2 up"), so it stays legible to colorblind readers and in a
+  screen reader.
