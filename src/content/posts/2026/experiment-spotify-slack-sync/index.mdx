@@ -10,11 +10,27 @@ tags: ["automation", "spotify", "slack", "python", "cron"]
 import ProcessStepCard from '../../../../components/ProcessStepCard.astro';
 import { syncSteps, wrappedSnapshot } from './flow';
 
-fredagslistan started as a Slack ritual: every Friday, a theme appears, people drop songs, and the playlist grows.
+fredagslistan started as a Slack ritual: every Friday, someone sets a theme in the morning, people drop songs that fit it, and the playlist grows.
 
-The weak link was boring and human: many songs never made it from Slack into Spotify. So the playlist was always a little wrong.
+"Fit" is doing generous work there. Free interpretation is not a loophole. It is basically the rule.
+
+A few anonymized openings, stripped of Slack links and names, give the shape better than architecture prose can:
+
+> Match så dagens tema är **dina bästa match-/träningspepplåtar**! ⚽ 🥵 🤸‍♀️ Fri tolkning!
+
+> Fredag! Dagens tema på listan är **flashbacks från högstadiet**. Nu kör vi en mix av tonårspersonligheter och årtionden. Let's go!
+
+> Ingen har väl missat de musikskapande frysarna i England? Tydligen fantastisk musik i C#. Så idag kör vi på tema **instrumental musik**! 🥁 🎸
+
+> Tut tuuut! Dagens tema på Fredagslistan är **tåg**. Go go go.
+
+For a while the playlist was maintained by hand. That worked about as well as hand-maintained shared state usually works: fine when someone remembered, wrong the moment they did not.
+
+Most people dropped tracks where the conversation already was, in Slack, and never made the second hop into Spotify. So the playlist was always a little wrong.
 
 I wrote a small Python cronjob to do the transfer for us. It has been running for years now. Quietly. No heroics. Exactly what I wanted.
+
+At some point it escaped work, too. At Friday dinners with friends I started asking them to guess the theme from the playlist. A normal person might call that small talk. I apparently turned it into an integration problem.
 
 ## One run
 
@@ -45,4 +61,4 @@ For this write-up I only want aggregate signals. No names. No leaderboard. No ac
 - Busiest Friday additions: {wrappedSnapshot.totals.busiestFridayAdds}
 - Longest theme streak (weeks): {wrappedSnapshot.totals.longestThemeStreakWeeks}
 
-The interactive part here is intentionally small. If it helps the story, good. If not, I can remove it without touching the core post.
+That is probably the real reason I still like this little job. It is not clever infrastructure. It is a tiny bit of glue that protects a ritual from becoming admin work.
