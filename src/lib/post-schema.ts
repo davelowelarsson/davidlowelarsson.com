@@ -39,14 +39,24 @@ export const postFrontmatterSchema = z.object({
   draft: z.boolean().default(false),
   tags: z.array(z.string()).default([]),
   /**
-   * Optional scheduled go-live, as Swedish local wall-clock: "YYYY-MM-DD"
-   * (start of that day) or "YYYY-MM-DDTHH:mm". Kept as a string, not a Date,
-   * so it is always read as Europe/Stockholm regardless of build-machine
-   * timezone. A non-draft post with a future `liveFrom` stays hidden in
-   * production until then; `pubDate` is unaffected (it is the displayed date).
+   * Optional scheduled go-live, read as Swedish local wall-clock: a bare date
+   * ("YYYY-MM-DD", start of that day) or "YYYY-MM-DDTHH:mm". A non-draft post
+   * with a future `liveFrom` stays hidden in production until then; `pubDate`
+   * is unaffected (it is the displayed date).
+   *
+   * YAML parses an unquoted `2026-07-09` as a Date, so we accept a Date too and
+   * normalize it back to its calendar "YYYY-MM-DD" (via UTC components — a YAML
+   * bare date is UTC midnight). Quote it (`"2026-07-09T09:00"`) when you need a
+   * time. It is compared as a string, never as an instant, to stay DST-safe and
+   * independent of the build machine's timezone.
    */
   liveFrom: z
-    .string()
+    .union([z.string(), z.date()])
+    .transform((value) =>
+      value instanceof Date
+        ? `${value.getUTCFullYear()}-${String(value.getUTCMonth() + 1).padStart(2, '0')}-${String(value.getUTCDate()).padStart(2, '0')}`
+        : value,
+    )
     .refine(
       isRealWallClock,
       'liveFrom must be a real "YYYY-MM-DD" or "YYYY-MM-DDTHH:mm" (Europe/Stockholm)',

@@ -299,13 +299,17 @@ how the project actually grew.
   so a post with a future `liveFrom` appears on its date with no server, no
   flag-flipping, and no CI writing to the repo. The gate lives in one function,
   so pages, RSS, sitemap, and llms.txt all honour it — no leak in one surface.
-- **`liveFrom` is a string, not a `Date`, on purpose.** `z.coerce.date()` parses
-  a bare date as UTC and a bare datetime as *build-machine local* — both wrong
-  for "David writes Swedish local time". Keeping the raw wall-clock string and
-  comparing it against *now formatted in Europe/Stockholm* (`Intl.DateTimeFormat`
-  with `timeZone`, lexical compare of zero-padded `YYYY-MM-DDTHH:mm`) is
-  DST-correct with zero offset math and independent of where CI runs. `pubDate`
-  stays `z.coerce.date()` — it is the displayed date, decoupled from go-live.
+- **`liveFrom` is compared as a string, not a `Date`, on purpose.**
+  `z.coerce.date()` parses a bare date as UTC and a bare datetime as
+  *build-machine local* — both wrong for "David writes Swedish local time".
+  Instead we hold the wall-clock string and compare it against *now formatted in
+  Europe/Stockholm* (`Intl.DateTimeFormat` with `timeZone`, lexical compare of
+  zero-padded `YYYY-MM-DDTHH:mm`) — DST-correct, no offset math, CI-location
+  independent. **Gotcha:** YAML parses an *unquoted* `liveFrom: 2026-07-09` into
+  a `Date`, so the schema is `z.union([z.string(), z.date()])` and normalizes a
+  Date back to its calendar `YYYY-MM-DD` (UTC components). A bare date can stay
+  unquoted; a value with a time must be quoted. `pubDate` stays
+  `z.coerce.date()` — the displayed date, decoupled from go-live.
 - **Idempotent + self-healing cron.** The job is an unconditional prod build +
   `wrangler deploy`; re-running it changes nothing if no post crossed its
   `liveFrom`, and a missed day is caught by the next run. `production-build.test`
