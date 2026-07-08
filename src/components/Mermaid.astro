@@ -33,7 +33,12 @@
       if (!pre) continue;
       const { svg, bindFunctions } = await mermaid.render(`mermaid-${i++}`, block.textContent ?? '');
       const figure = document.createElement('div');
-      figure.className = 'mermaid-diagram';
+      // `breakout` lets the diagram render wider than the 42rem prose column so
+      // it stays legible without shrinking to the paragraph measure (see the
+      // `.breakout` rule + ADR 0006). The diagram still fits its (wider)
+      // container — `useMaxWidth` keeps it from ever scrolling sideways — and a
+      // click opens it at natural size in the shared lightbox.
+      figure.className = 'mermaid-diagram breakout';
       figure.innerHTML = svg;
       pre.replaceWith(figure);
       bindFunctions?.(figure);
@@ -46,7 +51,13 @@
 <style is:global>
   .mermaid-diagram {
     margin: 2rem 0;
+    /* Safety net only: `useMaxWidth` keeps the SVG fitted to this container, so
+       this should never actually scroll — but if a future diagram ever exceeds
+       it, scroll beats clipping. */
     overflow-x: auto;
+    /* Signals the click-to-enlarge affordance the Lightbox wires up (matches
+       `article img`); harmless with JS disabled. */
+    cursor: zoom-in;
   }
 
   .mermaid-diagram svg {

@@ -377,3 +377,28 @@ how the project actually grew.
   reinforcement, never the sole signal: each status is a colored dot *plus* its
   count and word ("2 up"), so it stays legible to colorblind readers and in a
   screen reader.
+
+## Diagram readability: breakout + shared lightbox (2026-07-08)
+
+- **Mermaid's `useMaxWidth` is the shrink knob.** It defaults to `true`, scaling
+  the SVG to 100% of its container — which, in a 42rem prose column, is exactly
+  why a wide `flowchart LR` renders at ~6px text. We keep it `true` (inline must
+  never scroll sideways) and instead give the *container* more room.
+  Docs: https://mermaid.js.org/config/schema-docs/config.html
+- **`.breakout` escapes a narrow parent without a grid refactor.** `width:
+  min(60rem, 100vw - 2rem)` + `position: relative; left: 50%; translateX(-50%)`
+  re-centres a child wider than its parent on the viewport. Cheaper than
+  restructuring `<body>` (which also holds header/footer) into a full-bleed CSS
+  grid — same effect, one reusable class. Capped at 100vw−gutter so the page
+  never gains a horizontal scrollbar. Josh Comeau's grid version is the
+  documented upgrade if a real full-bleed language lands (#11).
+- **Client-rendered content needs *delegated* listeners.** `Mermaid.astro`
+  swaps its `<pre>` for a diagram `<div>` *after* `Lightbox.astro`'s script
+  runs, so a one-shot `querySelectorAll` at load never sees a diagram. One
+  `click` listener on `<article>` that walks `event.target.closest()` catches
+  both images and async-inserted diagrams — the standard fix for
+  progressively-enhanced DOM that arrives late.
+- **Cloning an inline SVG into a `<dialog>` beats serialising it.**
+  `svg.cloneNode(true)`, strip the `useMaxWidth` cap, pin width/height from
+  `viewBox.baseVal` → it renders crisp at natural size, scroll-to-pan, no
+  data-URI round-trip and no pan/zoom dependency.
