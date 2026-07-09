@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { normalizeMediaKey } from './media';
+import { normalizeMediaKey } from './media.ts';
 
 /**
  * Pure logic for `scripts/media-sync.mjs` and `scripts/media-check.mjs`
