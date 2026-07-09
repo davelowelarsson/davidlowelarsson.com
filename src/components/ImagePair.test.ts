@@ -6,7 +6,7 @@ const left = { src: '/_astro/left.hash.jpg', width: 1200, height: 900, format: '
 const right = { src: '/_astro/right.hash.jpg', width: 1200, height: 900, format: 'jpg' as const };
 
 describe('ImagePair', () => {
-  it('renders two processed images in a breakout pair layout', async () => {
+  it('renders two processed images in a compact cropped pair layout', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(ImagePair, {
       props: {
@@ -22,5 +22,9 @@ describe('ImagePair', () => {
     expect(html).toContain('Right image');
     expect(html).toContain('left.hash.jpg');
     expect(html).toContain('right.hash.jpg');
+    expect(html).not.toContain('breakout');
+    expect(html).toContain('data-image-layout="compact-pair"');
+    expect(html).toContain('data-image-crop="4:3"');
+    expect(html).toContain('sizes="(min-width: 44rem) 17rem, calc(100vw - 2.5rem)"');
   });
 });

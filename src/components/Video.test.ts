@@ -50,6 +50,17 @@ describe('Video', () => {
     expect(html).toContain('poster="/images/poster.jpg"');
   });
 
+  it('can omit the poster and let the browser show video metadata/first frame', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(Video, {
+      props: { src: '2026/my-post/clip.mp4' },
+    });
+
+    expect(html).toContain('<video');
+    expect(html).toContain('preload="metadata"');
+    expect(html).not.toContain('poster=');
+  });
+
   it('defaults the source type to video/mp4', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(Video, {

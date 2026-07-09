@@ -283,6 +283,19 @@ how the project actually grew.
   link dumps, and external links get `target="_blank" rel="noreferrer"` in one
   reusable component.
 
+## MDX media layout components (2026-07-09)
+
+- **Prefer components over raw MDX styles** for repeated media layouts.
+  `ImagePair.astro` and `ArticleImage.astro` keep crop, sizing, and responsive
+  `Image` props out of post prose, and avoid MDX parser edge cases around raw
+  `<style>` blocks.
+- **Dynamic lightbox content needs global CSS.** Images cloned into the dialog
+  by client JS do not carry Astro's scoped style attributes, so Lightbox's fit
+  rules use `style is:global` while component-local layout styles stay scoped.
+- **Video posters are optional.** A post can pass a representative local poster,
+  or omit it and let the browser use native video metadata/first-frame behavior
+  instead of forcing a misleading still image.
+
 ## YouTube embed facade + MDX support (2026-07-08, issue #37)
 
 - **`@astrojs/mdx` adds no UI framework.** MDX is JSX-in-Markdown syntax, not

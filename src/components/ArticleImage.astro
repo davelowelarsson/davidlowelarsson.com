@@ -1,0 +1,30 @@
+---
+import { Image } from 'astro:assets';
+
+interface Props {
+  src: ImageMetadata;
+  alt: string;
+}
+
+const { src, alt } = Astro.props;
+---
+
+<figure class="article-image" data-image-layout="constrained-single">
+  <Image src={src} alt={alt} widths={[320, 560, 720]} sizes="min(34rem, calc(100vw - 2.5rem))" />
+</figure>
+
+<style>
+  .article-image {
+    max-width: min(34rem, 100%);
+    margin: 2rem auto;
+  }
+
+  .article-image :global(img) {
+    display: block;
+    width: 100%;
+    max-height: min(32rem, 72vh);
+    height: auto;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+</style>

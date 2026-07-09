@@ -13,15 +13,16 @@ interface Props {
 const { images } = Astro.props;
 ---
 
-<figure class="breakout image-pair">
-  {images.map((image) => <Image src={image.src} alt={image.alt} widths={[360, 720, 1080]} sizes="(min-width: 44rem) 29rem, calc(100vw - 2rem)" />)}
+<figure class="image-pair" data-image-layout="compact-pair" data-image-crop="4:3">
+  {images.map((image) => <Image src={image.src} alt={image.alt} widths={[320, 560, 720]} sizes="(min-width: 44rem) 17rem, calc(100vw - 2.5rem)" />)}
 </figure>
 
 <style>
   .image-pair {
     display: grid;
     gap: 0.75rem;
-    margin: 2rem 0;
+    max-width: min(36rem, 100%);
+    margin: 2rem auto;
   }
 
   @media (min-width: 44rem) {
@@ -34,7 +35,9 @@ const { images } = Astro.props;
   .image-pair :global(img) {
     display: block;
     width: 100%;
-    height: auto;
+    aspect-ratio: 4 / 3;
+    height: 100%;
+    object-fit: cover;
     border-radius: 8px;
   }
 </style>
