@@ -20,7 +20,7 @@ That was April 2018. A few minutes later people were joining the channel, and by
 
 Every Friday after that, someone sets a theme in the morning, people drop songs that "fit" it, and the playlist grows.
 
-"Fit" is being generous work there. "Free interpretation" is the norm or maybe basically the rule 😅.
+"Fit" is being generous here. "Free interpretation" is the norm or maybe basically the rule 😅.
 
 Here are a couple of more examples (all translated to English):
 
@@ -72,11 +72,11 @@ Missing tracks are added to the playlist. If a song is already there (within the
 
 There is one small design choice here that I like more than it deserves: the job only looks back a few days in Slack.
 
-That six-day rolling window is enough to catch the current Friday and late additions without turning the whole channel history into input every time. It also means an old Spotify link someone reposts weeks later is treated like a new suggestion, which dosen't ignore songs people repost, which feels "correct". The source of truth is not "all links ever seen." It is "what people are talking about around this Fridays theme." and late additions will still be added.
+That six-day rolling window is enough to catch the current Friday and late additions without turning the whole channel history into input every time. It also means an old Spotify link someone reposts weeks later is treated like a new suggestion, which doesn't ignore songs people repost, which feels "correct". The source of truth is not "all links ever seen." It is "what people are talking about around this Fridays theme." and late additions will still be added.
 
 ## Snapshot, not surveillance
 
-I thought it would be fun to add some stats .. they're abit messy because the cronjob has had improvements over the years and the stats are pretty "basic".
+I thought it would be fun to add some stats .. they're a bit messy because the cronjob has had improvements over the years and the stats are pretty "basic".
 
 <WrappedSnapshot stats={wrappedStats} />
 
