@@ -12,17 +12,17 @@ import ProcessStepCard from '../../../../components/ProcessStepCard.astro';
 import WrappedSnapshot from '../../../../components/WrappedSnapshot.astro';
 import { syncSteps, wrappedStats } from './flow';
 
-fredagslistan started because Agnes made a playlist, dropped it in Slack, and gave the first theme: **sun**.
+**"Fredagslistan"** started because Agnes made a playlist, dropped it in Slack, and gave the first theme: **sun**.
+
+> Here is the list! Today's theme is **sun**.
 
 That was April 2018. A few minutes later people were joining the channel, and by the next Friday the ritual already had momentum.
 
-Every Friday after that, someone sets a theme in the morning, people drop songs that fit it, and the playlist grows.
+Every Friday after that, someone sets a theme in the morning, people drop songs that "fit" it, and the playlist grows.
 
-"Fit" is doing generous work there. Free interpretation is not a loophole. It is basically the rule.
+"Fit" is being generous work there. "Free interpretation" is the norm or maybe basically the rule 😅.
 
-A few anonymized and translated openings, stripped of Slack links and names, give the shape better than architecture prose can:
-
-> Here is the list! Today's theme is **sun**.
+Here are a couple of more examples (all translated to English):
 
 > There is a match today, so the theme is **your best match/training hype songs**! ⚽ 🥵 🤸‍♀️ Free interpretation!
 
@@ -30,11 +30,11 @@ A few anonymized and translated openings, stripped of Slack links and names, giv
 
 > Surely nobody missed the music-making freezers in England? Apparently fantastic music in C#. So today the theme is **instrumental music**! 🥁 🎸
 
-For a while the playlist was maintained by hand. That worked about as well as hand-maintained shared state usually works: fine when someone remembered, wrong the moment they did not.
+For a while the playlist was maintained by hand. That worked as well as any "hand-maintained shared state" usually works: fine when someone remembered to do it.
 
-Most people dropped tracks where the conversation already was, in Slack, and never made the second hop into Spotify. So the playlist was always a little wrong.
+Most people dropped tracks where the conversation already was, in Slack, and never made the second hop into Spotify. So the playlist was always a little skewed. Sometimes I inserted all the missing songs by hand, sometimes someone else did ... often nobody did. 
 
-I wrote a small Python cronjob to do the transfer for us. It has been running for years now. Quietly. No heroics. Exactly what I wanted.
+Then a coworker, Jonas, wrote a small python script. Which evolved to a small Python cronjob to do the transfer for us. It has been running for years now. Quietly. No heroics.
 
 <ArticleLinks
 	links={[
@@ -46,40 +46,38 @@ I wrote a small Python cronjob to do the transfer for us. It has been running fo
 	]}
 />
 
-At some point it escaped work, too. At Friday dinners with friends I started asking them to guess the theme from the playlist. A normal person might call that small talk. I apparently turned it into an integration problem.
+At some point it escaped work, too. At Friday dinners with friends, that we usually have every Friday, I started asking them to guess the theme from the playlist. A normal person might call that a "dinner game". I apparently turned it into infrastructure.
 
 ## One run
 
 ### 1. Fetch from Slack
 
-The job reads the Friday channel, extracts track links, and normalizes IDs. This is mostly input hygiene, because chat data is messy in ways APIs are not.
+The job reads the Friday channel, extracts spotify links, and normalizes IDs. This is mostly clean up, because chat data is messy in ways APIs don't appreciate.
 
 <ProcessStepCard step={syncSteps.fetchSlack} />
 
 ### 2. Compute the diff
 
-Next step is simple set math: what exists in Slack but not yet in Spotify. No scoring model, no ranking, no "smart" guesswork. Just the gap.
+Next step is simple set math: what exists in Slack but not yet in Spotify. No scoring model, no ranking, no "smart" guesswork. Just the difference.
 
 <ProcessStepCard step={syncSteps.diff} />
 
 ### 3. Add missing songs
 
-Missing tracks are appended to the playlist. If a song is already there, the run leaves it alone. Re-runs are intentionally boring.
+Missing tracks are added to the playlist. If a song is already there (within the 6 day window), the run leaves it alone. Re-runs are intentionally boring.
 
 <ProcessStepCard step={syncSteps.addSpotify} />
 
 There is one small design choice here that I like more than it deserves: the job only looks back a few days in Slack.
 
-That six-day rolling window is enough to catch the current Friday and late additions without turning the whole channel history into input every time. It also means an old Spotify link someone reposts weeks later is treated like a new suggestion, which is probably correct. The source of truth is not "all links ever seen." It is "what people are talking about around this week's theme."
+That six-day rolling window is enough to catch the current Friday and late additions without turning the whole channel history into input every time. It also means an old Spotify link someone reposts weeks later is treated like a new suggestion, which dosen't ignore songs people repost, which feels "correct". The source of truth is not "all links ever seen." It is "what people are talking about around this Fridays theme." and late additions will still be added.
 
 ## Snapshot, not surveillance
 
-For this write-up I only want aggregate signals. No names. No leaderboard. No accidental coworker analytics.
+I thought it would be fun to add some stats .. they're abit messy because the cronjob has had improvements over the years and the stats are pretty "basic".
 
 <WrappedSnapshot stats={wrappedStats} />
 
-The honest footnote is that some of the operational stats I now want are not historical, because I did not log every run from the start. If I want to say "auto-added over the years" later, I need the job to write that number down from here on instead of pretending a current playlist snapshot is the same thing as a run log.
+A small tracks-per-year curve, total listening time, returning artists, or genre drift would probably be more interesting than a fake precision counter anyway.
 
-That is fine. A small tracks-per-year curve, total listening time, returning artists, or genre drift would probably be more interesting than a fake precision counter anyway.
-
-That is probably the real reason I still like this little job. It is not clever infrastructure. It is a tiny bit of glue that protects a ritual from becoming admin work.
+That is probably the real reason I still like this little job. It is not clever infrastructure. It is a tiny bit of glue that protects a ritual from becoming admin work. No one likes admin work 😅, right? 
