@@ -51,7 +51,7 @@ At some point it escaped work, too. At Friday dinners with friends, that we usua
 
 One thing I do love with our Friday dinners is the "bäst i veckan" (Swedish), each week we always lift one thing that was the "best of the week", I can really recommend it to anyone (and the rule is no bad things, just the good parts ... and it's not allowed to say "this dinner" either 😉, right Joel? )
 
-## One run
+## One Slack to spotify sync run - explained
 
 ### 1. Fetch from Slack
 
@@ -75,7 +75,7 @@ There is one small design choice here that I like more than it deserves: the job
 
 That six-day rolling window is enough to catch the current Friday and late additions without turning the whole channel history into input every time. It also means an old Spotify link someone reposts weeks later is treated like a new suggestion, which doesn't ignore songs people repost, which feels "correct". The source of truth is not "all links ever seen." It is "what people are talking about around this Fridays theme." and late additions will still be added.
 
-## Snapshot, not surveillance
+## "Stats Snapshot"
 
 I thought it would be fun to add some stats .. they're a bit messy because the cronjob has had improvements over the years and the stats are pretty "basic".
 
