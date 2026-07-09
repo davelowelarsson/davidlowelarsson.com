@@ -8,6 +8,7 @@ draft: false
 ---
 
 import Video from '../../../../components/Video.astro';
+import ImagePair from '../../../../components/ImagePair.astro';
 import arduinoDemoPoster from './20200524_130559.jpg';
 import arduinoDemoPoster2 from './20200512_195530.jpg';
 import tableImage from './20200731_153322.jpg';
@@ -15,10 +16,12 @@ import partsImage from './20200521_214438.jpg';
 
 When corona spread to Sweden (where I live) I went to the office and brought home the Arduino stat kit that I had bought for the office. We usually have Lab Fridays at work, which is a day to learn more about "that thing you don't have time to fix/learn about"
 
-<div class="breakout image-pair">
-  <img src={tableImage.src} alt="Arduino kit on the table" />
-  <img src={partsImage.src} alt="Arduino project parts during the build" />
-</div>
+<ImagePair
+  images={[
+    { src: tableImage, alt: 'Arduino kit on the table' },
+    { src: partsImage, alt: 'Arduino project parts during the build' },
+  ]}
+/>
 
 ## The kids were skeptical (and still are)
 
@@ -50,23 +53,3 @@ we'll see how this will work ... time will tell 😁
   src="2020/building-with-children/VID_20180427_111949.mp4"
   poster={arduinoDemoPoster2}
 />
-
-
-<style>
-  .image-pair {
-    display: grid;
-    gap: 0.75rem;
-    margin: 2rem 0;
-  }
-
-  @media (min-width: 44rem) {
-    .image-pair {
-      grid-template-columns: 1fr 1fr;
-    }
-  }
-
-  .image-pair img {
-    width: 100%;
-    border-radius: 8px;
-  }
-</style>

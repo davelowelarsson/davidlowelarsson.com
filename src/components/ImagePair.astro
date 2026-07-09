@@ -1,0 +1,40 @@
+---
+import { Image } from 'astro:assets';
+
+interface PairImage {
+  src: ImageMetadata;
+  alt: string;
+}
+
+interface Props {
+  images: [PairImage, PairImage];
+}
+
+const { images } = Astro.props;
+---
+
+<figure class="breakout image-pair">
+  {images.map((image) => <Image src={image.src} alt={image.alt} widths={[360, 720, 1080]} sizes="(min-width: 44rem) 29rem, calc(100vw - 2rem)" />)}
+</figure>
+
+<style>
+  .image-pair {
+    display: grid;
+    gap: 0.75rem;
+    margin: 2rem 0;
+  }
+
+  @media (min-width: 44rem) {
+    .image-pair {
+      grid-template-columns: 1fr 1fr;
+      align-items: start;
+    }
+  }
+
+  .image-pair :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }
+</style>
