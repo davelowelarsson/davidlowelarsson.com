@@ -1,0 +1,82 @@
+---
+interface ArticleLink {
+  label: string;
+  href: string;
+  description?: string;
+}
+
+interface Props {
+  title?: string;
+  links: ArticleLink[];
+}
+
+const { title = 'Main links', links } = Astro.props;
+
+function isExternal(href: string) {
+  return /^https?:\/\//.test(href);
+}
+---
+
+<nav class="article-links" aria-label={title}>
+  <h2>{title}</h2>
+  <ul>
+    {links.map((link) => (
+      <li>
+        <a href={link.href} target={isExternal(link.href) ? '_blank' : undefined} rel={isExternal(link.href) ? 'noreferrer' : undefined}>
+          <span class="article-links__label">{link.label}</span>
+          {link.description && <span class="article-links__description">{link.description}</span>}
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>
+
+<style>
+  .article-links {
+    margin: 1.75rem 0 2rem;
+    border: 1px solid var(--hairline);
+    border-radius: 0.5rem;
+    background: var(--chip);
+    padding: 0.9rem;
+  }
+
+  .article-links h2 {
+    margin: 0 0 0.7rem;
+    font-size: 0.95rem;
+    line-height: 1.35;
+  }
+
+  .article-links ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 0.55rem;
+  }
+
+  .article-links a {
+    display: grid;
+    gap: 0.12rem;
+    border: 1px solid var(--hairline);
+    border-radius: 0.4rem;
+    background: light-dark(#ffffff, #151518);
+    padding: 0.65rem 0.7rem;
+    text-decoration: none;
+  }
+
+  .article-links a:hover .article-links__label {
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  .article-links__label {
+    font-weight: 580;
+    line-height: 1.35;
+  }
+
+  .article-links__description {
+    color: var(--muted);
+    font-size: 0.82rem;
+    line-height: 1.45;
+  }
+</style>

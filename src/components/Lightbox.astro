@@ -17,7 +17,7 @@
   <div class="lightbox-content"></div>
 </dialog>
 
-<style>
+<style is:global>
   /* No open/close animation at all — the simplest way to respect
      prefers-reduced-motion is to never add motion in the first place. */
   #lightbox {
@@ -26,9 +26,16 @@
     max-width: 92vw;
     max-height: 92vh;
     background: transparent;
+    overscroll-behavior: contain;
+  }
+
+  #lightbox[data-lightbox-kind='image'] {
+    overflow: hidden;
+  }
+
+  #lightbox[data-lightbox-kind='diagram'] {
     /* A natural-size diagram can exceed the dialog box — scroll to pan it. */
     overflow: auto;
-    overscroll-behavior: contain;
   }
 
   #lightbox::backdrop {
@@ -41,6 +48,7 @@
     display: block;
     max-width: 92vw;
     max-height: 92vh;
+    object-fit: contain;
   }
 
   .lightbox-content svg {
@@ -53,7 +61,8 @@
   const content = dialog?.querySelector<HTMLElement>('.lightbox-content');
 
   if (dialog && content) {
-    const open = (node: Node) => {
+    const open = (node: Node, kind: 'image' | 'diagram') => {
+      dialog.dataset.lightboxKind = kind;
       content.replaceChildren(node);
       dialog.showModal();
     };
@@ -69,7 +78,7 @@
         const clone = document.createElement('img');
         clone.src = img.src;
         clone.alt = img.alt;
-        open(clone);
+        open(clone, 'image');
         return;
       }
 
@@ -88,7 +97,7 @@
           clone.setAttribute('width', String(box.width));
           clone.setAttribute('height', String(box.height));
         }
-        open(clone);
+        open(clone, 'diagram');
       }
     });
 
@@ -98,6 +107,10 @@
     // showModal() dialog natively, so it needs no handler here.
     dialog.addEventListener('click', (event) => {
       if (event.target === dialog) dialog.close();
+    });
+
+    dialog.addEventListener('close', () => {
+      dialog.removeAttribute('data-lightbox-kind');
     });
   }
 </script>

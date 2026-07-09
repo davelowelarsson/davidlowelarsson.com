@@ -12,11 +12,13 @@ interface Props {
   /** An R2 key relative to MEDIA_ORIGIN, or an already-absolute http(s) URL. */
   src: string;
   /**
-   * A LOCAL poster image — either an `import poster from './poster.jpg'`
+   * Optional LOCAL poster image — either an `import poster from './poster.jpg'`
    * (ImageMetadata, run through Astro's image pipeline) or a plain path
    * served as-is. Never a remote URL — same rule as YouTube.astro's poster.
+   * When omitted, the browser uses its native video loading behavior (usually
+   * black/first frame after metadata) instead of forcing a mismatched image.
    */
-  poster: ImageMetadata | string;
+  poster?: ImageMetadata | string;
   /** Optional intrinsic dimensions — when given they set the exact ratio; otherwise a 16/9 box is reserved so there is no layout shift either way. */
   width?: number;
   height?: number;
@@ -25,8 +27,9 @@ interface Props {
 }
 
 const { src, poster, width, height, type = 'video/mp4' } = Astro.props;
-const isProcessedImage = typeof poster !== 'string';
-const posterSrc = isProcessedImage ? (poster as ImageMetadata).src : (poster as string);
+const hasPoster = poster !== undefined;
+const isProcessedImage = hasPoster && typeof poster !== 'string';
+const posterSrc = isProcessedImage ? (poster as ImageMetadata).src : poster;
 // Reserve the box before the video loads: exact ratio when dimensions are
 // given, otherwise the 16/9 default that covers the common case — either way
 // no layout shift.

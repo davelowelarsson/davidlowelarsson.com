@@ -258,7 +258,43 @@ how the project actually grew.
   step-level `if: needs.changes.outputs.app == 'true'`, and has a guard step
   that `exit 1`s when `needs.changes.result != 'success'`. `deploy-preview`/
   `deploy-production` aren't required checks, so a job-level `if` is fine there.
-  Docs: https://github.com/dorny/paths-filter
+
+## Inline MDX process cards (2026-07-08)
+
+- **A reusable Astro component inside MDX** works best when it explains the
+  paragraph it sits next to. `ProcessStepCard.astro` takes one typed step from
+  a post-local config and renders a visual insert without wrapping the article.
+- **Static before clever:** the card has no client script, observer, or scroll
+  state. The prose stays in the normal reading frame, and the visual appears
+  immediately after the related idea on desktop and mobile.
+- **Post-local data, shared component:** `flow.ts` owns the Slack/Spotify sample
+  arrays for this story, while `src/lib/process-rail.ts` owns validation and
+  reusable types for future MDX explainers.
+- **Redraw sensitive screenshots:** when real screenshots contain people, names,
+  or avatars, the post uses anonymized UI-shaped cards instead of committing
+  masked screenshots. The point is to teach the workflow, not preserve pixels.
+- **Static CSS charts before chart libraries:** `WrappedSnapshot.astro` renders
+  aggregate-only bars/tags from typed post-local data. No client JS is needed
+  for a small explanatory visualization, and caveats (like a skewed playlist
+  year) live in the component data next to the numbers.
+- **Main article links as a component:** `ArticleLinks.astro` gives posts one
+  consistent place for source repos, demos, references, or project pages. It
+  keeps important outbound links scannable without turning prose paragraphs into
+  link dumps, and external links get `target="_blank" rel="noreferrer"` in one
+  reusable component.
+
+## MDX media layout components (2026-07-09)
+
+- **Prefer components over raw MDX styles** for repeated media layouts.
+  `ImagePair.astro` and `ArticleImage.astro` keep crop, sizing, and responsive
+  `Image` props out of post prose, and avoid MDX parser edge cases around raw
+  `<style>` blocks.
+- **Dynamic lightbox content needs global CSS.** Images cloned into the dialog
+  by client JS do not carry Astro's scoped style attributes, so Lightbox's fit
+  rules use `style is:global` while component-local layout styles stay scoped.
+- **Video posters are optional.** A post can pass a representative local poster,
+  or omit it and let the browser use native video metadata/first-frame behavior
+  instead of forcing a misleading still image.
 
 ## YouTube embed facade + MDX support (2026-07-08, issue #37)
 
