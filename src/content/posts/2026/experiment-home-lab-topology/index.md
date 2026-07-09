@@ -112,7 +112,8 @@ the remote tunnel config, not as a wildcard public hostname that would hijack ha
 - No inbound ports on the router for these services. The lab dials out; the internet does not dial
    in.
 - One registry I can trust. If the zone says a service exists and is marked for the dashboard,
-   the dashboard can show it without any parallel config.
+   the dashboard shows it. Experiments that don't route — archived projects, link-only write-ups —
+   live in a small static list beside the zone, so a card can point at a repo instead.
 - A cleaner publishing path. For the Kubernetes case, creating the DNS record is effectively the
    act of making the service public, while still letting me keep certain records out of the
    dashboard.
