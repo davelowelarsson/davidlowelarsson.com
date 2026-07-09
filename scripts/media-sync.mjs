@@ -44,6 +44,7 @@ function readManifest() {
 
 function writeManifest(manifest) {
   writeFileSync(MANIFEST_PATH, `${JSON.stringify(manifest, null, 2)}\n`);
+  execFileSync('biome', ['format', '--write', MANIFEST_PATH], { stdio: 'inherit' });
 }
 
 /** The one function that ever touches R2 — never called by tests. */
