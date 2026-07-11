@@ -41,3 +41,7 @@ Consult these guides before working on related tasks:
   GitHub issues, not ad-hoc. Before proposing what/when to publish, read
   `docs/publishing-routine.md` and the open `content`-labelled `Content roadmap`
   issue. David drives all writing — never draft post content into issues unasked.
+- **Voice**: any work on post prose — drafting, editing, reviewing tone — goes
+  through the `/draft-post` skill (`.claude/skills/draft-post/`), which loads
+  David's voice guide (`VOICE.md`, Tier 1 canon). Never draft or revise post
+  content in your own voice.
