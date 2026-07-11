@@ -44,6 +44,8 @@ Those two needs are not enemies. They just live in the same namespace, the same 
 
 The first version I built was the classic version. Node, Express, MongoDB, a generated ID, and a redirect endpoint. It did exactly what a URL shortener does in the tutorial version of the problem.
 
+The resurrected lab version is here: [shortener-classic.saltast.com](https://shortener-classic.saltast.com/).
+
 ```ts
 app.get('/:alias', async (req, res) => {
   const { alias } = req.params;
@@ -79,6 +81,8 @@ That is automation, but not autonomy.
 The next attempt corrected that mistake with the confidence of a person, me, who had learned exactly one lesson and then over-applied it.
 
 If the problem was that people needed control, then I would give them a control plane. A dashboard. A backend. Authentication. Custom slugs. Stats. A real content model. The whole thing.
+
+The resurrected dashboard version is here: [shortener.saltast.com/login](https://shortener.saltast.com/login).
 
 I ended up with a decoupled frontend and a headless CMS backend, which is a lot of machinery for storing a source URL, a destination URL, a status, and a visit count.
 
