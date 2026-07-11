@@ -23,6 +23,12 @@ category names because the page that collects them explains them.
   side-build): what it was, the tools, and the author's part in it. Kind, not
   age — an old project is still a project; `pubDate` alone says "archive".
 
+The experiment/project boundary is decided once, at writing time, by the
+litmus test: **if the thing had failed, would the post still exist?** Yes →
+experiment; no → project. Origin and done-ness are irrelevant, and the
+category is changed only for genuine misfiles — never to track the work's
+status over time (ADR 0007).
+
 ## Draft
 
 A Post with `draft: true` in frontmatter. Drafts are visible on Preview
