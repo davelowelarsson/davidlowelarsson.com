@@ -8,8 +8,6 @@ draft: false
 tags: ["archive", "3d", "python", "tooling", "maya", "xml-export-import"]
 ---
 
-> Originally published in 2013 and recovered from the [Wayback Machine](https://web.archive.org/web/20150627202806id_/http://davidlowelarsson.com/maya-scene-python-to-xml/).
-
 ![Python to XML exporter tool screenshot](./feature.png)
 
 ## Python to XML
