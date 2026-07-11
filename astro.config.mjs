@@ -16,7 +16,7 @@ function postDates() {
   const dates = new Map();
   for (const entry of readdirSync(base, { recursive: true })) {
     const path = String(entry);
-    if (!path.endsWith('index.md')) continue;
+    if (!/index\.mdx?$/.test(path)) continue;
     const slug = path.split('/').at(-2);
     const pubDate = readFileSync(join(base, path), 'utf8').match(/^pubDate:\s*(\S+)/m)?.[1];
     if (slug && pubDate) dates.set(slug, new Date(pubDate).toISOString());

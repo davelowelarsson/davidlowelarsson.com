@@ -93,6 +93,9 @@ test('sitemap carries per-post lastmod and robots.txt points at it', async ({ re
 
   const sitemap = await (await request.get('/sitemap-0.xml')).text();
   expect(sitemap).toContain('<lastmod>');
+  expect(sitemap).toContain(
+    '<loc>https://davidlowelarsson.com/posts/experiment-spotify-slack-sync/</loc><lastmod>2026-07-10T00:00:00.000Z</lastmod>',
+  );
 
   const robots = await (await request.get('/robots.txt')).text();
   expect(robots).toContain('Sitemap: https://davidlowelarsson.com/sitemap-index.xml');
