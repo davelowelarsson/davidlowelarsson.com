@@ -94,6 +94,7 @@ test('sitemap covers every page the build produced', async ({ request }) => {
     'https://davidlowelarsson.com/category/til/',
     'https://davidlowelarsson.com/category/essay/',
     'https://davidlowelarsson.com/category/experiment/',
+    'https://davidlowelarsson.com/category/project/',
   ]) {
     expect(urls, `missing ${required}`).toContain(required);
   }

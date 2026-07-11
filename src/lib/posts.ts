@@ -1,4 +1,4 @@
-export const CATEGORIES = ['essay', 'til', 'experiment'] as const;
+export const CATEGORIES = ['essay', 'til', 'experiment', 'project'] as const;
 
 export type Category = (typeof CATEGORIES)[number];
 
@@ -8,6 +8,8 @@ export const CATEGORY_DESCRIPTIONS: Record<Category, string> = {
     'Longer, opinionated pieces on engineering leadership, delivery, and how software gets made.',
   til: 'Today I Learned — quick, unpolished notes captured while building. Written the same day, kept forever.',
   experiment: 'Write-ups from the lab: trying things out, measuring, and keeping honest notes.',
+  project:
+    'Write-ups of finished pieces of work — what it was, the tools, and my part in it. From 3D art to home-lab builds.',
 };
 
 export function filterByCategory<T extends { data: { category: Category } }>(

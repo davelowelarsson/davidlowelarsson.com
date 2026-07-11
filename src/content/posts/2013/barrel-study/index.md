@@ -2,7 +2,7 @@
 title: "Barrel Study"
 description: "A quick study modeling and rendering a barrel to sharpen modeling and texturing skills."
 pubDate: 2013-08-11
-category: experiment
+category: project
 draft: true
 tags: ["archive", "3d", "modeling", "study", "vray"]
 ---

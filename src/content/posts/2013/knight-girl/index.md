@@ -2,7 +2,7 @@
 title: "Knight Girl"
 description: "A concept-to-3D work sample: turning a quick sprite-sheet sketch into a full 3D character in Maya."
 pubDate: 2013-08-04
-category: experiment
+category: project
 draft: true
 tags: ["archive", "3d", "character-art", "maya"]
 ---

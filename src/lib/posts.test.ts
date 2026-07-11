@@ -91,6 +91,12 @@ describe('filterByCategory', () => {
   });
 });
 
+describe('CATEGORIES', () => {
+  it('includes project — finished-work write-ups are not experiments', () => {
+    expect(CATEGORIES).toContain('project');
+  });
+});
+
 describe('CATEGORY_DESCRIPTIONS', () => {
   it('has a description for every category — category pages teach the term', () => {
     for (const category of CATEGORIES) {

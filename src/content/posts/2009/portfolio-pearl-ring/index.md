@@ -2,7 +2,7 @@
 title: "Pearl Ring"
 description: "A school project rendering a pearl ring, printed on canvas and given as a birthday present."
 pubDate: 2009-09-08
-category: experiment
+category: project
 draft: true
 tags: ["archive", "3d", "portfolio", "shading", "maya"]
 ---

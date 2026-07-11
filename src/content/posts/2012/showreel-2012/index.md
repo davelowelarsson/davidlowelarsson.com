@@ -2,7 +2,7 @@
 title: "Showreel 2012"
 description: "Showreel breakdown from 2012 — organic modeling, sculpting, and a realtime human body. Only the listing-page excerpt survived in the archive."
 pubDate: 2012-09-21
-category: experiment
+category: project
 draft: true
 tags: ["archive", "3d", "showreel", "sculpting"]
 ---

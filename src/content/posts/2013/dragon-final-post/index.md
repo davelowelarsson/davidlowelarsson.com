@@ -2,7 +2,7 @@
 title: "Dragon – final post"
 description: "Finishing a long-shelved quadruped dragon model — rigging wings, breathing Maya fluid fire, and rendering the final passes in Marmoset."
 pubDate: 2013-07-07
-category: experiment
+category: project
 draft: true
 tags: ["archive", "3d", "rigging", "animation", "dragon", "marmoset-toolbag"]
 ---

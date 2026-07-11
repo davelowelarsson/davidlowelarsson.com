@@ -2,7 +2,7 @@
 title: "Oil Barrel Study"
 description: "Another asset study — an oil barrel modeled in Modo to sharpen modeling skills outside the day job's toolset."
 pubDate: 2013-09-08
-category: experiment
+category: project
 draft: true
 tags: ["archive", "3d", "modeling", "study", "modo"]
 ---

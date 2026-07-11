@@ -2,7 +2,7 @@
 title: "Wodden Pallet Study"
 description: "A short asset study — a wooden pallet, used as more Modo training."
 pubDate: 2013-09-30
-category: experiment
+category: project
 draft: true
 tags: ["archive", "3d", "modeling", "study", "modo"]
 ---

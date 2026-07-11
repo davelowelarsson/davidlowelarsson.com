@@ -2,7 +2,7 @@
 title: "Showreel 2009"
 description: "David's first showreel — digging up past work including the fluids explosion and the Specsavers internship project."
 pubDate: 2009-09-13
-category: experiment
+category: project
 draft: true
 tags: ["archive", "3d", "portfolio", "showreel"]
 ---

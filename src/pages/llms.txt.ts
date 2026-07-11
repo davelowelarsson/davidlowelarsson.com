@@ -15,7 +15,7 @@ export async function GET(context: APIContext) {
     '',
     '> The notebook, not the résumé: essays, TILs, and home-lab experiments from',
     '> a platform engineer with roots in visual effects, 3D, and digital art.',
-    '> Posts are categorized as essay, til (Today I Learned), or experiment.',
+    '> Posts are categorized as essay, til (Today I Learned), experiment, or project.',
     '',
     '## Posts',
     '',
