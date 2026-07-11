@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { futureScheduledSlugs } from './scheduled-slugs';
+import { futureScheduledSlugs, unpublishedSlugs } from './scheduled-slugs';
 
 let dir: string;
 
@@ -79,5 +79,25 @@ describe('futureScheduledSlugs', () => {
     );
 
     expect(futureScheduledSlugs(dir, new Date('2026-01-01'))).toEqual(['mdx-queued']);
+  });
+});
+
+describe('unpublishedSlugs', () => {
+  it('finds drafts and future posts but excludes live posts', () => {
+    dir = mkdtempSync(join(tmpdir(), 'unpublished-slugs-'));
+    writePost(dir, 'draft', 'title: "Draft"\ndraft: true');
+    writePost(dir, 'queued', 'title: "Queued"\ndraft: false\nliveFrom: "2999-01-01"');
+    writePost(dir, 'live', 'title: "Live"\ndraft: false\nliveFrom: "2020-01-01"');
+
+    expect(unpublishedSlugs(dir, new Date('2026-01-01')).sort()).toEqual(['draft', 'queued']);
+  });
+
+  it('finds an MDX draft', () => {
+    dir = mkdtempSync(join(tmpdir(), 'unpublished-slugs-'));
+    const folder = join(dir, 'mdx-draft');
+    mkdirSync(folder, { recursive: true });
+    writeFileSync(join(folder, 'index.mdx'), '---\ntitle: "Draft"\ndraft: true\n---\n\nBody.\n');
+
+    expect(unpublishedSlugs(dir, new Date('2026-01-01'))).toEqual(['mdx-draft']);
   });
 });
