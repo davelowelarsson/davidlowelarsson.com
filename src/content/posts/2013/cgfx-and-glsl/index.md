@@ -8,7 +8,7 @@ draft: false
 tags: ["archive", "3d", "tooling", "shaders", "maya", "realtime"]
 ---
 
-> Recovered from the [Wayback Machine](https://web.archive.org/web/20150629105655id_/http://davidlowelarsson.com/cgfx-and-glsl/) — originally published 15 Jan 2013 on the old WordPress site. Lightly reformatted; images preserved.
+> Originally published in 2013 and recovered from the [Wayback Machine](https://web.archive.org/web/20150629105655id_/http://davidlowelarsson.com/cgfx-and-glsl/).
 
 ![CGFX to GLSL exporter tool screenshot](./feature.png)
 
