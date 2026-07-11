@@ -2,12 +2,14 @@
 title: "CGFX and GLSL"
 description: "Building a Maya-to-engine material exporter so artists could preview CGFX shaders in-engine without restarting anything."
 pubDate: 2013-01-15
+liveFrom: 2026-07-28
 category: experiment
-draft: true
+draft: false
 tags: ["archive", "3d", "tooling", "shaders", "maya", "realtime"]
 ---
 
-> Recovered from the [Wayback Machine](https://web.archive.org/web/20150629105655id_/http://davidlowelarsson.com/cgfx-and-glsl/) — originally published 15 Jan 2013 on the old WordPress site. Lightly reformatted; images preserved.
+import YouTube from '../../../../components/YouTube.astro';
+import videoPoster from './feature.png';
 
 ![CGFX to GLSL exporter tool screenshot](./feature.png)
 
@@ -23,7 +25,7 @@ I started off by creating a regular Phong shader inside the engine, then built i
 
 The glow works like a clean add inside the CGFX shader. I decided to use it as self illumination in GLSL, it also respects the alpha in the texture. The reason for this was mainly because it felt more logical for me.
 
-[Watch the video](https://www.youtube.com/watch?v=PUBQvz_dP18)
+<YouTube id="PUBQvz_dP18" title="CGFX and GLSL glow comparison" poster={videoPoster} />
 
 I then continued working on the material exporter. As stated above, I wanted the artist to be able to move their work into the engine. So the shaders I had written needed to be connected to the materials that were assigned to the meshes. The exporter checks the CGFX shader for all the attributes and then creates an XML formated material that the engine can use. Depending on what's being used in the CGFX shader it also assigns the most suitable GLSL shader which then results in a exact copy inside the engine.
 
@@ -31,4 +33,4 @@ I created some videos showing some comparisons between the CGFX in Maya and the 
 
 When I continued creating more and more complex shaders I also realised the difficulty to prepare for every situation. Sometimes it's hard not to create a certain shader just for that special case, but creating the most common shaders and then using them over and over is just a necessity and it's great when you have a preview look inside your tool and you know that it will look exactly the same inside the engine.
 
-[Watch the video](https://www.youtube.com/watch?v=NaFxesQ4Lzw)
+<YouTube id="NaFxesQ4Lzw" title="CGFX and GLSL material comparison" poster={videoPoster} />

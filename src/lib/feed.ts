@@ -77,36 +77,62 @@ export interface FeedItem {
   customData?: string;
 }
 
-const ABSOLUTE_SRC = /^(https?:)?\//;
+const REMOTE_SRC = /^(https?:)?\/\//;
+const ROOT_RELATIVE_SRC = /^\//;
+
+function absoluteSrcset(srcset: string, site: string): string {
+  return srcset
+    .split(',')
+    .map((candidate) => {
+      const [src, ...descriptor] = candidate.trim().split(/\s+/);
+      const absoluteSrc = src && ROOT_RELATIVE_SRC.test(src) ? new URL(src, site).href : src;
+      return [absoluteSrc, ...descriptor].join(' ');
+    })
+    .join(', ');
+}
 
 /**
  * Relative image paths (./diagram.svg) aren't servable as-is in a feed
  * reader — there's no page context to resolve them against — so they're
  * rewritten to the real hashed `/_astro/...` URL via `imageManifest`
  * (`resolveImageSrc`). Anything that doesn't resolve (no `filePath`, or not
- * in the manifest) is stripped rather than left as a dead link. Absolute
- * paths pass through untouched.
+ * in the manifest) is stripped rather than left as a dead link. Remote URLs
+ * pass through untouched; root-relative URLs emitted by Astro's renderer are
+ * made absolute for feed readers.
  */
 function renderContent(
   post: FeedSourcePost,
   imageManifest: Map<string, string>,
   site: string,
+  renderedBody?: string,
 ): string {
-  return sanitizeHtml(markdown.render(post.body ?? ''), {
+  return sanitizeHtml(renderedBody ?? markdown.render(post.body ?? ''), {
     allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
     transformTags: {
       img: (tagName, attribs) => {
+        const normalizedAttribs = attribs.srcset
+          ? { ...attribs, srcset: absoluteSrcset(attribs.srcset, site) }
+          : attribs;
         const src = String(attribs.src ?? '');
-        if (ABSOLUTE_SRC.test(src)) return { tagName, attribs };
+        if (REMOTE_SRC.test(src)) return { tagName, attribs: normalizedAttribs };
+        if (ROOT_RELATIVE_SRC.test(src)) {
+          return {
+            tagName,
+            attribs: { ...normalizedAttribs, src: new URL(src, site).href },
+          };
+        }
 
         const resolved = resolveImageSrc(post.filePath, src, imageManifest);
-        if (!resolved) return { tagName, attribs };
+        if (!resolved) return { tagName, attribs: normalizedAttribs };
 
-        return { tagName, attribs: { ...attribs, src: new URL(resolved, site).href } };
+        return {
+          tagName,
+          attribs: { ...normalizedAttribs, src: new URL(resolved, site).href },
+        };
       },
     },
     exclusiveFilter: (frame) =>
-      frame.tag === 'img' && !ABSOLUTE_SRC.test(String(frame.attribs.src ?? '')),
+      frame.tag === 'img' && !REMOTE_SRC.test(String(frame.attribs.src ?? '')),
   });
 }
 
@@ -125,6 +151,7 @@ export function toFeedItems(
   showDrafts: boolean,
   site: string,
   imageManifest: Map<string, string> = new Map(),
+  renderedBodies: ReadonlyMap<string, string> = new Map(),
 ): FeedItem[] {
   return sortByPubDateDesc(posts.filter((post) => isVisible(post.data, showDrafts))).map(
     (post) => ({
@@ -132,7 +159,7 @@ export function toFeedItems(
       description: post.data.description,
       pubDate: post.data.pubDate,
       link: `/posts/${post.id}/`,
-      content: renderContent(post, imageManifest, site),
+      content: renderContent(post, imageManifest, site, renderedBodies.get(post.id)),
       categories: [post.data.category, ...post.data.tags],
       customData: coverCustomData(post, site),
     }),

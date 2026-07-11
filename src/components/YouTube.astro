@@ -1,16 +1,16 @@
 ---
 import { Image } from 'astro:assets';
 
-// Click-to-load YouTube facade (issue #37): renders a static poster + play
-// button, loads the real iframe only once the reader clicks. Zero requests
-// to Google/YouTube until then — hand-rolled instead of the
+// Click-to-load YouTube facade (issue #37): renders a static poster, play
+// button, and direct fallback link. Page load makes zero requests to
+// Google/YouTube — hand-rolled instead of the
 // lite-youtube-embed package to stay dependency-free, same posture as
 // Mermaid.astro/Lightbox.astro (a tiny bundled `<script>`, no CDN, nothing
 // framework-specific).
 //
-// `youtube-nocookie.com` only (never youtube.com) — the reduced-tracking
-// embed host — and the iframe is created by client JS after a real click, so
-// nothing third-party ever appears in the server-rendered HTML.
+// `youtube-nocookie.com` is the only embed host. Server-rendered HTML includes
+// a plain `youtube.com` fallback anchor, but no third-party resource is fetched
+// until the reader clicks either play or that link.
 interface Props {
   /** YouTube video id, e.g. the `v=` param or the end of a youtu.be link. */
   id: string;
@@ -31,26 +31,42 @@ const { id, title, poster, start } = Astro.props;
 const isProcessedImage = typeof poster !== 'string';
 ---
 
-<div class="youtube-embed" data-youtube-id={id} data-youtube-title={title} data-youtube-start={start}>
-  <button type="button" class="youtube-embed__play" aria-label={`Play video: ${title}`}>
-    {
-      isProcessedImage ? (
-        <Image
-          src={poster as ImageMetadata}
-          alt=""
-          class="youtube-embed__poster"
-          widths={[320, 640, 960, 1280]}
-          sizes="(min-width: 40rem) 40rem, 100vw"
-        />
-      ) : (
-        <img src={poster as string} alt="" class="youtube-embed__poster" />
-      )
-    }
-    <span class="youtube-embed__play-icon" aria-hidden="true"></span>
-  </button>
+<div class="youtube-player">
+  <div class="youtube-embed" data-youtube-id={id} data-youtube-title={title} data-youtube-start={start}>
+    <button type="button" class="youtube-embed__play" aria-label={`Play video: ${title}`}>
+      {
+        isProcessedImage ? (
+          <Image
+            src={poster as ImageMetadata}
+            alt=""
+            class="youtube-embed__poster"
+            widths={[320, 640, 960, 1280]}
+            sizes="(min-width: 40rem) 40rem, 100vw"
+          />
+        ) : (
+          <img src={poster as string} alt="" class="youtube-embed__poster" />
+        )
+      }
+      <span class="youtube-embed__play-icon" aria-hidden="true"></span>
+    </button>
+  </div>
+  <p class="youtube-player__fallback">
+    <a
+      href={`https://www.youtube.com/watch?v=${id}`}
+      target="_blank"
+      rel="noreferrer"
+      aria-label={`Open "${title}" on YouTube`}>Open on YouTube</a
+    >
+  </p>
 </div>
 
 <style>
+  .youtube-player__fallback {
+    margin: 0.4rem 0 0;
+    font-size: 0.9rem;
+    text-align: right;
+  }
+
   /* `aspect-ratio` reserves the 16:9 box before the poster (or the eventual
      iframe) has loaded — that's the whole no-layout-shift trick, independent
      of whatever intrinsic size the poster image itself has. */

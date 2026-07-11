@@ -60,4 +60,15 @@ describe('YouTube', () => {
     expect(html).toContain('/images/poster.jpg');
     expect(html).not.toContain('<iframe');
   });
+
+  it('always provides a distinctly labelled direct YouTube link', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(YouTube, {
+      props: { id: 'dQw4w9WgXcQ', title: 'A test video', poster },
+    });
+
+    expect(html).toContain('href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"');
+    expect(html).toContain('aria-label="Open &quot;A test video&quot; on YouTube"');
+    expect(html).toContain('Open on YouTube');
+  });
 });
