@@ -49,13 +49,13 @@ function frontmatterDescription(source: string): string | undefined {
 
 /**
  * A plain-text word from the article body — proof the Teaser didn't leak it.
- * Skips words the teaser legitimately contains (its own boilerplate and the
- * post's title) so the probe can't false-fail on an innocent teaser.
+ * Skips any word contained in text the teaser legitimately carries (its own
+ * boilerplate, the post's title, the slug in the canonical URL) — substring
+ * containment, not word equality, so "shortener" is excluded when the title
+ * says "shorteners".
  */
-function bodyProbe(source: string): string | undefined {
-  const teaserVocabulary = new Set(
-    ['scheduled', 'expected', ...frontmatterTitle(source).split(/\s+/)].map((w) => w.toLowerCase()),
-  );
+function bodyProbe(source: string, slug: string): string | undefined {
+  const legitimate = `scheduled expected ${frontmatterTitle(source)} ${slug}`.toLowerCase();
   const body = source
     .split(/^---\s*$/m)
     .slice(2)
@@ -63,7 +63,7 @@ function bodyProbe(source: string): string | undefined {
   const plain = body.replace(/^#.*$/gm, '').replace(/[*_`>[\]()]/g, '');
   return plain
     .split(/\s+/)
-    .find((word) => word.length >= 8 && !teaserVocabulary.has(word.toLowerCase()));
+    .find((word) => word.length >= 8 && !legitimate.includes(word.toLowerCase()));
 }
 
 const outDir = mkdtempSync(join(tmpdir(), 'prod-build-'));
@@ -106,7 +106,7 @@ describe('production build (SHOW_DRAFTS=false)', () => {
 
       const source = postSource(slug);
       expect(html, `${slug} teaser missing its title`).toContain(frontmatterTitle(source));
-      const probe = bodyProbe(source);
+      const probe = bodyProbe(source, slug);
       if (probe) expect(html, `${slug} teaser leaked article body`).not.toContain(probe);
 
       // Article-only metadata must be absent — a teaser is not the article.
