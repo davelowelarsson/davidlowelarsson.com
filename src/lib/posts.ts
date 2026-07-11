@@ -95,8 +95,10 @@ export function isVisible(
 
 /**
  * A non-draft post queued for a future `liveFrom` — it will publish itself
- * later. Surfaced only in previews (in production it is simply hidden), so a
- * scheduled post is distinguishable from a live one at a glance.
+ * later. Previews render it in full (with a scheduled badge, so it reads as
+ * distinct from a live post at a glance); production serves a Teaser at its
+ * URL instead of hiding it outright — see `src/pages/posts/[slug].astro` and
+ * `Teaser.astro`.
  */
 export function isScheduled(data: PostVisibility, now: Date = new Date()): boolean {
   return !data.draft && data.liveFrom !== undefined && !liveFromHasPassed(data.liveFrom, now);

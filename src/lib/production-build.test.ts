@@ -3,12 +3,13 @@ import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
-import { liveFromHasPassed } from './posts';
+import { frontmatterBlock, futureScheduledSlugs } from './scheduled-slugs';
 
 // The e2e suite runs against the drafts-visible build (so content-dependent
 // tests keep working while posts are in draft). THIS test owns the opposite
 // guarantee: a production build (SHOW_DRAFTS=false) must never publish a
-// draft anywhere — page, feed, sitemap, or llms.txt.
+// draft anywhere — page, feed, sitemap, or llms.txt — and that a scheduled
+// post's page is a Teaser, never its real content.
 
 function draftSlugs(): string[] {
   const base = 'src/content/posts';
@@ -16,8 +17,8 @@ function draftSlugs(): string[] {
   for (const entry of readdirSync(base, { recursive: true }) as string[]) {
     const path = entry.toString();
     if (!path.endsWith('index.md') && !path.endsWith('index.mdx')) continue;
-    const frontmatter = readFileSync(join(base, path), 'utf8');
-    if (/^draft:\s*true/m.test(frontmatter)) {
+    const frontmatter = frontmatterBlock(readFileSync(join(base, path), 'utf8'));
+    if (/^\s*draft\s*:\s*true/m.test(frontmatter)) {
       const slug = path.split('/').at(-2);
       if (slug) slugs.push(slug);
     }
@@ -25,26 +26,44 @@ function draftSlugs(): string[] {
   return slugs;
 }
 
-// Non-draft posts whose `liveFrom` has not yet passed — they must be excluded
-// from production just like drafts, for a different reason (scheduled, not
-// unvetted). A live guard: no-op until a scheduled post exists, meaningful once
-// one does. Reuses the real `liveFromHasPassed` so the test can't drift.
-function futureScheduledSlugs(): string[] {
+/** The raw source (frontmatter + body) for a given post slug. */
+function postSource(slug: string): string {
   const base = 'src/content/posts';
-  const now = new Date();
-  const slugs: string[] = [];
   for (const entry of readdirSync(base, { recursive: true }) as string[]) {
     const path = entry.toString();
     if (!path.endsWith('index.md') && !path.endsWith('index.mdx')) continue;
-    const frontmatter = readFileSync(join(base, path), 'utf8');
-    if (/^draft:\s*true/m.test(frontmatter)) continue; // drafts covered above
-    const match = frontmatter.match(/^liveFrom:\s*["']?([0-9T:-]+)["']?/m);
-    if (match && !liveFromHasPassed(match[1], now)) {
-      const slug = path.split('/').at(-2);
-      if (slug) slugs.push(slug);
-    }
+    if (path.split('/').at(-2) === slug) return readFileSync(join(base, path), 'utf8');
   }
-  return slugs;
+  throw new Error(`no source found for slug ${slug}`);
+}
+
+function frontmatterTitle(source: string): string {
+  return (source.match(/^title:\s*(.+)$/m)?.[1] ?? '').replace(/^"|"$/g, '');
+}
+
+function frontmatterDescription(source: string): string | undefined {
+  return frontmatterBlock(source)
+    .match(/^\s*description\s*:\s*(.+)$/m)?.[1]
+    ?.replace(/^["']|["']$/g, '');
+}
+
+/**
+ * A plain-text word from the article body — proof the Teaser didn't leak it.
+ * Skips words the teaser legitimately contains (its own boilerplate and the
+ * post's title) so the probe can't false-fail on an innocent teaser.
+ */
+function bodyProbe(source: string): string | undefined {
+  const teaserVocabulary = new Set(
+    ['scheduled', 'expected', ...frontmatterTitle(source).split(/\s+/)].map((w) => w.toLowerCase()),
+  );
+  const body = source
+    .split(/^---\s*$/m)
+    .slice(2)
+    .join('---');
+  const plain = body.replace(/^#.*$/gm, '').replace(/[*_`>[\]()]/g, '');
+  return plain
+    .split(/\s+/)
+    .find((word) => word.length >= 8 && !teaserVocabulary.has(word.toLowerCase()));
 }
 
 const outDir = mkdtempSync(join(tmpdir(), 'prod-build-'));
@@ -78,7 +97,31 @@ describe('production build (SHOW_DRAFTS=false)', () => {
     }
 
     for (const slug of futureScheduledSlugs()) {
-      expect(existsSync(join(outDir, 'posts', slug)), `scheduled ${slug} built early`).toBe(false);
+      const pagePath = join(outDir, 'posts', slug, 'index.html');
+      expect(existsSync(pagePath), `teaser page missing for scheduled ${slug}`).toBe(true);
+
+      const html = readFileSync(pagePath, 'utf8');
+      expect(html, `${slug} teaser missing noindex`).toMatch(/name="robots"[^>]*noindex/);
+      expect(html, `${slug} teaser missing "expected" wording`).toContain('expected');
+
+      const source = postSource(slug);
+      expect(html, `${slug} teaser missing its title`).toContain(frontmatterTitle(source));
+      const probe = bodyProbe(source);
+      if (probe) expect(html, `${slug} teaser leaked article body`).not.toContain(probe);
+
+      // Article-only metadata must be absent — a teaser is not the article.
+      expect(html, `${slug} teaser carries og:type article`).not.toContain(
+        'property="og:type" content="article"',
+      );
+      expect(html, `${slug} teaser carries JSON-LD`).not.toContain('application/ld+json');
+      expect(html, `${slug} teaser carries article:published_time`).not.toContain(
+        'article:published_time',
+      );
+      const description = frontmatterDescription(source);
+      if (description) {
+        expect(html, `${slug} teaser leaked the description`).not.toContain(description);
+      }
+
       expect(rss, `scheduled ${slug} leaked into rss.xml`).not.toContain(`/posts/${slug}/`);
       expect(sitemap, `scheduled ${slug} leaked into sitemap`).not.toContain(`/posts/${slug}/`);
       expect(llms, `scheduled ${slug} leaked into llms.txt`).not.toContain(`/posts/${slug}/`);

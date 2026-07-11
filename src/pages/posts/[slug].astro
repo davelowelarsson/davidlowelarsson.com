@@ -1,47 +1,75 @@
 ---
 import { getCollection, render } from 'astro:content';
 import { SHOW_DRAFTS } from 'astro:env/server';
+import Teaser from '../../components/Teaser.astro';
 import Base from '../../layouts/Base.astro';
 import { formatScheduleDate, isScheduled, isVisible } from '../../lib/posts';
 import { blogPostingJsonLd } from '../../lib/seo';
 
 export async function getStaticPaths() {
   const posts = await getCollection('posts', ({ data }) => isVisible(data, SHOW_DRAFTS));
-  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+  const paths = posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post, teaser: false },
+  }));
+
+  // Production only: a scheduled post's URL still resolves — to a Teaser, not
+  // its content — so a deliberate inbound link never dead-ends on a 404.
+  // Previews already render scheduled posts in full via `isVisible` above.
+  if (!SHOW_DRAFTS) {
+    const scheduled = await getCollection('posts', ({ data }) => isScheduled(data));
+    for (const post of scheduled) {
+      paths.push({ params: { slug: post.id }, props: { post, teaser: true } });
+    }
+  }
+
+  return paths;
 }
 
-const { post } = Astro.props;
-const { Content } = await render(post);
+const { post, teaser } = Astro.props;
 
 const site = Astro.site?.href ?? 'https://davidlowelarsson.com';
 const rasterCover =
   post.data.cover && post.data.cover.format !== 'svg'
     ? new URL(post.data.cover.src, site).href
     : undefined;
+
+// Teasers never touch the post body — nothing to fetch, nothing to leak.
+let Content: Awaited<ReturnType<typeof render>>['Content'] | null = null;
+if (!teaser) {
+  ({ Content } = await render(post));
+}
 ---
 
 <Base
   title={`${post.data.title} — David Lowe Larsson`}
-  description={post.data.description}
-  ogType="article"
-  ogImage={rasterCover}
-  publishedTime={post.data.pubDate.toISOString()}
-  jsonLd={blogPostingJsonLd(post, site)}
+  description={teaser ? 'Scheduled — coming soon.' : post.data.description}
+  ogType={teaser ? undefined : 'article'}
+  ogImage={teaser ? undefined : rasterCover}
+  publishedTime={teaser ? undefined : post.data.pubDate.toISOString()}
+  jsonLd={teaser ? undefined : blogPostingJsonLd(post, site)}
+  noindex={teaser}
 >
-  <article>
-    <h1>{post.data.title}</h1>
-    <p class="post-meta">
-      <time datetime={post.data.pubDate.toISOString()}>
-        {post.data.pubDate.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' })}
-      </time>
-      <a class={`badge badge-${post.data.category}`} href={`/category/${post.data.category}/`}>
-        {post.data.category}
-      </a>
-      {post.data.draft && <span class="badge badge-warning">draft</span>}
-      {isScheduled(post.data) && post.data.liveFrom && (
-        <span class="badge badge-scheduled">scheduled · {formatScheduleDate(post.data.liveFrom)}</span>
-      )}
-    </p>
-    <Content />
-  </article>
+  {
+    teaser && post.data.liveFrom ? (
+      <Teaser title={post.data.title} liveFrom={post.data.liveFrom} />
+    ) : (
+      <article>
+        <h1>{post.data.title}</h1>
+        <p class="post-meta">
+          <time datetime={post.data.pubDate.toISOString()}>
+            {post.data.pubDate.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' })}
+          </time>
+          <a class={`badge badge-${post.data.category}`} href={`/category/${post.data.category}/`}>
+            {post.data.category}
+          </a>
+          {post.data.draft && <span class="badge badge-warning">draft</span>}
+          {isScheduled(post.data) && post.data.liveFrom && (
+            <span class="badge badge-scheduled">scheduled · {formatScheduleDate(post.data.liveFrom)}</span>
+          )}
+        </p>
+        {Content && <Content />}
+      </article>
+    )
+  }
 </Base>

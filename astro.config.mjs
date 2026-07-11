@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import { defineConfig, envField } from 'astro/config';
+import { futureScheduledSlugs } from './src/lib/scheduled-slugs.ts';
 
 /**
  * slug → pubDate ISO string, read from post frontmatter. The sitemap
@@ -24,6 +25,14 @@ function postDates() {
 }
 
 const postLastmod = postDates();
+
+// Scheduled posts get a Teaser page (see src/pages/posts/[slug].astro) but
+// must not show up in search results before they're real — same source scan
+// the production-build test guards against, so the two can't drift apart.
+// Snapshotted at config load; a build that straddles a liveFrom boundary can
+// misfile one sitemap entry for a day. Accepted: the window is seconds, the
+// teaser carries noindex regardless, and the daily rebuild self-heals it.
+const scheduledSlugs = new Set(futureScheduledSlugs());
 
 // https://astro.build/config
 export default defineConfig({
@@ -54,6 +63,10 @@ export default defineConfig({
   // Docs: https://docs.astro.build/en/guides/integrations-guide/mdx/
   integrations: [
     sitemap({
+      filter(page) {
+        const slug = page.match(/\/posts\/([^/]+)\/$/)?.[1];
+        return !slug || !scheduledSlugs.has(slug);
+      },
       serialize(item) {
         const slug = item.url.match(/\/posts\/([^/]+)\/$/)?.[1];
         const lastmod = slug && postLastmod.get(slug);

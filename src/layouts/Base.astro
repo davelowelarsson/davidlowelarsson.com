@@ -12,6 +12,8 @@ interface Props {
   ogImage?: string;
   publishedTime?: string;
   jsonLd?: Record<string, unknown>;
+  /** Teaser pages: keep them out of search results without hiding the URL. */
+  noindex?: boolean;
 }
 
 const {
@@ -21,6 +23,7 @@ const {
   ogImage,
   publishedTime,
   jsonLd,
+  noindex = false,
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site);
@@ -33,6 +36,7 @@ const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
     <link rel="canonical" href={canonical} />
     <link rel="alternate" type="application/rss+xml" title="David Lowe Larsson" href="/rss.xml" />
     {/* Warm the connection to saltast.com so the footer tally fetch is quicker. */}

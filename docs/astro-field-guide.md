@@ -438,3 +438,22 @@ how the project actually grew.
   `svg.cloneNode(true)`, strip the `useMaxWidth` cap, pin width/height from
   `viewBox.baseVal` → it renders crisp at natural size, scroll-to-pan, no
   data-URI round-trip and no pan/zoom dependency.
+
+## Teaser pages for Scheduled Posts (2026-07-11)
+
+- **One route, two page shapes via `getStaticPaths` props.** `[slug].astro`'s
+  `getStaticPaths` still emits every visible post, then — production only —
+  pushes a second path per scheduled post with `props: { post, teaser: true }`.
+  Same URL space, same file, one boolean deciding whether `render(post)` (and
+  the article's og/JSON-LD) ever run. Docs:
+  https://docs.astro.build/en/guides/routing/#dynamic-routes
+- **`@astrojs/sitemap`'s `filter` option** takes the built page URL and
+  returns a boolean — the one hook for excluding a page the crawl itself
+  can't know is "not really live yet". Paired with a robots `noindex` meta
+  (a new optional `Base.astro` prop) so a Teaser is reachable by direct link
+  but invisible to search and to the sitemap.
+- **A source-scan helper shared across a config file and a test.**
+  `src/lib/scheduled-slugs.ts` is plain Node/TS (no Astro import) so both
+  `astro.config.mjs` (evaluated before any content collection exists) and
+  `production-build.test.ts`'s live guard read frontmatter the same way —
+  one definition of "scheduled," not two that can drift.
