@@ -25,6 +25,20 @@ category names because the page that collects them explains them.
 A Post with `draft: true` in frontmatter. Drafts are visible on Preview
 Deployments and invisible in Production. Draft status is orthogonal to Category.
 
+## Scheduled Post
+
+A non-draft Post with a future `liveFrom`. Merged and committed — it publishes
+itself when its time arrives. Shown in full on Preview Deployments (with a
+scheduled badge); in Production its URL serves a Teaser until it goes live.
+
+## Teaser
+
+The page served in Production at a Scheduled Post's URL before its `liveFrom`
+arrives: the Post's title and its **expected** date, but no content. It exists
+so a deliberate inbound link never dead-ends on a 404. Reachable only by direct
+link — never listed, fed, or shown to search engines. Replaced by the real
+Post once it is live.
+
 ## Preview Deployment
 
 A build of the site from a non-main branch, published at an obscure URL with

@@ -1,0 +1,19 @@
+---
+import { formatScheduleDate } from '../lib/posts';
+
+interface Props {
+  title: string;
+  liveFrom: string;
+}
+
+const { title, liveFrom } = Astro.props;
+const expected = formatScheduleDate(liveFrom);
+---
+
+<h1>{title}</h1>
+<p class="post-meta"><span class="badge badge-scheduled">scheduled · expected {expected}</span></p>
+<p>
+  This post is written and scheduled — it should go live around {expected}. Check back soon, or grab
+  the <a href="/rss.xml">RSS feed</a>.
+</p>
+<p class="all-posts"><a href="/">← Home</a> · <a href="/posts/">Posts →</a></p>
