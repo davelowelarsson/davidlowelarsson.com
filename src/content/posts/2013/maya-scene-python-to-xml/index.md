@@ -2,8 +2,9 @@
 title: "Maya Scene, Python to XML"
 description: "Writing a Python import/export pipeline so artists could move Maya scenes into a proprietary XML-based engine without needing the engine running."
 pubDate: 2013-02-14
+liveFrom: 2026-07-21
 category: experiment
-draft: true
+draft: false
 tags: ["archive", "3d", "python", "tooling", "maya", "xml-export-import"]
 ---
 
