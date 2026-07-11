@@ -8,6 +8,9 @@ draft: false
 tags: ["archive", "3d", "python", "tooling", "maya", "xml-export-import"]
 ---
 
+import YouTube from '../../../../components/YouTube.astro';
+import videoPoster from './feature.png';
+
 ![Python to XML exporter tool screenshot](./feature.png)
 
 ## Python to XML
@@ -36,13 +39,13 @@ I then continued with the more difficult Export/Import track script. This entail
 
 Importing the XML was difficult mainly because of the look at and up locations instead of rotations. I needed to create temporary locators and then use a aimConstraint and then finally start getting the right rotations. After creating all those things i needed to clean the scene up again and let the user continue working without any clutter in the scene
 
-[Watch the video](https://www.youtube.com/watch?v=UXsNGHSSLPo)
+<YouTube id="UXsNGHSSLPo" title="Export and import track script" poster={videoPoster} />
 
 The next step was importing exporting a whole scene. Although there was a lot of lines of code involved it was pretty straight forward. Just collecting different values and then printing them in XML format in a file. I can't think of any hurdles except the ability to distinguish groups easily in Maya. This seems like an old problem, I searched the internet and didn't find any easy solutions. Just like the type 'mesh' there should be a type 'group', it's weird in my opinion. I understand that groups need to behave like transforms but there should really be an easy way to find groups in a Maya scene. I might have missed something (please comment if I have)
 
 When importing a module it converts all the position data, obj and materials into a Maya friendly version again. If you are importing a file into a Maya scene that already has materials that are associated with an object it just applies it (that way you could use a more complex material inside Maya). If the material isn't present it creates the material instead. That way you will always have an "identical" scene in the engine and in Maya.
 
-[Watch the video](https://www.youtube.com/watch?v=PKhWh5Hbx6U)
+<YouTube id="PKhWh5Hbx6U" title="Importing and exporting a whole scene" poster={videoPoster} />
 
 Creating support for different materials is what I would consider the biggest challenge; there are so many different scenarios with materials and it can be a challenge to handle all the different options.
 

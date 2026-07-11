@@ -61,3 +61,23 @@ test('the facade poster causes no layout shift once it finishes loading', async 
   expect(boxAfterPosterLoad?.height).toBe(boxAtLoad?.height);
   expect(boxAfterPosterLoad?.width).toBe(boxAtLoad?.width);
 });
+
+test('the Maya exporter post embeds both original videos with fallbacks', async ({ page }) => {
+  await page.goto('/posts/maya-scene-python-to-xml/');
+
+  const players = page.locator('.youtube-player');
+  await expect(players).toHaveCount(2);
+  await expect(players.locator('[data-youtube-id="UXsNGHSSLPo"]')).toHaveCount(1);
+  await expect(players.locator('[data-youtube-id="PKhWh5Hbx6U"]')).toHaveCount(1);
+  await expect(players.getByRole('link', { name: 'Open on YouTube' })).toHaveCount(2);
+});
+
+test('the CGFX post embeds both original videos with fallbacks', async ({ page }) => {
+  await page.goto('/posts/cgfx-and-glsl/');
+
+  const players = page.locator('.youtube-player');
+  await expect(players).toHaveCount(2);
+  await expect(players.locator('[data-youtube-id="PUBQvz_dP18"]')).toHaveCount(1);
+  await expect(players.locator('[data-youtube-id="NaFxesQ4Lzw"]')).toHaveCount(1);
+  await expect(players.getByRole('link', { name: 'Open on YouTube' })).toHaveCount(2);
+});

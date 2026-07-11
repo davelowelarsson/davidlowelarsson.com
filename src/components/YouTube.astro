@@ -31,26 +31,37 @@ const { id, title, poster, start } = Astro.props;
 const isProcessedImage = typeof poster !== 'string';
 ---
 
-<div class="youtube-embed" data-youtube-id={id} data-youtube-title={title} data-youtube-start={start}>
-  <button type="button" class="youtube-embed__play" aria-label={`Play video: ${title}`}>
-    {
-      isProcessedImage ? (
-        <Image
-          src={poster as ImageMetadata}
-          alt=""
-          class="youtube-embed__poster"
-          widths={[320, 640, 960, 1280]}
-          sizes="(min-width: 40rem) 40rem, 100vw"
-        />
-      ) : (
-        <img src={poster as string} alt="" class="youtube-embed__poster" />
-      )
-    }
-    <span class="youtube-embed__play-icon" aria-hidden="true"></span>
-  </button>
+<div class="youtube-player">
+  <div class="youtube-embed" data-youtube-id={id} data-youtube-title={title} data-youtube-start={start}>
+    <button type="button" class="youtube-embed__play" aria-label={`Play video: ${title}`}>
+      {
+        isProcessedImage ? (
+          <Image
+            src={poster as ImageMetadata}
+            alt=""
+            class="youtube-embed__poster"
+            widths={[320, 640, 960, 1280]}
+            sizes="(min-width: 40rem) 40rem, 100vw"
+          />
+        ) : (
+          <img src={poster as string} alt="" class="youtube-embed__poster" />
+        )
+      }
+      <span class="youtube-embed__play-icon" aria-hidden="true"></span>
+    </button>
+  </div>
+  <p class="youtube-player__fallback">
+    <a href={`https://www.youtube.com/watch?v=${id}`} target="_blank" rel="noreferrer">Open on YouTube</a>
+  </p>
 </div>
 
 <style>
+  .youtube-player__fallback {
+    margin: 0.4rem 0 0;
+    font-size: 0.9rem;
+    text-align: right;
+  }
+
   /* `aspect-ratio` reserves the 16:9 box before the poster (or the eventual
      iframe) has loaded — that's the whole no-layout-shift trick, independent
      of whatever intrinsic size the poster image itself has. */
