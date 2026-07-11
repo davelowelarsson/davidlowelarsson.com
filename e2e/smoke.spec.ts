@@ -96,6 +96,9 @@ test('sitemap carries per-post lastmod and robots.txt points at it', async ({ re
   expect(sitemap).toContain(
     '<loc>https://davidlowelarsson.com/posts/experiment-spotify-slack-sync/</loc><lastmod>2026-07-10T00:00:00.000Z</lastmod>',
   );
+  expect(sitemap).not.toContain(
+    '<loc>https://davidlowelarsson.com/posts/embed-test-fixture/</loc>',
+  );
 
   const robots = await (await request.get('/robots.txt')).text();
   expect(robots).toContain('Sitemap: https://davidlowelarsson.com/sitemap-index.xml');
