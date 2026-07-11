@@ -2,7 +2,7 @@
 title: "Fit n' Clean"
 description: "A late-night rush job: mashing up several bottle designs into one coherent design for a sports-laundry-detergent brand, then animating it."
 pubDate: 2013-04-15
-category: experiment
+category: project
 draft: true
 tags: ["archive", "3d", "product-visualization", "vray", "mental-ray"]
 ---

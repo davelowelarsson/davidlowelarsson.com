@@ -2,7 +2,7 @@
 title: "A 35 Stock car"
 description: "Portfolio page for the A 35 rocket stock car model — a companion piece to the journal write-up of the same project."
 pubDate: 2013-05-27
-category: experiment
+category: project
 draft: true
 tags: ["archive", "3d", "portfolio", "modeling", "texturing"]
 ---

@@ -2,7 +2,7 @@
 title: "Siba Centurion"
 description: "Modeling work during an internship at Bobby, including tracking down a stubborn reversed-normal bug."
 pubDate: 2009-09-08
-category: experiment
+category: project
 draft: true
 tags: ["archive", "3d", "portfolio", "modeling"]
 ---

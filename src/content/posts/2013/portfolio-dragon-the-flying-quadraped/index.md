@@ -2,7 +2,7 @@
 title: "Dragon – the flying quadraped"
 description: "Portfolio page for the finished dragon model and animation — a companion piece to the journal write-up of the same project."
 pubDate: 2013-07-07
-category: experiment
+category: project
 draft: true
 tags: ["archive", "3d", "portfolio", "rigging", "animation", "dragon"]
 cover: ./feature.png

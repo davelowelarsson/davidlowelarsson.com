@@ -2,7 +2,7 @@
 title: "Retrospelsmässan 8-bit FTW"
 description: "A free trailer made for a friend's growing annual retro-games conference."
 pubDate: 2011-03-23
-category: experiment
+category: project
 draft: true
 tags: ["archive", "3d", "portfolio", "animation", "showreel"]
 ---

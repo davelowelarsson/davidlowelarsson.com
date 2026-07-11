@@ -2,7 +2,7 @@
 title: "A 35 Rocket Stock Car"
 description: "Modeling and texturing a beautiful old rocket stock car, start to finish in about 20 hours."
 pubDate: 2013-05-27
-category: experiment
+category: project
 draft: true
 tags: ["archive", "3d", "modeling", "texturing", "rocket"]
 ---

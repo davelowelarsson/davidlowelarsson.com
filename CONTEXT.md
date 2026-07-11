@@ -19,6 +19,9 @@ category names because the page that collects them explains them.
 - **til** — Today I Learned: a same-day, unpolished note. A genre term from
   dev culture (Willison's TILs); kept because the audience is engineers.
 - **experiment** — a write-up from the lab, with measurements and honest notes.
+- **project** — a write-up of a finished piece of work (client job, art piece,
+  side-build): what it was, the tools, and the author's part in it. Kind, not
+  age — an old project is still a project; `pubDate` alone says "archive".
 
 ## Draft
 

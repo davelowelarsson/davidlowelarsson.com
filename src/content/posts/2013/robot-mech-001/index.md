@@ -2,7 +2,7 @@
 title: "Robot Mech _001_"
 description: "A hard-surface mech built in spare time — modeled, sculpted in Mudbox, textured with dDo, and animated in Unity."
 pubDate: 2013-03-14
-category: experiment
+category: project
 draft: true
 tags: ["archive", "3d", "modeling", "sculpting", "mudbox", "mech", "unity"]
 ---

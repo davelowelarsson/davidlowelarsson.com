@@ -2,7 +2,7 @@
 title: "fitNclean"
 description: "Portfolio page for the Fit n' Clean bottle designs and animation — a companion piece to the journal write-up of the same project."
 pubDate: 2013-04-15
-category: experiment
+category: project
 draft: true
 tags: ["archive", "3d", "portfolio", "product-visualization"]
 ---

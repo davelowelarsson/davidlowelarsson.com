@@ -2,7 +2,7 @@
 title: "Mech 001"
 description: "Portfolio page for the hard-surface mech model — a companion piece to the journal write-up of the same project."
 pubDate: 2013-03-14
-category: experiment
+category: project
 draft: true
 tags: ["archive", "3d", "portfolio", "modeling", "mech"]
 ---

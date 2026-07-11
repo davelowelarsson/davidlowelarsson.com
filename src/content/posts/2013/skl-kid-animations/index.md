@@ -2,7 +2,7 @@
 title: "SKL Kid Animations"
 description: "A few simple, cute character animations of a kid model."
 pubDate: 2013-05-12
-category: experiment
+category: project
 draft: true
 tags: ["archive", "3d", "animation", "character-art"]
 ---

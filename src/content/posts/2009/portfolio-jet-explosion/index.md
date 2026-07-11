@@ -2,7 +2,7 @@
 title: "Jet Explosion"
 description: "A school project experimenting with Maya fluids and particles to simulate a jet engine explosion."
 pubDate: 2009-08-02
-category: experiment
+category: project
 draft: true
 tags: ["archive", "3d", "portfolio", "dynamics", "explosion"]
 ---
