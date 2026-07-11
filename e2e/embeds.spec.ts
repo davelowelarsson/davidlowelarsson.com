@@ -62,6 +62,19 @@ test('the facade poster causes no layout shift once it finishes loading', async 
   expect(boxAfterPosterLoad?.width).toBe(boxAtLoad?.width);
 });
 
+test('clicking the poster plays the video without opening the image lightbox', async ({ page }) => {
+  await page.goto(EMBED_FIXTURE_PATH);
+
+  const facade = page.locator('.youtube-embed');
+  const dialog = page.locator('#lightbox');
+  await expect(dialog).toBeHidden();
+
+  await facade.locator('.youtube-embed__poster').click({ position: { x: 20, y: 20 } });
+
+  await expect(facade.locator('iframe')).toHaveCount(1);
+  await expect(dialog).toBeHidden();
+});
+
 test('the Maya exporter post embeds both original videos with fallbacks', async ({ page }) => {
   await page.goto('/posts/maya-scene-python-to-xml/');
 

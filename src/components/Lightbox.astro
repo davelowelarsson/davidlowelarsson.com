@@ -74,7 +74,7 @@
       const target = event.target as Element | null;
 
       const img = target?.closest?.<HTMLImageElement>('img');
-      if (img) {
+      if (img && !img.closest('button, a')) {
         const clone = document.createElement('img');
         clone.src = img.src;
         clone.alt = img.alt;
