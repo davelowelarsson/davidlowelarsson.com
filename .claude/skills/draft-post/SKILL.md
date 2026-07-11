@@ -30,10 +30,16 @@ already answered):
    it? (No placeholders — if there's no real detail, ask again.)
 4. **The cost.** What didn't work, what does it not solve, what are you
    unsure about? (Canon closes hedged; experiments admit limitations.)
-5. **Category & language.** essay / til / experiment? English or Swedish?
-6. **Anything to fit around?** An image, a video, an existing series?
+5. **Category & language.** essay / til / experiment (or a `snippet` TIL)?
+   English or Swedish? (Swedish personal stories are a live genre.)
+6. **TL;DR?** Wanted for this one? (Case-by-case, per VOICE.md conventions.)
+7. **Images & anything to fit around?** What photos/diagrams exist or could
+   exist? A video, an existing series? Where nothing exists yet, the draft
+   carries placeholder slots with a suggested concept and alt text.
 
-Then draft **once**, at the genre budget from VOICE.md, into a new bundle:
+Then draft **once**, at the genre budget from VOICE.md — including image
+placeholder slots (concept + alt text) and, when the post leans on external
+docs, a closing `## Links` section — into a new bundle:
 `src/content/posts/<year>/<slug>/index.md` with frontmatter
 (`title`, `description`, `pubDate`, `category`, `draft: true`, `tags`).
 Always `draft: true`. Before handing it over, self-run check mode (below) on

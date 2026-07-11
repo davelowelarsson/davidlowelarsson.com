@@ -83,9 +83,10 @@ restatement, never a recap list, never a moral.
   the cloud?", "The kids were skeptical (and still are)"). **Never**
   colon-subtitle constructions ("The first version: automation without
   autonomy").
-- No tables. No numbered step lists. At most one inventory-style bullet list
-  when literally listing things (services to run). Procedure is narrated in
-  prose.
+- Tables and numbered lists only where the 2026 conventions permit them
+  (genuine comparison, genuinely sequential procedure — see below). At most
+  one inventory-style bullet list when literally listing things (services to
+  run). Everything else is narrated in prose.
 - At most one code block per post, only when the post is about the code.
 - Blockquotes only as framing (a personal disclaimer, a quoted book) — never
   pull-quotes of the post's own thesis.
@@ -106,6 +107,35 @@ word ("...or there's some kind och blocker"). Rules:
 - **Drafting:** write clean. Manufacturing David's typos is forgery, not voice.
 - **Editing/checking:** never "correct" texture in prose David wrote unless he
   asks. It is his fingerprint, not an error backlog.
+
+## Deliberate 2026 conventions (David's explicit choices)
+
+Interviewed 2026-07-11. These are conscious additions the canon doesn't
+show — where they conflict with a canon-derived rule, THESE win, and check
+mode must not flag them:
+
+- **TL;DR** — case-by-case, decided in the drafting interview. When wanted:
+  3–5 bullets at the top. A TL;DR does not license a closing recap too —
+  the ending stays canon (hedged, no summary).
+- **Links footer** — an optional `## Links` section at the end collecting
+  the docs, repos, and tools the post touched. David's public bookmark
+  trail — encourage it whenever a post leans on external docs. Inline links
+  in prose stay canon style.
+- **Small comparison tables** — allowed when genuinely comparing 2–3 things
+  side by side. Flag only decorative tables (restating what prose already
+  said).
+- **Numbered steps** — allowed for genuinely sequential procedures (setup,
+  pipelines). Prose narration stays the default for everything else.
+- **Mermaid/diagrams** — welcome in experiments for architecture and flow.
+- **Images** — encourage one or two per post; they make the read. Drafts
+  include placeholder slots with a suggested concept and alt text
+  ("photo: the pi cluster in the closet") for David to fill.
+- **Emoji** — lighter than the 2020 canon: a few per post where they land
+  naturally, clause-end as always. Not one-per-paragraph confetti.
+- **Snippet TILs** — gist-like public notes (a config, a command, a how-to
+  from work or life) live in the `til` category tagged `snippet`, with
+  relaxed rules: multiple code blocks fine, minimal prose, budget flexible
+  (~100–400 words). The point is saving it publicly, attached to David.
 
 ## Genre shapes and budgets
 
@@ -132,9 +162,12 @@ marks prose that isn't David:
 2. Colon-subtitle headings.
 3. One-sentence punch paragraphs as recurring rhythm (>2 per post).
 4. Instructional "you".
-5. Thesis restated in the close; recap bullet lists; "In summary".
+5. Thesis restated in the close; closing recap bullet lists; "In summary".
+   (A top-of-post TL;DR is a deliberate convention, not a recap — see above.)
 6. Rhetorical tricolons ("the X, the Y, the Z" triads).
-7. Tables and numbered step lists.
+7. Decorative tables and numbered lists — ones restating what prose already
+   says. Genuine comparisons and genuinely sequential procedures are
+   deliberate conventions (see above).
 8. Generic placeholders ("someone in marketing", `<domain>.se`) where David
    would name the person, repo, number, or date.
 9. Em-dashes as rhythm; semicolons.
