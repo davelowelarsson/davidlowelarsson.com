@@ -29,6 +29,9 @@ const postLastmod = postDates();
 // Scheduled posts get a Teaser page (see src/pages/posts/[slug].astro) but
 // must not show up in search results before they're real — same source scan
 // the production-build test guards against, so the two can't drift apart.
+// Snapshotted at config load; a build that straddles a liveFrom boundary can
+// misfile one sitemap entry for a day. Accepted: the window is seconds, the
+// teaser carries noindex regardless, and the daily rebuild self-heals it.
 const scheduledSlugs = new Set(futureScheduledSlugs());
 
 // https://astro.build/config

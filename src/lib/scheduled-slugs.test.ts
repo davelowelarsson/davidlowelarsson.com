@@ -10,10 +10,10 @@ afterEach(() => {
   if (dir) rmSync(dir, { recursive: true, force: true });
 });
 
-function writePost(base: string, slug: string, frontmatter: string) {
+function writePost(base: string, slug: string, frontmatter: string, body = 'Body.') {
   const folder = join(base, slug);
   mkdirSync(folder, { recursive: true });
-  writeFileSync(join(folder, 'index.md'), `---\n${frontmatter}\n---\n\nBody.\n`);
+  writeFileSync(join(folder, 'index.md'), `---\n${frontmatter}\n---\n\n${body}\n`);
 }
 
 describe('futureScheduledSlugs', () => {
@@ -43,6 +43,30 @@ describe('futureScheduledSlugs', () => {
     writePost(dir, 'plain', 'title: "Plain"\ndraft: false');
 
     expect(futureScheduledSlugs(dir, new Date('2026-01-01'))).toEqual([]);
+  });
+
+  it('ignores a liveFrom that only appears in the post body (e.g. a code sample)', () => {
+    dir = mkdtempSync(join(tmpdir(), 'scheduled-slugs-'));
+    writePost(
+      dir,
+      'about-scheduling',
+      'title: "About scheduling"\ndraft: false',
+      '```yaml\nliveFrom: 2999-01-01\n```',
+    );
+
+    expect(futureScheduledSlugs(dir, new Date('2026-01-01'))).toEqual([]);
+  });
+
+  it('accepts YAML whitespace variants the collection schema would accept', () => {
+    dir = mkdtempSync(join(tmpdir(), 'scheduled-slugs-'));
+    writePost(dir, 'spaced', 'title: "Spaced"\ndraft: false\nliveFrom : "2999-01-01"');
+    writePost(dir, 'indented', 'title: "Indented"\ndraft: false\n  liveFrom: "2999-01-01"');
+    writePost(dir, 'spaced-draft', 'title: "Spaced draft"\ndraft : true\nliveFrom: "2999-01-01"');
+
+    expect(futureScheduledSlugs(dir, new Date('2026-01-01')).sort()).toEqual([
+      'indented',
+      'spaced',
+    ]);
   });
 
   it('finds an .mdx bundle too', () => {
