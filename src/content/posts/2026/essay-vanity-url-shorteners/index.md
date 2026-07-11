@@ -12,6 +12,8 @@ On a Lab Friday in 2020 I built what I thought was a URL shortener. A few years 
 
 The ask was not strange. A colleague on the communication/campaign/marketing side wanted clean links that could be printed, spoken, and remembered by actual humans:
 
+Vanity urls examples:
+
 ```txt
 <domain>.se/summer
 ```
