@@ -51,7 +51,12 @@ const isProcessedImage = typeof poster !== 'string';
     </button>
   </div>
   <p class="youtube-player__fallback">
-    <a href={`https://www.youtube.com/watch?v=${id}`} target="_blank" rel="noreferrer">Open on YouTube</a>
+    <a
+      href={`https://www.youtube.com/watch?v=${id}`}
+      target="_blank"
+      rel="noreferrer"
+      aria-label={`Open "${title}" on YouTube`}>Open on YouTube</a
+    >
   </p>
 </div>
 

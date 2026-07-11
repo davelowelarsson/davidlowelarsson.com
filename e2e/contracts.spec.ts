@@ -61,11 +61,27 @@ test('rss item for a diagram post resolves its in-body image to a served hashed 
   );
 
   expect(diagramItem, 'expected the draft-preview-pipeline post in the feed').toBeTruthy();
-  // `<content:encoded>` is HTML-entity-escaped by the XML builder, so the
-  // `<img>` markup shows up as `&lt;img src=&quot;...&quot;`.
+  // `<content:encoded>` is HTML-entity-escaped by the XML builder.
   expect(diagramItem).toMatch(
-    /&lt;img src=&quot;https:\/\/davidlowelarsson\.com\/_astro\/[^&]+&quot;/,
+    /&lt;img [^>]*src=&quot;https:\/\/davidlowelarsson\.com\/_astro\/[^&]+&quot;/,
   );
+  expect(diagramItem).not.toContain('srcset=&quot;/_astro/');
+});
+
+test('rss renders MDX posts without leaking imports or component source', async ({ request }) => {
+  const xml = await (await request.get('/rss.xml')).text();
+  const spotifyItem = xml
+    .split('<item>')
+    .slice(1)
+    .find((item) =>
+      item.includes('<link>https://davidlowelarsson.com/posts/experiment-spotify-slack-sync/'),
+    );
+
+  expect(spotifyItem, 'expected the published Spotify post in the feed').toBeTruthy();
+  expect(spotifyItem).toContain('Fredagslistan');
+  expect(spotifyItem).not.toContain('import ArticleLinks');
+  expect(spotifyItem).not.toContain('&lt;ProcessStepCard');
+  expect(spotifyItem).not.toContain('&lt;WrappedSnapshot');
 });
 
 test('sitemap covers every page the build produced', async ({ request }) => {

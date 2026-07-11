@@ -457,3 +457,15 @@ how the project actually grew.
   `astro.config.mjs` (evaluated before any content collection exists) and
   `production-build.test.ts`'s live guard read frontmatter the same way —
   one definition of "scheduled," not two that can drift.
+
+## Rendering MDX in RSS (2026-07-11)
+
+- **A collection entry's `body` is raw source, not feed-ready HTML.** For MDX
+  that includes imports and component JSX, so RSS must call `render(entry)`
+  and render its `Content` component rather than pass `body` to MarkdownIt.
+  Docs: https://docs.astro.build/en/guides/content-collections/#rendering-body-content
+- **One build-time Container turns all `Content` components into strings.**
+  `rss.xml.ts` loads the MDX renderer once, renders every entry, then hands the
+  resulting HTML to the existing sanitizer. The Container API is experimental,
+  so this dependency stays isolated to the prerendered RSS endpoint and its
+  production-build contract. Docs: https://docs.astro.build/en/reference/container-reference/

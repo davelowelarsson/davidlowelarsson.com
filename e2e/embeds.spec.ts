@@ -82,7 +82,7 @@ test('the Maya exporter post embeds both original videos with fallbacks', async 
   await expect(players).toHaveCount(2);
   await expect(players.locator('[data-youtube-id="UXsNGHSSLPo"]')).toHaveCount(1);
   await expect(players.locator('[data-youtube-id="PKhWh5Hbx6U"]')).toHaveCount(1);
-  await expect(players.getByRole('link', { name: 'Open on YouTube' })).toHaveCount(2);
+  await expect(players.getByRole('link', { name: /^Open ".+" on YouTube$/ })).toHaveCount(2);
 });
 
 test('the CGFX post embeds both original videos with fallbacks', async ({ page }) => {
@@ -92,5 +92,5 @@ test('the CGFX post embeds both original videos with fallbacks', async ({ page }
   await expect(players).toHaveCount(2);
   await expect(players.locator('[data-youtube-id="PUBQvz_dP18"]')).toHaveCount(1);
   await expect(players.locator('[data-youtube-id="NaFxesQ4Lzw"]')).toHaveCount(1);
-  await expect(players.getByRole('link', { name: 'Open on YouTube' })).toHaveCount(2);
+  await expect(players.getByRole('link', { name: /^Open ".+" on YouTube$/ })).toHaveCount(2);
 });
