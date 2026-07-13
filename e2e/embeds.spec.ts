@@ -94,3 +94,31 @@ test('the CGFX post embeds both original videos with fallbacks', async ({ page }
   await expect(players.locator('[data-youtube-id="NaFxesQ4Lzw"]')).toHaveCount(1);
   await expect(players.getByRole('link', { name: /^Open ".+" on YouTube$/ })).toHaveCount(2);
 });
+
+for (const post of [
+  {
+    slug: 'a-35-rocket-stock-car',
+    videoIds: ['dpb5nWYVEyo'],
+  },
+  {
+    slug: 'dragon-final-post',
+    videoIds: ['2tcs7vpUBlg', 'B8vGuhu_0m0', '508U_Fmi_9Y'],
+  },
+  {
+    slug: 'portfolio-dragon-the-flying-quadraped',
+    videoIds: ['508U_Fmi_9Y', '2tcs7vpUBlg'],
+  },
+]) {
+  test(`${post.slug} embeds its original videos with fallbacks`, async ({ page }) => {
+    await page.goto(`/posts/${post.slug}/`);
+
+    const players = page.locator('.youtube-player');
+    await expect(players).toHaveCount(post.videoIds.length);
+    for (const videoId of post.videoIds) {
+      await expect(players.locator(`[data-youtube-id="${videoId}"]`)).toHaveCount(1);
+    }
+    await expect(players.getByRole('link', { name: /^Open ".+" on YouTube$/ })).toHaveCount(
+      post.videoIds.length,
+    );
+  });
+}
