@@ -11,28 +11,28 @@ coverAlt: Maya showing the data-centre scene in wireframe with the Export/Import
 ---
 
 When I rebuilt this site in Astro I started digging through backups of my old websites, trying to
-find the posts and projects I had left behind. Which made me opening a lot of old pages and watching videos I had not
-seen for years. It's really "cringe" (as my daugther would say), but I also don't want that work to be buried or forgotten just because it is old. It is
+find the posts and projects I had left behind. Which made me open a lot of old pages and watch videos I had not
+seen for years. It's really "cringe" (as my daughter would say), but I also don't want that work to be buried or forgotten just because it is old. It is
 still fun, and it is part of my history.
 
 ![My dual-monitor workstation during the period when I was building Maya pipeline tools](./workstation-2013.png)
 
 Two of the things I found were tools I built around Maya, Python, XML, CGFX and GLSL. Watching
 those videos again reminded me of the line on the start page of this site, where I say that
-"somewhere along the way, building the tools became the craft" (hope fully it's still there and I haven't changed it when you're reading this 😅). I think these tools were part of
+"somewhere along the way, building the tools became the craft" (hopefully it's still there and I haven't changed it when you're reading this 😅). I think these tools were part of
 that "somewhere".
 
 ## The "long feedback loop"
 
 We were building a real-time walkthrough of a data centre and its cooling system. The scene had a
 lot of small parts, many with their own materials, and all of them needed to end up in the right
-place as one complete scene. The engine ran mainly on Linux while the me and other artists worked in Maya on
+place as one complete scene. The engine ran mainly on Linux while me and the other artists worked in Maya on
 Mac and Windows, so testing the actual result was awkward and time-consuming.
 
 Before the tool, objects were exported and then placed by editing XML manually. A change could
-mean exporting the individual objects, objs, again, updating the XML, moving over to the engine and
+mean exporting the individual `.obj` files again, updating the XML, moving over to the engine and
 finding out what was wrong. Going back and forth could take several hours, which made it very
-easy to loose "flow".
+easy to lose "flow".
 
 ![Maya showing the data-centre scene in wireframe with the Export/Import Module tool open](./maya-datacentre-exporter.png)
 
@@ -41,7 +41,7 @@ XML format. It handled groups, objects and materials, but it also had to transla
 applications represented orientation. Maya used rotations while the engine expected look-at and
 up positions, so the script created temporary locators and constraints to do the conversion. It
 was not particularly elegant, and I even wrote "don't ask me why" about the engine format in the
-original post, but it did shorten the feedback loop, "was i correct?".
+original post, but it did shorten the feedback loop, "was I correct?".
 
 The [Maya Scene, Python to XML](/posts/maya-scene-python-to-xml/) project handled placement and
 scene structure. The [CGFX and GLSL](/posts/cgfx-and-glsl/) project attacked the same delay from
@@ -74,13 +74,13 @@ def command = $/echo \\\"${foo}\\\"/$
 sh command                     // \"bar\"
 ```
 
-As Github actions, Drone and Circle CI appeared, I became more interested in smaller, modular
+As GitHub Actions, Drone and CircleCI appeared, I became more interested in smaller, modular
 parts that could be replaced.
 
 ## Removing the deploy button
 
 Removing the "deploy button" has been one of my goals since I started at UR ... merge a feature
-and let it reach users. As long as it's in a feature branch or jira ticket, it dosen't bring any user
+and let it reach users. As long as it's in a feature branch or Jira ticket, it doesn't bring any user
 value.
 
 Today that work includes GitOps, preview applications and progressive delivery on Kubernetes. A
