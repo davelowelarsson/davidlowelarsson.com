@@ -1,9 +1,10 @@
 ---
 title: "TIL: DNSEndpoint CRs, and comments on Cloudflare DNS records"
 description: "Claude Code suggested a Kubernetes resource I didn't know existed, and it turned out Cloudflare DNS records can carry 100 characters of metadata."
-pubDate: 2026-07-13
+pubDate: 2026-08-11
+liveFrom: 2026-08-11
 category: til
-draft: true
+draft: false
 tags: ["snippet", "kubernetes", "external-dns", "cloudflare", "dns", "homelab"]
 ---
 
