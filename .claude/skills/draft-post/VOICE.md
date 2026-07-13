@@ -132,6 +132,9 @@ mode must not flag them:
   ("photo: the pi cluster in the closet") for David to fill.
 - **Emoji** — lighter than the 2020 canon: a few per post where they land
   naturally, clause-end as always. Not one-per-paragraph confetti.
+- **Word vetoes** (growing list, David's explicit calls) — "terse" (2026-07-13:
+  "I would lean into concise more"); prefer the plain word he'd actually say
+  ("concise", "short").
 - **No "TIL:" prefix in titles** (decided 2026-07-13) — the category badge
   and the /category/til/ page carry the genre; the title names the one thing
   learned so it stands alone in RSS and search.
