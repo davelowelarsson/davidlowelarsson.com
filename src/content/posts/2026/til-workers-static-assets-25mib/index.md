@@ -1,5 +1,5 @@
 ---
-title: "TIL: Workers static assets cap files at 25 MiB"
+title: "Workers static assets cap files at 25 MiB"
 description: Cloudflare's static-assets hosting refuses any single file over 25 MiB — which quietly decides your whole video strategy for you.
 pubDate: 2026-07-07
 category: til

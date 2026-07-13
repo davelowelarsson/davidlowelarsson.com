@@ -132,10 +132,17 @@ mode must not flag them:
   ("photo: the pi cluster in the closet") for David to fill.
 - **Emoji** — lighter than the 2020 canon: a few per post where they land
   naturally, clause-end as always. Not one-per-paragraph confetti.
-- **Snippet TILs** — gist-like public notes (a config, a command, a how-to
-  from work or life) live in the `til` category tagged `snippet`, with
-  relaxed rules: multiple code blocks fine, minimal prose, budget flexible
-  (~100–400 words). The point is saving it publicly, attached to David.
+- **Word vetoes** (growing list, David's explicit calls) — "terse" (2026-07-13:
+  "I would lean into concise more"); prefer the plain word he'd actually say
+  ("concise", "short").
+- **No "TIL:" prefix in titles** (decided 2026-07-13) — the category badge
+  and the /category/til/ page carry the genre; the title names the one thing
+  learned so it stands alone in RSS and search.
+- **TILs are domain-free and may carry blocks** (decided 2026-07-13) — one
+  thing learned, from any part of life, optionally wrapped around a copyable
+  block (a manifest, a one-liner, a recipe). No snippet/regular subtypes —
+  tags and the text say what was learned. The point is saving it publicly,
+  attached to David.
 
 ## Genre shapes and budgets
 
@@ -143,7 +150,7 @@ mode must not flag them:
 |---|---|---|
 | essay / personal story | 350–900 | concrete trigger → 2–4 plain-phrase sections → hedged, forward-looking close |
 | experiment | 600–1000 | what I wanted (boring goal) → what I did, narrated → what it cost / doesn't solve → "next iteration" close |
-| til | 200–300 | 1–2 sentence hook (the bug/surprise) → what happened → fix → bold **Takeaway:** one-liner |
+| til | 200–300 prose (blocks don't count) | one thing learned, any domain (code, kids, cooking, wood); hook on the moment of surprise → what I learned → bold **Takeaway:** one-liner; optionally carries a copyable block (config, command, recipe); tags carry the subject |
 | Swedish personal | 120–400 | no headings, images, plain close |
 
 The **Takeaway:** closer and the honest-limitations section are site

@@ -1,5 +1,5 @@
 ---
-title: "TIL: Biome lint presets"
+title: "Biome lint presets"
 description: "Biome's recommended preset is opinionated enough that most projects only need a small overrides block, not a rule-by-rule config."
 pubDate: 2026-05-22
 category: til

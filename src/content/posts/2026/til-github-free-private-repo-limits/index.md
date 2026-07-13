@@ -1,5 +1,5 @@
 ---
-title: "TIL: Branch protection needs a public repo (or Pro) — and Dependabot has its own secrets"
+title: "Branch protection needs a public repo (or Pro) — and Dependabot has its own secrets"
 description: Two GitHub surprises from one afternoon — the features that push a personal site's repo public, and the separate secrets store Dependabot PRs read from.
 pubDate: 2026-07-07
 category: til
