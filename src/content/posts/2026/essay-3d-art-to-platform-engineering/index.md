@@ -1,98 +1,101 @@
 ---
 title: "From 3D digital art to platform engineering"
-description: "A decade in 3D pipelines taught me more about platform engineering than any infra job did on its own — both are about making other people's work possible."
-pubDate: 2026-06-05
+description: "Finding my old Maya tools again made me realise that I was shortening feedback loops long before I called it platform engineering."
+pubDate: 2026-07-17
+liveFrom: 2026-07-17
 category: essay
-draft: true
+draft: false
 tags: ["career", "platform-engineering", "3d-art", "tooling"]
-cover: ./essay-3d-art-pipeline.svg
-coverAlt: Render pipeline sketch
+cover: ./maya-datacentre-exporter.png
+coverAlt: Maya showing the data-centre scene in wireframe with the Export/Import Module tool open
 ---
 
-> **WIP/TEST** — placeholder content while the site's design is under construction.
+When I rebuilt this site in Astro I started digging through backups of my old websites, trying to
+find the posts and projects I had left behind. Which made me opening a lot of old pages and watching videos I had not
+seen for years. It's really "cringe" (as my daugther would say), but I also don't want that work to be buried or forgotten just because it is old. It is
+still fun, and it is part of my history.
 
-For about a decade, before infrastructure paid the bills, I built 3D scenes. Renders, rigs,
-lighting setups, the occasional short animation. I didn't think of it as engineering practice.
-It turns out it was — just for a different kind of pipeline.
+![My dual-monitor workstation during the period when I was building Maya pipeline tools](./workstation-2013.png)
 
-![Abstract composition of a wireframe cube dissolving into flat geometric panels](./essay-3d-art-pipeline.svg)
+Two of the things I found were tools I built around Maya, Python, XML, CGFX and GLSL. Watching
+those videos again reminded me of the line on the start page of this site, where I say that
+"somewhere along the way, building the tools became the craft" (hope fully it's still there and I haven't changed it when you're reading this 😅). I think these tools were part of
+that "somewhere".
 
-## Two pipelines, one shape
+## The "long feedback loop"
 
-A 3D production pipeline and a software delivery pipeline rhyme more than I expected. Both move
-raw material through a sequence of transformations — modeling, texturing, rigging, lighting,
-rendering, compositing on one side; commit, build, test, deploy, observe on the other — and both
-live or die on how well the *handoffs* between stages work, not how good any single stage is in
-isolation.
+We were building a real-time walkthrough of a data centre and its cooling system. The scene had a
+lot of small parts, many with their own materials, and all of them needed to end up in the right
+place as one complete scene. The engine ran mainly on Linux while the me and other artists worked in Maya on
+Mac and Windows, so testing the actual result was awkward and time-consuming.
 
-### The render farm was my first platform team
+Before the tool, objects were exported and then placed by editing XML manually. A change could
+mean exporting the individual objects, objs, again, updating the XML, moving over to the engine and
+finding out what was wrong. Going back and forth could take several hours, which made it very
+easy to loose "flow".
 
-Before I knew the term "platform engineering," I was the person who set up the render farm: a
-pool of machines, a job queue, a way to distribute frames across nodes and reassemble them into a
-finished sequence. Artists submitted jobs. My job was to make submitting a job boring — no
-manual file copying, no "which machine has the right plugin version," no surprises at 2am before
-a deadline.
+![Maya showing the data-centre scene in wireframe with the Export/Import Module tool open](./maya-datacentre-exporter.png)
 
-That's platform engineering. Different substrate, same job: reduce the cognitive load of the
-people doing the primary work, and be invisible when it's going well.
+So I built a Python importer and exporter that could move the scene between Maya and the engine's
+XML format. It handled groups, objects and materials, but it also had to translate how the two
+applications represented orientation. Maya used rotations while the engine expected look-at and
+up positions, so the script created temporary locators and constraints to do the conversion. It
+was not particularly elegant, and I even wrote "don't ask me why" about the engine format in the
+original post, but it did shorten the feedback loop, "was i correct?".
 
-![A cluttered digital art workbench: reference boards, in-progress renders, and a job queue script pinned beside them](./workbench.png)
+The [Maya Scene, Python to XML](/posts/maya-scene-python-to-xml/) project handled placement and
+scene structure. The [CGFX and GLSL](/posts/cgfx-and-glsl/) project attacked the same delay from
+another direction, giving artists a close preview in Maya of how materials would look in the
+engine. The preview could never replace testing in the real engine and there was always some
+final polish, but most mistakes could be found where the artist was already working.
 
-That workbench — half art tool, half ops console — is the clearest artifact I have of the
-transition already underway before I had a name for it.
+Most 3D posts in the archive are simply finished projects, they don't need a platform-engineering
+lesson. These two just made part of my work journey easier for me to see.
 
-### What breaks in both worlds
+## I called it automation
 
-> A render that fails at 90% and a deploy that fails after the health check passes cost you the
-> same thing: trust in the pipeline, which is much more expensive to rebuild than the job itself.
+When I moved into web development I kept trying to shorten the same kind of round trip. At Delta
+Websolutions, Jenkins became central to that work, and I brought a lot of those ideas with me to
+UR. At the time I mostly called it automation: put shared logic in one place, add the checks once
+and make it easier for every project to get the same behavior, including things like security
+scanning. Almost treating the build pipeline like a "lib" for all projects.
 
-The failure modes even feel similar:
+Jenkins also taught me where that approach became hard to maintain. Groovy, shell commands and
+layers of escaping could turn a simple command into a small puzzle. I still have an example where
+preserving quotes around a variable needed six backslashes... eventually the shared workflow was
+creating its own friction. The shortest version looked something like this:
 
-- A texture reference pointing at a path that only exists on one artist's machine — the same
-  shape as a config value that's only set correctly in one engineer's `.env` file.
-- A render that looks fine at low resolution and falls apart at full quality — the same shape as
-  a service that works under a light load test and buckles under real traffic.
-- A pipeline stage that silently succeeds while producing garbage output — the same shape as a CI
-  step that exits 0 despite the actual check never running.
+```groovy
+sh 'echo "$BUILD_NUMBER"'      // 1, quotes silently dropped
+sh 'echo \\"$BUILD_NUMBER\\"'  // "1"
 
-## What carried over directly
-
-| 3D production skill                     | Platform engineering equivalent                  |
-| ---------------------------------------- | -------------------------------------------------- |
-| Version-controlling scene files          | Version-controlling infrastructure as code         |
-| Render farm job scheduling               | CI/CD runner scheduling and concurrency limits      |
-| Asset dependency graphs (textures, rigs) | Service dependency graphs and build caching         |
-| "Bake" steps (lighting, simulation)      | Build/compile steps that trade runtime cost for prep cost |
-| Frame-by-frame QA before a deadline      | Progressive rollout and canary checks before a release |
-
-## The part that didn't carry over cleanly
-
-Artistic feedback loops are slow and subjective by nature — a director's note like "make it feel
-warmer" doesn't compile into a ticket. Engineering feedback loops can be fast and objective: a
-test either passes or it doesn't. I had to unlearn some patience for ambiguity that served me
-well as an artist and would have made me a slow, hedge-everything engineer if I'd kept it
-unchecked.
-
-A small example of the instinct I had to actively override — treating "it looks right" as
-sufficient evidence, instead of writing it down as a check:
-
-```ts
-// artist instinct: "I looked at it, it's fine"
-// engineering habit: encode the check so it survives without me looking
-test('preview build has no draft posts in production mode', async () => {
-  const posts = await getVisiblePosts({ showDrafts: false });
-  expect(posts.every((p) => !p.data.draft)).toBe(true);
-});
+def foo = 'bar'
+def command = $/echo \\\"${foo}\\\"/$
+sh command                     // \"bar\"
 ```
 
-## Why I think the move made sense
+As Github actions, Drone and Circle CI appeared, I became more interested in smaller, modular
+parts that could be replaced.
 
-Both disciplines are, underneath the specific tools, about designing systems that let other
-people do good work without having to understand every layer beneath them. A lighting artist
-shouldn't need to know how the render farm schedules jobs. A developer shouldn't need to know how
-the deployment pipeline provisions its runners. Good platform work in either domain is the same
-craft: absorb complexity so it doesn't propagate to the people depending on you.
+## Removing the deploy button
 
-I don't render scenes for a living anymore, but I still think in pipelines, dependency graphs,
-and "what happens when this stage fails at 2am" — because that's the muscle a decade of production
-work actually built, whatever the tool set looked like at the time.
+Removing the "deploy button" has been one of my goals since I started at UR ... merge a feature
+and let it reach users. As long as it's in a feature branch or jira ticket, it dosen't bring any user
+value.
+
+Today that work includes GitOps, preview applications and progressive delivery on Kubernetes. A
+change can go through unit, integration, end-to-end and smoke tests, get a final sanity check with
+k6, and then move into a canary rollout. Argo Rollouts can use metrics such as latency and server
+errors to decide whether a new version should continue or roll back, while the developers get a
+signal quickly when something fails.
+
+Some services still have a manual promotion step, so that is progressive delivery. Others have
+taken the step to continuous deployment, where a healthy version is promoted by the system and a
+failing one is rolled back without a developer needing to press a deploy button. Production is
+still the final environment, just as the Linux engine was, but the path to useful feedback is a
+lot shorter and more of the repeated checking has been encoded into the system.
+
+I did not have the language of platform engineering or feedback loops when I wrote those Python
+scripts. I was trying to get a data-centre scene out of Maya without spending hours placing it by
+hand again. There are probably more pieces of this transition hiding in the archive that I have
+not found yet... I look forward to seeing what else turns up.

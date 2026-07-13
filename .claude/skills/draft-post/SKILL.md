@@ -23,11 +23,13 @@ already answered):
 
 1. **The moment.** What concrete thing happened that starts this post? (A
    date, a person, a broken thing, a conversation — the canon never opens on
-   a topic.)
+   a topic.) What was David's unfiltered reaction to it?
 2. **The one thought.** What's the single thing you want a reader to get?
    (One — the canon posts carry exactly one.)
 3. **The real details.** Which names, repos, numbers, links, dates belong in
-   it? (No placeholders — if there's no real detail, ask again.)
+   it? Which exact phrases did David use for the thing at the time or while
+   telling the story? (No placeholders — if there's no real detail, ask
+   again.)
 4. **The cost.** What didn't work, what does it not solve, what are you
    unsure about? (Canon closes hedged; experiments admit limitations.)
 5. **Category & language.** essay / til / experiment (or a `snippet` TIL)?
@@ -43,8 +45,11 @@ docs, a closing `## Links` section — into a new bundle:
 `src/content/posts/<year>/<slug>/index.md` with frontmatter
 (`title`, `description`, `pubDate`, `category`, `draft: true`, `tags`).
 Always `draft: true`. Before handing it over, self-run check mode (below) on
-your own draft and fix what it flags — do not deliver prose that fails the
-canon.
+your own draft and fix what it flags. Then run a traceability pass: preserve
+David's supplied phrases, reactions, asides, and working vocabulary where
+they fit; do not translate them all into cleaner professional abstractions.
+Never invent texture to satisfy this pass. Do not deliver prose that fails
+the canon.
 
 ## Mode: check — voice-lint, never rewrite
 

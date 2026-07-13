@@ -2,16 +2,15 @@ import { expect, test } from '@playwright/test';
 
 // Guards issue #9: global image.layout/responsiveStyles config actually
 // produces responsive markup for a raster image dropped into a post, and
-// the dependency-free lightbox opens/closes it. The proof-post
-// (essay-3d-art-to-platform-engineering) carries one raster image
-// (workbench.png) specifically to exercise this — every other post image is
-// SVG, which Astro passes through without generating width variants.
+// the dependency-free lightbox opens/closes it. The Raspberry Pi cluster post
+// provides a stable, published raster-image fixture.
 
-const POST_PATH = '/posts/essay-3d-art-to-platform-engineering/';
+const POST_PATH = '/posts/raspberry-pi-cluster/';
+const IMAGE_SELECTOR = 'article img[src*="raw-rpi-home-cluster"]';
 
 test('a raster image in a post gets a multi-width srcset and lazy loading', async ({ page }) => {
   await page.goto(POST_PATH);
-  const image = page.locator('article img[src*="workbench"]');
+  const image = page.locator(IMAGE_SELECTOR).first();
   await expect(image).toHaveAttribute('loading', 'lazy');
 
   const srcset = await image.getAttribute('srcset');
@@ -25,7 +24,7 @@ test('clicking an in-article image opens a full-size dialog, and Escape closes i
   page,
 }) => {
   await page.goto(POST_PATH);
-  const image = page.locator('article img[src*="workbench"]');
+  const image = page.locator(IMAGE_SELECTOR).first();
   const dialog = page.locator('#lightbox');
 
   await expect(dialog).toBeHidden();
@@ -42,7 +41,7 @@ test('clicking an in-article image opens a full-size dialog, and Escape closes i
 
 test('clicking the dialog backdrop also closes the lightbox', async ({ page }) => {
   await page.goto(POST_PATH);
-  const image = page.locator('article img[src*="workbench"]');
+  const image = page.locator(IMAGE_SELECTOR).first();
   const dialog = page.locator('#lightbox');
 
   await image.click();
