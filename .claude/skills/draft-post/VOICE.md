@@ -132,6 +132,9 @@ mode must not flag them:
   ("photo: the pi cluster in the closet") for David to fill.
 - **Emoji** — lighter than the 2020 canon: a few per post where they land
   naturally, clause-end as always. Not one-per-paragraph confetti.
+- **No "TIL:" prefix in titles** (decided 2026-07-13) — the category badge
+  and the /category/til/ page carry the genre; the title names the one thing
+  learned so it stands alone in RSS and search.
 - **TILs are domain-free and may carry blocks** (decided 2026-07-13) — one
   thing learned, from any part of life, optionally wrapped around a copyable
   block (a manifest, a one-liner, a recipe). No snippet/regular subtypes —

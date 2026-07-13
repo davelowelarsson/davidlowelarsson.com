@@ -1,5 +1,5 @@
 ---
-title: "TIL: Astro eats the space at inline tag boundaries"
+title: "Astro eats the space at inline tag boundaries"
 description: A newline between prose and an inline <a> renders as no space at all — "I writeessays". Unlike HTML, which collapses it to one space.
 pubDate: 2026-07-07
 category: til

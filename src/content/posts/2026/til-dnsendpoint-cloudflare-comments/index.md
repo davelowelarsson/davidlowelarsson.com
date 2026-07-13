@@ -1,5 +1,5 @@
 ---
-title: "TIL: DNSEndpoint CRs, and comments on Cloudflare DNS records"
+title: "DNSEndpoint: the external-dns resource I didn't know existed"
 description: "Cloudflare DNS records can carry a comment ... I'm using mine as a tiny metadata DB for the homelab dashboard."
 pubDate: 2026-08-11
 liveFrom: 2026-08-11
