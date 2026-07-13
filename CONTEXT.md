@@ -16,8 +16,11 @@ category names because the page that collects them explains them.
 
 - **essay** — longer, opinionated long-form (the personal-essay tradition:
   Graham, Reilly), not "articles" (journalism) or "blog posts" (says nothing).
-- **til** — Today I Learned: a same-day, unpolished note. A genre term from
-  dev culture (Willison's TILs); kept because the audience is engineers.
+- **til** — Today I Learned: one thing learned, written close to the moment,
+  short and unpolished. Domain-free — code, parenting, cooking, woodwork; the
+  tags carry the subject. May wrap a copyable block (a manifest, a command, a
+  recipe). The name is a genre term from dev culture (Willison's TILs), kept
+  even though the subjects range wider.
 - **experiment** — a write-up from the lab, with measurements and honest notes.
 - **project** — a write-up of a finished piece of work (client job, art piece,
   side-build): what it was, the tools, and the author's part in it. Kind, not

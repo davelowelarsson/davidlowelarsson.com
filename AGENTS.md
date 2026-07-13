@@ -45,3 +45,9 @@ Consult these guides before working on related tasks:
   through the `/draft-post` skill (`.claude/skills/draft-post/`), which loads
   David's voice guide (`VOICE.md`, Tier 1 canon). Never draft or revise post
   content in your own voice.
+- **Obfuscation**: published content uses real names (domains, repos,
+  namespaces — that's the voice) but obviously-fake values for any identifier
+  that is not otherwise publicly discoverable: tunnel/account/zone IDs,
+  webhook paths, tokens (e.g. `00000000-dead-beef-...`). The bar: a reader
+  who goes searching must not be able to assemble puzzle pieces into an
+  exploit. Applies to posts, docs, issues — everything public in this repo.

@@ -6,7 +6,7 @@ export type Category = (typeof CATEGORIES)[number];
 export const CATEGORY_DESCRIPTIONS: Record<Category, string> = {
   essay:
     'Longer, opinionated pieces on engineering leadership, delivery, and how software gets made.',
-  til: 'Today I Learned — quick, unpolished notes captured while building. Written the same day, kept forever.',
+  til: 'Today I Learned — one thing learned, written close to the moment. Code, kids, cooking, wood — kept forever.',
   experiment: 'Write-ups from the lab: trying things out, measuring, and keeping honest notes.',
   project:
     'Write-ups of finished pieces of work — what it was, the tools, and my part in it. From 3D art to home-lab builds.',
