@@ -64,16 +64,6 @@ flowchart TD
 
 ## Owning the chain
 
-The three pull requests from my presentation were the opposite of that contained box. They were a
-test migration and an API contract change spread across thousands of lines, and each pull request
-had to merge in the correct order. The agent could produce the changes, but it could not make the
-review fit inside a human head. Understanding and insight into the code became the bottleneck.
-
-At the time I also showed the [METR study of experienced open-source developers](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/),
-where 16 developers working on 246 real issues took 19% longer when AI tools were allowed. The
-developers still believed they had been faster, but METR now says that result, based on early-2025
-tools, is out of date.
-
 <MediaAside
   src={metrProductivityEstimates}
   alt="Interval chart showing METR's early-2025 slowdown estimate and two uncertain late-2025 speed-up estimates"
@@ -82,6 +72,17 @@ tools, is out of date.
   sourceHref="https://metr.org/blog/2026-02-24-uplift-update/"
   sourceLabel="Data: METR"
 >
+  The three pull requests from my presentation were the opposite of that contained box. They were
+  a test migration and an API contract change spread across thousands of lines, and each pull
+  request had to merge in the correct order. The agent could produce the changes, but it could not
+  make the review fit inside a human head. Understanding and insight into the code became the
+  bottleneck.
+
+  At the time I also showed the [METR study of experienced open-source developers](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/),
+  where 16 developers working on 246 real issues took 19% longer when AI tools were allowed. The
+  developers still believed they had been faster, but METR now says that result, based on
+  early-2025 tools, is out of date.
+
   Their [2026 follow-up](https://metr.org/blog/2026-02-24-uplift-update/) is even more interesting
   to me. Some developers did not want to participate because they did not want to work without AI,
   which probably made the measured speed-up smaller. The pay had also dropped from $150 to $50 per

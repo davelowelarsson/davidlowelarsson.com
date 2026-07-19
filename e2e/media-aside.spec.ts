@@ -11,6 +11,7 @@ test('research media sits right on desktop and below its text on mobile', async 
   const figure = aside.locator('figure');
   await expect(figure).toBeVisible();
   await expect(figure.getByRole('link', { name: 'Data: METR' })).toBeVisible();
+  await expect(content.locator('p')).toHaveCount(3);
 
   const desktopContent = await content.boundingBox();
   const desktopFigure = await figure.boundingBox();
@@ -20,6 +21,7 @@ test('research media sits right on desktop and below its text on mobile', async 
     (desktopContent?.x ?? Number.POSITIVE_INFINITY) + (desktopContent?.width ?? 0),
   );
   expect(Math.abs((desktopFigure?.y ?? 0) - (desktopContent?.y ?? 0))).toBeLessThanOrEqual(1);
+  expect(Math.abs((desktopFigure?.height ?? 0) - (desktopContent?.height ?? 0))).toBeLessThan(100);
 
   await page.setViewportSize({ width: 390, height: 844 });
   const mobileContent = await content.boundingBox();
