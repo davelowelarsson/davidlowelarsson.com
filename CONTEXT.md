@@ -56,6 +56,16 @@ Post once it is live.
 A build of the site from a non-main branch, published at an obscure URL with
 drafts visible. Used to review content and code from any device before merging.
 
+## Research Visual
+
+A chart or diagram that explains findings from external research. The default is
+an original, deliberately simplified interpretation of the cited data, visibly
+labelled with and linked to its primary source. It must never imply that David
+performed the research. Reproduce an original third-party visual only when that
+visual itself is being discussed and its license allows reuse; keep its branding
+intact and name the creator, license, and source in a visible caption. Alt text
+describes the image for accessibility — it is never the attribution.
+
 ## Production
 
 The build of the `main` branch served at davidlowelarsson.com, with drafts

@@ -1,0 +1,93 @@
+---
+import { Image } from 'astro:assets';
+
+interface Props {
+  src: ImageMetadata;
+  alt: string;
+  side?: 'left' | 'right';
+  caption?: string;
+  sourceHref?: string;
+  sourceLabel?: string;
+}
+
+const { src, alt, side = 'right', caption, sourceHref, sourceLabel = 'Source' } = Astro.props;
+---
+
+<section class={`media-aside media-aside--${side}`} data-media-side={side}>
+  <div class="media-aside__content">
+    <slot />
+  </div>
+  <figure class="media-aside__figure">
+    <Image
+      src={src}
+      alt={alt}
+      widths={[360, 580, 900]}
+      sizes="(min-width: 52rem) 29rem, calc(100vw - 2.5rem)"
+    />
+    {
+      (caption || sourceHref) && (
+        <figcaption>
+          {caption && <span>{caption}</span>}
+          {sourceHref && <a href={sourceHref}>{sourceLabel}</a>}
+        </figcaption>
+      )
+    }
+  </figure>
+</section>
+
+<style>
+  .media-aside {
+    display: grid;
+    gap: 1.5rem;
+    width: min(60rem, calc(100vw - 2rem));
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 2.75rem 0;
+  }
+
+  .media-aside__content,
+  .media-aside__figure {
+    min-width: 0;
+  }
+
+  .media-aside__figure {
+    margin: 0;
+  }
+
+  .media-aside__figure :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+    cursor: zoom-in;
+  }
+
+  figcaption {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.15rem 0.5rem;
+    margin-top: 0.65rem;
+    color: var(--muted);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+  }
+
+  @media (min-width: 52rem) {
+    .media-aside {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: start;
+      gap: 2.5rem;
+    }
+
+    .media-aside--left .media-aside__figure {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .media-aside--left .media-aside__content {
+      grid-column: 2;
+      grid-row: 1;
+    }
+  }
+</style>

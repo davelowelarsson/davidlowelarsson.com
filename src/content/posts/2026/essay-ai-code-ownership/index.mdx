@@ -7,6 +7,9 @@ draft: true
 tags: ["ai", "software-engineering", "platform-engineering", "devsecops"]
 ---
 
+import MediaAside from '../../../../components/MediaAside.astro';
+import metrProductivityEstimates from './metr-productivity-estimates.svg';
+
 On Friday I read Dalia Abuadas's GitHub post [The cost of saying yes has
 changed](https://github.blog/engineering/the-cost-of-saying-yes-has-changed/). She describes the
 first patch as a price check rather than the finished product, which reminded me of a presentation
@@ -71,18 +74,22 @@ where 16 developers working on 246 real issues took 19% longer when AI tools wer
 developers still believed they had been faster, but METR now says that result, based on early-2025
 tools, is out of date.
 
-Their [2026 follow-up](https://metr.org/blog/2026-02-24-uplift-update/) is even more interesting to
-me. Some developers did not want to participate because they did not want to work without AI,
-which probably made the measured speed-up smaller. The pay had also dropped from $150 to $50 per
-hour, and developers running several agents at once could not reliably say how much time one task
-took. METR calls the new signal unreliable, so the chart can point towards acceleration without
-telling us exactly how much. The way we work is changing quickly enough that measuring the change
-has become difficult too.
-
-![METR chart comparing the early-2025 slowdown with uncertain speed-up estimates from the late-2025 follow-up](./metr-late-2025-productivity-follow-up.png)
-
-*METR's follow-up estimates point towards a speed-up, but the confidence intervals and selection
-effects leave the size uncertain. [Source and methodology](https://metr.org/blog/2026-02-24-uplift-update/), CC BY.*
+<MediaAside
+  src={metrProductivityEstimates}
+  alt="Interval chart showing METR's early-2025 slowdown estimate and two uncertain late-2025 speed-up estimates"
+  side="right"
+  caption="My simplified view of METR's estimates. Both follow-up intervals cross no change, and selection effects make the real speed-up difficult to measure."
+  sourceHref="https://metr.org/blog/2026-02-24-uplift-update/"
+  sourceLabel="Data: METR"
+>
+  Their [2026 follow-up](https://metr.org/blog/2026-02-24-uplift-update/) is even more interesting
+  to me. Some developers did not want to participate because they did not want to work without AI,
+  which probably made the measured speed-up smaller. The pay had also dropped from $150 to $50 per
+  hour, and developers running several agents at once could not reliably say how much time one task
+  took. METR calls the new signal unreliable, so the chart can point towards acceleration without
+  telling us exactly how much. The way we work is changing quickly enough that measuring the change
+  has become difficult too.
+</MediaAside>
 
 For work with a larger blast radius I try to make the change small enough that I can understand
 it, keep the public contract intact, add or update tests and know how to turn it back. A feature

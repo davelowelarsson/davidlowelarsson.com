@@ -296,6 +296,16 @@ how the project actually grew.
   or omit it and let the browser use native video metadata/first-frame behavior
   instead of forcing a misleading still image.
 
+## Text beside media (2026-07-19, PR #74)
+
+- **`MediaAside.astro` keeps prose first in the HTML**, then uses scoped grid
+  CSS to place its figure left or right on desktop; mobile returns to one column
+  without changing reading order. The `side` prop changes presentation only.
+- **MDX supplies the prose through a slot and a local `ImageMetadata` import.**
+  The component owns responsive `Image` sizes and visible source attribution,
+  with no Post-specific styles and no client JavaScript.
+  Docs: https://docs.astro.build/en/basics/astro-components/#slots
+
 ## YouTube embed facade + MDX support (2026-07-08, issue #37)
 
 - **`@astrojs/mdx` adds no UI framework.** MDX is JSX-in-Markdown syntax, not

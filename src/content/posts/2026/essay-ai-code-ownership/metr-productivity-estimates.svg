@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="760" viewBox="0 0 600 760" role="img" aria-labelledby="title desc">
+  <title id="title">METR developer productivity estimates</title>
+  <desc id="desc">A simplified interval chart. The early-2025 study estimated a 19 percent slowdown. The late-2025 follow-up estimated speed-ups of 18 percent for repeat participants and 4 percent for new participants, but both confidence intervals cross no change.</desc>
+  <style>
+    .background { fill: #f7f5ef; }
+    .ink { fill: #22252a; }
+    .muted { fill: #646870; }
+    .grid { stroke: #d8d4ca; }
+    .baseline { stroke: #777b82; }
+    .early { fill: #b4553f; stroke: #b4553f; }
+    .repeat { fill: #2878a8; stroke: #2878a8; }
+    .new { fill: #278164; stroke: #278164; }
+
+    @media (prefers-color-scheme: dark) {
+      .background { fill: #1b1d20; }
+      .ink { fill: #f1f1ed; }
+      .muted { fill: #b2b3b1; }
+      .grid { stroke: #3e4145; }
+      .baseline { stroke: #a5a7a8; }
+      .early { fill: #e27a61; stroke: #e27a61; }
+      .repeat { fill: #67acd4; stroke: #67acd4; }
+      .new { fill: #60b493; stroke: #60b493; }
+    }
+  </style>
+
+  <rect class="background" width="600" height="760" rx="8" />
+  <text class="ink" x="36" y="54" font-family="system-ui, sans-serif" font-size="30" font-weight="650">What METR could measure</text>
+  <text class="muted" x="36" y="84" font-family="system-ui, sans-serif" font-size="16">Estimated change in task time when AI was allowed</text>
+
+  <g font-family="system-ui, sans-serif" font-size="13" text-anchor="middle">
+    <text class="muted" x="80" y="132">40% faster</text>
+    <text class="muted" x="200" y="132">20% faster</text>
+    <text class="ink" x="320" y="132" font-weight="650">No change</text>
+    <text class="muted" x="440" y="132">20% slower</text>
+    <text class="muted" x="560" y="132">40% slower</text>
+  </g>
+
+  <g stroke-width="1">
+    <line class="grid" x1="80" y1="152" x2="80" y2="640" />
+    <line class="grid" x1="200" y1="152" x2="200" y2="640" />
+    <line class="baseline" x1="320" y1="152" x2="320" y2="640" stroke-width="2" />
+    <line class="grid" x1="440" y1="152" x2="440" y2="640" />
+    <line class="grid" x1="560" y1="152" x2="560" y2="640" />
+  </g>
+
+  <g font-family="system-ui, sans-serif">
+    <text class="ink" x="36" y="208" font-size="20" font-weight="650">Early 2025</text>
+    <text class="muted" x="36" y="234" font-size="15">16 developers, 246 tasks</text>
+    <line class="early" x1="332" y1="284" x2="554" y2="284" stroke-width="8" stroke-linecap="round" />
+    <circle class="early" cx="434" cy="284" r="12" />
+    <text class="early" x="434" y="263" font-size="17" text-anchor="middle" font-weight="650">19% slower</text>
+
+    <text class="ink" x="36" y="354" font-size="20" font-weight="650">Late 2025, repeat participants</text>
+    <text class="muted" x="36" y="380" font-size="15">10 developers, 137 tasks</text>
+    <line class="repeat" x1="92" y1="430" x2="374" y2="430" stroke-width="8" stroke-linecap="round" />
+    <circle class="repeat" cx="212" cy="430" r="12" />
+    <text class="repeat" x="212" y="409" font-size="17" text-anchor="middle" font-weight="650">18% faster</text>
+
+    <text class="ink" x="36" y="500" font-size="20" font-weight="650">Late 2025, new participants</text>
+    <text class="muted" x="36" y="526" font-size="15">47 developers, 690 tasks</text>
+    <line class="new" x1="230" y1="576" x2="374" y2="576" stroke-width="8" stroke-linecap="round" />
+    <circle class="new" cx="296" cy="576" r="12" />
+    <text class="new" x="296" y="555" font-size="17" text-anchor="middle" font-weight="650">4% faster</text>
+  </g>
+
+  <g class="muted" font-family="system-ui, sans-serif" font-size="14">
+    <text x="36" y="686">Dots are estimates; lines are 95% confidence intervals.</text>
+    <text x="36" y="711">Based on METR's February 2026 follow-up.</text>
+  </g>
+</svg>

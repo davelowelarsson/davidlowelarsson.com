@@ -81,7 +81,7 @@ describe('templates/new-post', () => {
 describe('AI code ownership draft', () => {
   it('is an unpublished essay with the agreed title', () => {
     const draft = readFileSync(
-      join(process.cwd(), 'src/content/posts/2026/essay-ai-code-ownership/index.md'),
+      join(process.cwd(), 'src/content/posts/2026/essay-ai-code-ownership/index.mdx'),
       'utf8',
     );
 
