@@ -67,6 +67,8 @@ function bodyProbe(source: string, slug: string): string | undefined {
 }
 
 function rssItemLink(slug: string): string {
+  // Published posts may intentionally link to scheduled teaser URLs in their
+  // article bodies. Only an item's canonical link means RSS published the post.
   return `<link>https://davidlowelarsson.com/posts/${slug}/</link>`;
 }
 

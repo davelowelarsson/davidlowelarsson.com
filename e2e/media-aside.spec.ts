@@ -16,7 +16,9 @@ test('research media sits right on desktop and below its text on mobile', async 
   const desktopFigure = await figure.boundingBox();
   expect(desktopContent, 'desktop text should have a box').not.toBeNull();
   expect(desktopFigure, 'desktop figure should have a box').not.toBeNull();
-  expect(desktopFigure?.x).toBeGreaterThan(desktopContent?.x ?? Number.POSITIVE_INFINITY);
+  expect(desktopFigure?.x).toBeGreaterThanOrEqual(
+    (desktopContent?.x ?? Number.POSITIVE_INFINITY) + (desktopContent?.width ?? 0),
+  );
   expect(Math.abs((desktopFigure?.y ?? 0) - (desktopContent?.y ?? 0))).toBeLessThanOrEqual(1);
 
   await page.setViewportSize({ width: 390, height: 844 });

@@ -7,9 +7,9 @@
     .muted { fill: #646870; }
     .grid { stroke: #d8d4ca; }
     .baseline { stroke: #777b82; }
-    .early { fill: #b4553f; stroke: #b4553f; }
-    .repeat { fill: #2878a8; stroke: #2878a8; }
-    .new { fill: #278164; stroke: #278164; }
+    .early { fill: #a84b37; stroke: #a84b37; }
+    .repeat { fill: #226f9d; stroke: #226f9d; }
+    .new { fill: #21765b; stroke: #21765b; }
 
     @media (prefers-color-scheme: dark) {
       .background { fill: #1b1d20; }
