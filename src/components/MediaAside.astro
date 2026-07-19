@@ -12,14 +12,8 @@ interface Props {
 }
 
 const { src, alt, side = 'right', caption, sourceHref, sourceLabel = 'Source' } = Astro.props;
-const imageProps =
-  src.format === 'svg'
-    ? { layout: 'none' as const }
-    : {
-        widths: [360, 580, 900],
-        sizes:
-          '(min-width: 62rem) 28.75rem, (min-width: 52rem) calc((100vw - 4.5rem) / 2), calc(100vw - 2rem)',
-      };
+const rasterSizes =
+  '(min-width: 62rem) 28.75rem, (min-width: 52rem) calc((100vw - 4.5rem) / 2), calc(100vw - 2rem)';
 ---
 
 <div class={`media-aside media-aside--${side} breakout`} data-media-side={side}>
@@ -27,7 +21,20 @@ const imageProps =
     <slot />
   </div>
   <figure class="media-aside__figure">
-    <Image src={src} alt={alt} {...imageProps} />
+    {
+      src.format === 'svg' ? (
+        <img
+          src={src.src}
+          width={src.width}
+          height={src.height}
+          alt={alt}
+          loading="lazy"
+          decoding="async"
+        />
+      ) : (
+        <Image src={src} alt={alt} widths={[360, 580, 900]} sizes={rasterSizes} />
+      )
+    }
     {
       (caption || sourceHref) && (
         <figcaption>

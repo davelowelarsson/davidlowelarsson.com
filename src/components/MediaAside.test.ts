@@ -64,6 +64,7 @@ describe('MediaAside', () => {
       slots: { default: '<p>Chart context.</p>' },
     });
 
+    expect(html).toContain('src="/_astro/research.hash.svg"');
     expect(html).not.toContain('srcset=');
     expect(html).not.toContain('sizes=');
   });

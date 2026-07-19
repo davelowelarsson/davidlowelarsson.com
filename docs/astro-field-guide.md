@@ -304,8 +304,8 @@ how the project actually grew.
 - **MDX imports the local image as `ImageMetadata`** and passes it to a wrapper
   around `astro:assets` `<Image>`, which owns responsive sizing and attribution.
 - **Media reuses the global `.breakout` utility** for width and centering. Raster
-  images get grid-accurate `widths`/`sizes`; SVGs use `layout="none"` so Astro
-  does not emit redundant responsive copies of the same vector.
+  images use `<Image>` with grid-accurate `widths`/`sizes`; imported SVG metadata
+  goes straight to a native `<img>` because vectors need no transformed copies.
   Docs: https://docs.astro.build/en/guides/integrations-guide/mdx/ · https://docs.astro.build/en/guides/images/
 
 ## YouTube embed facade + MDX support (2026-07-08, issue #37)
