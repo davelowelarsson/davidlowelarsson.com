@@ -37,6 +37,15 @@ status over time (ADR 0007).
 A Post with `draft: true` in frontmatter. Drafts are visible on Preview
 Deployments and invisible in Production. Draft status is orthogonal to Category.
 
+## TL;DR
+
+An optional 3–5 bullet summary near the start of a Post. Author it as ordinary
+Markdown: `## TL;DR` immediately followed by a list. That single shape works in
+both `.md` and `.mdx`, and the Core Site styles the rendered `#tldr` heading and
+adjacent list as one summary band. It is not a blockquote — David is summarizing
+his own Post, not quoting another source. The current style is a baseline for the
+iterative design work in issue #11, not a frozen visual decision.
+
 ## Scheduled Post
 
 A non-draft Post with a future `liveFrom`. Merged and committed — it publishes
