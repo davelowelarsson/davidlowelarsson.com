@@ -34,6 +34,15 @@ think)". I had made the mess myself.
 
 ## When the output is enough
 
+```mermaid
+flowchart TD
+  task[Using AI assistance<br/>for code or configuration] --> problem[What problem am I solving?]
+  problem --> risk{Blast radius?}
+  risk -->|Contained and reversible| box[Input / output box<br/>Verify the result<br/>Accept, correct or discard]
+  risk -->|Security or core service| chain[Full execution chain<br/>Understand context and dependencies]
+  chain --> checks[Test, review and observe<br/>Know the blast radius and rollback path<br/>Take responsibility for production]
+```
+
 I use AI for a lot of reading. It can gather context from documentation, issues, logs and code,
 then help me find the part that needs my attention. When the result is a summary or an internal
 integration with a small blast radius, I am mostly concerned with the input and the output. If a
@@ -52,15 +61,6 @@ with "what problem am I solving?", and how much risk sits around that problem. T
 is about the times I use AI assistance for code or configuration. I still write both without AI
 sometimes 😁, and those changes go wrong too. The blast radius does not care how the mistake was
 made.
-
-```mermaid
-flowchart TD
-  task[Using AI assistance<br/>for code or configuration] --> problem[What problem am I solving?]
-  problem --> risk{Blast radius?}
-  risk -->|Contained and reversible| box[Input / output box<br/>Verify the result<br/>Accept, correct or discard]
-  risk -->|Security or core service| chain[Full execution chain<br/>Understand context and dependencies]
-  chain --> checks[Test, review and observe<br/>Know the blast radius and rollback path<br/>Take responsibility for production]
-```
 
 ## Owning the chain
 
@@ -91,6 +91,13 @@ flowchart TD
   telling us exactly how much. The way we work is changing quickly enough that measuring the change
   has become difficult too.
 </MediaAside>
+
+I have seen a version of this shift before. In 2013 I wrote about [moving this site away from
+making changes directly through FTP and into a Git workflow](/posts/git-the-new-svn/), and since
+then more of the path has moved into virtual machines, containers, Kubernetes and GitOps. Each
+layer let me hand more repeated work to a system, but none of them took ownership when production
+failed. AI might become another layer in that path... I'm not sure the comparison holds all the
+way, but the responsibility boundary feels familiar.
 
 For work with a larger blast radius I try to make the change small enough that I can understand
 it, keep the public contract intact, add or update tests and know how to turn it back. A feature
