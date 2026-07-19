@@ -298,13 +298,12 @@ how the project actually grew.
 
 ## Text beside media (2026-07-19, PR #74)
 
-- **`MediaAside.astro` keeps prose first in the HTML**, then uses scoped grid
-  CSS to place its figure left or right on desktop; mobile returns to one column
+- **`MediaAside.astro` keeps slotted prose first in the HTML** and uses scoped
+  grid CSS to place its figure left or right; mobile returns to one column
   without changing reading order. The `side` prop changes presentation only.
-- **MDX supplies the prose through a slot and a local `ImageMetadata` import.**
-  The component owns responsive `Image` sizes and visible source attribution,
-  with no Post-specific styles and no client JavaScript.
-  Docs: https://docs.astro.build/en/basics/astro-components/#slots
+- **MDX imports the local image as `ImageMetadata`** and passes it to a wrapper
+  around `astro:assets` `<Image>`, which owns responsive sizing and attribution.
+  Docs: https://docs.astro.build/en/guides/integrations-guide/mdx/ · https://docs.astro.build/en/guides/images/
 
 ## YouTube embed facade + MDX support (2026-07-08, issue #37)
 
