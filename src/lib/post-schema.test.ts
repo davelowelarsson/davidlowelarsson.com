@@ -77,3 +77,21 @@ describe('templates/new-post', () => {
     expect(parsed.description).toBeTruthy();
   });
 });
+
+describe('AI code ownership draft', () => {
+  it('is an unpublished essay with the agreed title', () => {
+    const draft = readFileSync(
+      join(process.cwd(), 'src/content/posts/2026/essay-ai-code-ownership/index.md'),
+      'utf8',
+    );
+
+    const parsed = postFrontmatterSchema.parse(frontmatterOf(draft));
+
+    expect(parsed).toMatchObject({
+      title: 'Who owns the code AI writes?',
+      category: 'essay',
+      draft: true,
+    });
+    expect(parsed.pubDate.toISOString()).toBe('2026-07-19T00:00:00.000Z');
+  });
+});

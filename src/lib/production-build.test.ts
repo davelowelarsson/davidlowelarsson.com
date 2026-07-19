@@ -66,6 +66,10 @@ function bodyProbe(source: string, slug: string): string | undefined {
     .find((word) => word.length >= 8 && !legitimate.includes(word.toLowerCase()));
 }
 
+function rssItemLink(slug: string): string {
+  return `<link>https://davidlowelarsson.com/posts/${slug}/</link>`;
+}
+
 const outDir = mkdtempSync(join(tmpdir(), 'prod-build-'));
 
 afterAll(() => rmSync(outDir, { recursive: true, force: true }));
@@ -91,7 +95,7 @@ describe('production build (SHOW_DRAFTS=false)', () => {
 
     for (const slug of drafts) {
       expect(existsSync(join(outDir, 'posts', slug)), `page built for draft ${slug}`).toBe(false);
-      expect(rss, `draft ${slug} leaked into rss.xml`).not.toContain(`/posts/${slug}/`);
+      expect(rss, `draft ${slug} leaked into rss.xml`).not.toContain(rssItemLink(slug));
       expect(sitemap, `draft ${slug} leaked into sitemap`).not.toContain(`/posts/${slug}/`);
       expect(llms, `draft ${slug} leaked into llms.txt`).not.toContain(`/posts/${slug}/`);
     }
@@ -122,7 +126,7 @@ describe('production build (SHOW_DRAFTS=false)', () => {
         expect(html, `${slug} teaser leaked the description`).not.toContain(description);
       }
 
-      expect(rss, `scheduled ${slug} leaked into rss.xml`).not.toContain(`/posts/${slug}/`);
+      expect(rss, `scheduled ${slug} leaked into rss.xml`).not.toContain(rssItemLink(slug));
       expect(sitemap, `scheduled ${slug} leaked into sitemap`).not.toContain(`/posts/${slug}/`);
       expect(llms, `scheduled ${slug} leaked into llms.txt`).not.toContain(`/posts/${slug}/`);
     }

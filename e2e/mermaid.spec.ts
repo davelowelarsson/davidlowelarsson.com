@@ -9,6 +9,7 @@ import { expect, test } from '@playwright/test';
 // production build. The test is count-agnostic — a post may grow more diagrams.
 
 const MERMAID_POST_PATH = '/posts/experiment-home-lab-topology/';
+const AI_OWNERSHIP_POST_PATH = '/posts/essay-ai-code-ownership/';
 
 test('a mermaid block in a post renders as an inline SVG diagram', async ({ page }) => {
   await page.goto(MERMAID_POST_PATH);
@@ -26,6 +27,15 @@ test('a mermaid block in a post renders as an inline SVG diagram', async ({ page
   // A real mermaid render, not just an empty wrapper: flowchart nodes are
   // SVG <g class="node"> elements.
   await expect(diagrams.first().locator('g.node').first()).toBeVisible();
+});
+
+test('the AI code ownership risk map renders both responsibility paths', async ({ page }) => {
+  await page.goto(AI_OWNERSHIP_POST_PATH);
+
+  const diagram = page.locator('.mermaid-diagram svg');
+  await expect(diagram).toBeVisible();
+  await expect(diagram).toContainText('Input / output box');
+  await expect(diagram).toContainText('Full execution chain');
 });
 
 test('a diagram breaks out wider than the prose column on desktop', async ({ page }) => {
