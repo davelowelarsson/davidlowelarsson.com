@@ -31,7 +31,9 @@ describe('MediaAside', () => {
     expect(html).toContain('My simplified view of the published estimates.');
     expect(html).toContain('href="https://example.com/research"');
     expect(html).toContain('Data: Example Research');
-    expect(html).toContain('sizes="(min-width: 52rem) 29rem, calc(100vw - 2.5rem)"');
+    expect(html).toContain('<div class="media-aside media-aside--right"');
+    expect(html).not.toContain('<section');
+    expect(html).toContain('sizes="(min-width: 52rem) 29rem, calc(100vw - 2rem)"');
   });
 
   it('exposes the left-side desktop option without changing semantic order', async () => {

@@ -5,13 +5,20 @@ import { findOrphanMarkdown } from './content-hygiene';
 
 describe('findOrphanMarkdown', () => {
   it('accepts bundle index files', () => {
-    expect(findOrphanMarkdown(['2026/my-post/index.md'])).toEqual([]);
+    expect(findOrphanMarkdown(['2026/my-post/index.md', '2026/another-post/index.mdx'])).toEqual(
+      [],
+    );
   });
 
   it('flags markdown that the loader would silently ignore', () => {
     expect(
-      findOrphanMarkdown(['2026/my-post/index.md', '2026/my-post/draft.md', 'notes.md']),
-    ).toEqual(['2026/my-post/draft.md', 'notes.md']);
+      findOrphanMarkdown([
+        '2026/my-post/index.md',
+        '2026/my-post/draft.md',
+        '2026/another-post/draft.mdx',
+        'notes.md',
+      ]),
+    ).toEqual(['2026/my-post/draft.md', '2026/another-post/draft.mdx', 'notes.md']);
   });
 
   it('ignores non-markdown files', () => {

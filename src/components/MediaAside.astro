@@ -14,7 +14,7 @@ interface Props {
 const { src, alt, side = 'right', caption, sourceHref, sourceLabel = 'Source' } = Astro.props;
 ---
 
-<section class={`media-aside media-aside--${side}`} data-media-side={side}>
+<div class={`media-aside media-aside--${side}`} data-media-side={side}>
   <div class="media-aside__content">
     <slot />
   </div>
@@ -23,7 +23,7 @@ const { src, alt, side = 'right', caption, sourceHref, sourceLabel = 'Source' } 
       src={src}
       alt={alt}
       widths={[360, 580, 900]}
-      sizes="(min-width: 52rem) 29rem, calc(100vw - 2.5rem)"
+      sizes="(min-width: 52rem) 29rem, calc(100vw - 2rem)"
     />
     {
       (caption || sourceHref) && (
@@ -34,7 +34,7 @@ const { src, alt, side = 'right', caption, sourceHref, sourceLabel = 'Source' } 
       )
     }
   </figure>
-</section>
+</div>
 
 <style>
   .media-aside {
