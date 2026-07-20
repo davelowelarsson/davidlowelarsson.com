@@ -13,24 +13,36 @@ test('research media sits right on desktop and below its text on mobile', async 
   await expect(figure.getByRole('link', { name: 'Data: METR' })).toBeVisible();
   await expect(content.locator('p')).toHaveCount(3);
 
-  const desktopContent = await content.boundingBox();
-  const desktopFigure = await figure.boundingBox();
-  expect(desktopContent, 'desktop text should have a box').not.toBeNull();
-  expect(desktopFigure, 'desktop figure should have a box').not.toBeNull();
-  expect(desktopFigure?.x).toBeGreaterThanOrEqual(
-    (desktopContent?.x ?? Number.POSITIVE_INFINITY) + (desktopContent?.width ?? 0),
-  );
-  expect(Math.abs((desktopFigure?.y ?? 0) - (desktopContent?.y ?? 0))).toBeLessThanOrEqual(1);
-  expect(Math.abs((desktopFigure?.height ?? 0) - (desktopContent?.height ?? 0))).toBeLessThan(100);
+  const desktopLayout = await aside.evaluate((element) => {
+    const contentBox = element.querySelector('.media-aside__content')?.getBoundingClientRect();
+    const figureBox = element.querySelector('figure')?.getBoundingClientRect();
+    if (!contentBox || !figureBox) return null;
+
+    return {
+      figureStartsAfterContent: figureBox.x >= contentBox.x + contentBox.width,
+      topDifference: Math.abs(figureBox.y - contentBox.y),
+      heightDifference: Math.abs(figureBox.height - contentBox.height),
+    };
+  });
+  expect(desktopLayout, 'desktop media should have boxes').not.toBeNull();
+  expect(desktopLayout?.figureStartsAfterContent).toBe(true);
+  expect(desktopLayout?.topDifference).toBeLessThanOrEqual(1);
+  expect(desktopLayout?.heightDifference).toBeLessThan(100);
 
   await page.setViewportSize({ width: 390, height: 844 });
-  const mobileContent = await content.boundingBox();
-  const mobileFigure = await figure.boundingBox();
-  const mobileImage = await figure.locator('img').boundingBox();
-  expect(mobileContent, 'mobile text should have a box').not.toBeNull();
-  expect(mobileFigure, 'mobile figure should have a box').not.toBeNull();
-  expect(mobileImage, 'mobile chart should have a box').not.toBeNull();
-  expect(mobileFigure?.y).toBeGreaterThan(mobileContent?.y ?? Number.POSITIVE_INFINITY);
-  expect(mobileImage?.height).toBeGreaterThan(400);
+  const mobileLayout = await aside.evaluate((element) => {
+    const contentBox = element.querySelector('.media-aside__content')?.getBoundingClientRect();
+    const figureBox = element.querySelector('figure')?.getBoundingClientRect();
+    const imageBox = element.querySelector('figure img')?.getBoundingClientRect();
+    if (!contentBox || !figureBox || !imageBox) return null;
+
+    return {
+      figureFollowsContent: figureBox.y > contentBox.y,
+      imageHeight: imageBox.height,
+    };
+  });
+  expect(mobileLayout, 'mobile media should have boxes').not.toBeNull();
+  expect(mobileLayout?.figureFollowsContent).toBe(true);
+  expect(mobileLayout?.imageHeight).toBeGreaterThan(400);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(391);
 });
