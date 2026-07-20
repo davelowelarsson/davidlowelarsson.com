@@ -108,6 +108,32 @@ word ("...or there's some kind och blocker"). Rules:
 - **Editing/checking:** never "correct" texture in prose David wrote unless he
   asks. It is his fingerprint, not an error backlog.
 
+## David-confirmed current register
+
+First-party rewrites from current drafts can sharpen how the canon is applied
+without automatically joining Tier 1. Keep these observations evidence-based;
+they guide new drafts immediately, while promotion to the canon still requires
+David's explicit instruction.
+
+- **Evidence accumulates in the sentence.** When several checks all mattered,
+  David may name them one after another and repeat the conclusion ("All tests
+  passed, linting looked good, everything was typed, everything looked good")
+  instead of compressing them into "the pipeline was green." The repetition
+  carries the feeling of why saying no was difficult.
+- **Decisions include the room.** Preserve who discussed and decided something:
+  "we discussed it in the team" and "we decided not to merge it" are more
+  truthful than turning a shared decision into one engineer's abstract rule.
+- **Risk lands in ordinary consequences.** Name the service, the users, or the
+  hassle a mistake creates. Prefer plain stakes such as a streaming service not
+  working or creating bad will over polished phrases like "operational impact."
+- **Parentheses can question the thought in real time.** They are not only for
+  jokes; "(I think)" and "if it works, it works, right 🤷" let confidence and
+  doubt sit in the same paragraph.
+- **Technical confidence uses everyday framing.** Keep phrases such as "jumped
+  into Astro head first," "from 0 to a deployed working site in a day," and
+  "my super simple abstraction" when they are David's words. Do not translate
+  them into portfolio language.
+
 ## Deliberate 2026 conventions (David's explicit choices)
 
 Interviewed 2026-07-11. These are conscious additions the canon doesn't

@@ -10,29 +10,32 @@ tags: ["ai", "software-engineering", "platform-engineering", "devsecops"]
 import MediaAside from '../../../../components/MediaAside.astro';
 import metrProductivityEstimates from './metr-productivity-estimates.svg';
 
-On Friday I read Dalia Abuadas's GitHub post [The cost of saying yes has
-changed](https://github.blog/engineering/the-cost-of-saying-yes-has-changed/). She describes the
-first patch as a price check rather than the finished product, which reminded me of a presentation
-I held earlier this year and one experiment I used as my bad example.
+This Sunday I read Dalia Abuadas's GitHub post [The cost of saying yes has
+changed](https://github.blog/engineering/the-cost-of-saying-yes-has-changed/). She describes how saying no was easier at the idea phase before .. while it's now so ieasy to create a prototype/test/draft of a feature that it's almost better to test things and get a good idea of how complicated something is and then discuss if we want to do it for "real".
+Her subject is how AI now helps a lot (and sometimes dosen't help), which reminded me of a presentation
+I held earlier this year and one example I used, how we might not want to use AI when working 😅.
 
-I started by changing the testing framework, not really knowing where I would end up, then added
-types and did a whole lot of refactoring. It became three dependent pull requests that had to
-merge in order, changing 330 files with 10,221 lines added and 7,842 removed. Everything passed
-and everything looked good... we could probably have merged it 😅.
+My example was a big refactor, introducing typing, changing testframework which resulted in three, dependent, pull requests that had to
+merge in order. I had changed 330 files with 10,221 lines added and 7,842 removed. All tests passed, linting looked good, everything was typed, everything looked good... we could probably have merged it 😅.
 
-But I don't think that would have been responsible. No one would have had the knowledge or the
-understanding to compare my monster change with what was already in production and working that
-day. My note on the presentation slide was, "We can't responsibly put this into production. (I
-think)". I had made the mess myself.
+But we never did. We discussed it in the team and I don't think that would have been responsible. No one would have had the knowledge or the
+understanding to compare my changes with what was already in production and working. I had a note on the slide I was presenting, which read, "We can't responsibly put this into production. (I
+think)". I made a mess and after it was tested, working and good .. we decided not to merge it anyway.
 
 ## TL;DR
 
-- A generated patch can make the real cost visible, but it is not automatically the product.
+- A generated change can make the real cost visible, but it is not automatically the product.
 - I give AI more freedom when I can verify the output and the cost of a mistake is small.
 - The problem and its blast radius matter more to me than who, or what, wrote the code.
 - Tests and rollback paths help, but ownership still stays with a human.
 
 ## When the output is enough
+
+When the risk is low and the output is the only artifact I care about than whether a piece of code is "AI-generated". I try to start
+with "what problem am I solving?", and how much risk sits around that problem. The diagram below is my super simple abstraction on how/why I use AI assisted code generation.
+I still write code both with and without AI
+sometimes 😁, and those changes can go wrong, the blast radius does not care how the mistake was
+made (if it was me or an agent).
 
 ```mermaid
 flowchart TD
@@ -43,24 +46,16 @@ flowchart TD
   chain --> checks[Test, review and observe<br/>Know the blast radius and rollback path<br/>Take responsibility for production]
 ```
 
-I use AI for a lot of reading. It can gather context from documentation, issues, logs and code,
-then help me find the part that needs my attention. When the result is a summary or an internal
-integration with a small blast radius, I am mostly concerned with the input and the output. If a
-daily digest is slightly wrong I can correct it, and nobody's main service drops off the internet.
+I use AI for a lot of reading, research, checks and summarization. It can gather context from documentation, issues, logs and code,
+then help me find whats important, which I can then focus on. When the result is a summary or an internal
+implementation with a small blast radius, low risk, I am mostly concerned with the input and the output (if it works, it works, right 🤷). If a
+daily digest is slightly wrong I can correct it, no users are affected or impacted by my mistake (or AI's mistake).
 
-This website is another example. I probably would not have tried Astro and deployed it this fast
-without AI helping me read the documentation, write code and work through unfamiliar parts of the
-framework. But it is also a useful boundary: the source is public, the tests are visible and a bad
-change can be rolled back. I still review the work and often ask another model for a second
-opinion, but experimenting here does not carry the same risk as taking down a main streaming
-service. If I worked at a bank, changing the transaction or login system would sit at the other
-end of that scale.
-
-That difference matters more to me than whether a piece of code is "AI-generated". I try to start
-with "what problem am I solving?", and how much risk sits around that problem. The diagram below
-is about the times I use AI assistance for code or configuration. I still write both without AI
-sometimes 😁, and those changes go wrong too. The blast radius does not care how the mistake was
-made.
+This website is an example. For this build I jumped into Astro head first, I've previously had lots of experience in react/nextjs and several other frameworks but never tested Astro.
+Without AI helping me read the documentation, write code and work through unfamiliar parts of the
+framework I wouldn't have been able to go from 0 to a deployed working site in a day, which I did with this. I still review the work and often ask another model for a second
+opinion, but experimenting here does not carry the same risk as taking down the main streaming
+service at work, or if I worked at a bank, changing the transaction system or login system and nothing would work after my change. That could lead to a lot of bad will and hassle if I messed that up.
 
 ## Owning the chain
 
@@ -72,52 +67,50 @@ made.
   sourceHref="https://metr.org/blog/2026-02-24-uplift-update/"
   sourceLabel="Data: METR"
 >
-  The three pull requests from my presentation were the opposite of that contained box. They were
-  a test migration and an API contract change spread across thousands of lines, and each pull
-  request had to merge in the correct order. The agent could produce the changes, but it could not
-  make the review fit inside a human head. Understanding and insight into the code became the
-  bottleneck.
+  Those pull requests are why I keep coming back to understanding. The agent had produced
+  thousands of lines that passed all the checks, but no one in the team could realistically load
+  the whole change into their head and compare it with what was already working. We had code,
+  tests and types... but we didn't have anyone who could confidently own the whole thing.
 
-  At the time I also showed the [METR study of experienced open-source developers](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/),
-  where 16 developers working on 246 real issues took 19% longer when AI tools were allowed. The
-  developers still believed they had been faster, but METR now says that result, based on
-  early-2025 tools, is out of date.
+  When I held the presentation I also showed the [METR study of experienced open-source developers](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/).
+  They followed 16 developers working on 246 real issues, and the developers took 19% longer when
+  AI tools were allowed. The really interesting part was that they still believed they had been
+  faster. METR now says that result, based on early-2025 tools, is out of date... which is almost
+  as interesting as the result itself.
 
-  Their [2026 follow-up](https://metr.org/blog/2026-02-24-uplift-update/) is even more interesting
-  to me. Some developers did not want to participate because they did not want to work without AI,
-  which probably made the measured speed-up smaller. The pay had also dropped from $150 to $50 per
-  hour, and developers running several agents at once could not reliably say how much time one task
-  took. METR calls the new signal unreliable, so the chart can point towards acceleration without
-  telling us exactly how much. The way we work is changing quickly enough that measuring the change
-  has become difficult too.
+  Their [2026 follow-up](https://metr.org/blog/2026-02-24-uplift-update/) became
+  messy in a different way. Some developers did not want to participate because they didn't want
+  to work without AI, the pay had dropped from $150 to $50 per hour, and people running several
+  agents could not really say how long one task took while they were doing other things at the
+  same time. METR calls the new signal unreliable. The chart points towards AI making the work
+  faster, but the way we work has changed quickly enough that measuring how much is now difficult
+  too.
 </MediaAside>
 
-I have seen a version of this shift before. In 2013 I wrote about [moving this site away from
-making changes directly through FTP and into a Git workflow](/posts/git-the-new-svn/), and since
-then more of the path has moved into virtual machines, containers, Kubernetes and GitOps. Each
-layer let me hand more repeated work to a system, but none of them took ownership when production
-failed. AI might become another layer in that path... I'm not sure the comparison holds all the
-way, but the responsibility boundary feels familiar.
+I have seen parts of this shift before. In 2013 I wrote about [moving this site away from making
+changes directly through FTP and into a Git workflow](/posts/git-the-new-svn/), and since then
+more of the path has moved into virtual machines, containers, Kubernetes and GitOps. Every step
+let me hand more repeated work to a system. None of those systems owned the service when it
+stopped working though. AI might become another layer in that path... I'm not sure the comparison
+holds all the way, but that part feels very familiar.
 
-For work with a larger blast radius I try to make the change small enough that I can understand
-it, keep the public contract intact, add or update tests and know how to turn it back. A feature
-flag helps when there is one, but it is not a substitute for understanding what happens after the
-flag is enabled. The agent can write the smallest code change, list every file it touched and run
-the tests, but it does not own the result and it does not get called when the code needs
-maintenance next year (at least not yet).
+When the blast radius is larger I need a change small enough that I can actually understand it. I
+want the public contract to stay the same, tests that show what should keep working, and a way
+back when it doesn't. A feature flag helps, but it mostly makes turning the change off easier, it
+doesn't explain what the change did. The agent can make the smallest patch, list every file and
+run every check... it still doesn't get the call next year when someone has to maintain the code
+(at least not yet).
 
 The [Linux kernel policy for AI coding assistants](https://docs.kernel.org/process/coding-assistants.html)
-makes that ownership unusually clear. An AI agent must not add a `Signed-off-by` tag. A human
-reviews the code, certifies it and takes responsibility for the contribution. The fact that Linux
-now accepts AI-assisted code at all feels like a milestone, a fairly strong signal to the rest of
-the coding world that this way of working is here to stay... while the human signature stays
-exactly where it was.
+makes this almost comically literal. An AI agent is not allowed to add a `Signed-off-by` tag, a
+human has to read the code, sign it and take responsibility for the contribution. At the same time
+the fact that Linux accepts AI-assisted code at all feels like a milestone to me. This way of
+working is probably here to stay... but the human signature didn't move.
 
-I can hand more of solving the problem to an agent, Ansible, GitHub Actions or another part of the
-pipeline, but I cannot hand them the responsibility. We are creating services, applications and
-tools for other people, and a human still has to own what happens when they fail. My exact
-boundary will probably move as the tools and our safeguards improve... how we solve the problem
-will keep changing, but I don't think ownership moves with it.
+I can hand more work to Ansible, GitHub Actions, an agent or whatever comes next. I can probably
+hand over more than I am comfortable with today, and that boundary will move as the tools and our
+guardrails get better. But when the service fails a human still gets the call... I don't see that
+changing yet.
 
 ## Links
 
