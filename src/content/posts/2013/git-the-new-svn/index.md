@@ -8,8 +8,6 @@ draft: false
 tags: ["archive", "3d", "git", "version-control", "tooling"]
 ---
 
-> Recovered from the [Wayback Machine](https://web.archive.org/web/20160803033109id_/http://davidlowelarsson.com/git-the-new-svn/) — originally published 09 Jun 2013 on the old WordPress site. Lightly reformatted; images preserved.
-
 > **2026 note:** Thirteen years later I came back to this in [Who owns the code AI writes?](/posts/essay-ai-code-ownership/), with different tools but the same question around who owns what happens next.
 
 ![Try Git screenshot](./feature.jpg)
