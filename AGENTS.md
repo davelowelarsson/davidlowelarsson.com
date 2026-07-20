@@ -37,6 +37,12 @@ Consult these guides before working on related tasks:
   `src/`.
 - **Drafts**: `SHOW_DRAFTS` (build-time, `astro:env/server`) is the only draft
   switch. Preview deploys build with it `true`, production with `false`.
+- **Post-push checks**: use judgment. Monitor GitHub Actions jobs/workflows when
+  the change's risk or scope makes remote CI meaningful, or the task asks for
+  it; a routine prose/docs edit does not require monitoring after appropriate
+  local validation. Do not wait for, poll, or inspect the Cloudflare Preview
+  Deployment unless the task concerns deployment behavior, or David asks for
+  the URL or a deployed visual check.
 - **Publishing cadence**: posts ship on a self-renewing ~2-week cycle tracked in
   GitHub issues, not ad-hoc. Before proposing what/when to publish, read
   `docs/publishing-routine.md` and the open `content`-labelled `Content roadmap`

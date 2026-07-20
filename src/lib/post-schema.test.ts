@@ -77,3 +77,47 @@ describe('templates/new-post', () => {
     expect(parsed.description).toBeTruthy();
   });
 });
+
+describe('Git and AI ownership publication pair', () => {
+  it('schedules the archive Post immediately before the current essay', () => {
+    const essay = readFileSync(
+      join(process.cwd(), 'src/content/posts/2026/essay-ai-code-ownership/index.mdx'),
+      'utf8',
+    );
+    const gitPost = readFileSync(
+      join(process.cwd(), 'src/content/posts/2013/git-the-new-svn/index.md'),
+      'utf8',
+    );
+
+    const parsedEssay = postFrontmatterSchema.parse(frontmatterOf(essay));
+    const parsedGitPost = postFrontmatterSchema.parse(frontmatterOf(gitPost));
+
+    expect(parsedEssay).toMatchObject({
+      title: 'Who owns the code AI writes?',
+      category: 'essay',
+      draft: false,
+      liveFrom: '2026-07-23',
+    });
+    expect(parsedGitPost).toMatchObject({
+      title: 'Git, the new SVN?',
+      draft: false,
+      liveFrom: '2026-07-21',
+    });
+    expect(gitPost).toContain('/posts/essay-ai-code-ownership/');
+    expect(parsedEssay.pubDate.toISOString()).toBe('2026-07-19T00:00:00.000Z');
+  });
+
+  it('moves the July tooling archive Posts after the pair', () => {
+    const mayaPost = readFileSync(
+      join(process.cwd(), 'src/content/posts/2013/maya-scene-python-to-xml/index.mdx'),
+      'utf8',
+    );
+    const cgfxPost = readFileSync(
+      join(process.cwd(), 'src/content/posts/2013/cgfx-and-glsl/index.mdx'),
+      'utf8',
+    );
+
+    expect(postFrontmatterSchema.parse(frontmatterOf(mayaPost)).liveFrom).toBe('2026-07-28');
+    expect(postFrontmatterSchema.parse(frontmatterOf(cgfxPost)).liveFrom).toBe('2026-07-31');
+  });
+});

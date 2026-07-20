@@ -1,12 +1,13 @@
 /**
- * The posts loader only reads <folders>/<slug>/index.md. Any other markdown
+ * The posts loader only reads <folders>/<slug>/index.md(x). Any other markdown
  * file under the content tree would be silently skipped — this finds those so
  * a test can fail loudly instead.
  */
 export function findOrphanMarkdown(paths: string[]): string[] {
   return paths.filter((path) => {
-    if (!path.endsWith('.md')) return false;
+    if (!/\.mdx?$/.test(path)) return false;
     const segments = path.split('/');
-    return segments.at(-1) !== 'index.md' || segments.length < 2;
+    const filename = segments.at(-1);
+    return (filename !== 'index.md' && filename !== 'index.mdx') || segments.length < 2;
   });
 }

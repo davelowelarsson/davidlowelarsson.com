@@ -241,6 +241,35 @@ const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
     margin: 1.75em 0 0.5em;
   }
 
+  /* Markdown-native TL;DR: an ordinary heading immediately followed by a list.
+     This works unchanged in .md and .mdx and stays deliberately easy to restyle
+     during the full design pass in issue #11. */
+  article h2#tldr,
+  article h2#tldr + ul {
+    background: var(--chip);
+    border-left: 3px solid var(--focus);
+  }
+
+  article h2#tldr {
+    margin: 2.25rem 0 0;
+    padding: 0.9rem 1.25rem 0.25rem;
+    border-radius: 4px 4px 0 0;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    font-weight: 650;
+    letter-spacing: 0;
+  }
+
+  article h2#tldr + ul {
+    margin: 0 0 2.25rem;
+    padding: 0.25rem 1.25rem 1rem 2.75rem;
+    border-radius: 0 0 4px 4px;
+  }
+
+  article h2#tldr + ul li + li {
+    margin-top: 0.35rem;
+  }
+
   p {
     margin: 0 0 1.25em;
   }

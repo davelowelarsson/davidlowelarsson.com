@@ -296,6 +296,18 @@ how the project actually grew.
   or omit it and let the browser use native video metadata/first-frame behavior
   instead of forcing a misleading still image.
 
+## Text beside media (2026-07-19, PR #74)
+
+- **`MediaAside.astro` keeps slotted prose first in the HTML** and uses scoped
+  grid CSS to place its figure left or right; mobile returns to one column
+  without changing reading order. The `side` prop changes presentation only.
+- **MDX imports the local image as `ImageMetadata`** and passes it to a wrapper
+  around `astro:assets` `<Image>`, which owns responsive sizing and attribution.
+- **Media reuses the global `.breakout` utility** for width and centering. Raster
+  images use `<Image>` with grid-accurate `widths`/`sizes`; imported SVG metadata
+  goes straight to a native `<img>` because vectors need no transformed copies.
+  Docs: https://docs.astro.build/en/guides/integrations-guide/mdx/ · https://docs.astro.build/en/guides/images/
+
 ## YouTube embed facade + MDX support (2026-07-08, issue #37)
 
 - **`@astrojs/mdx` adds no UI framework.** MDX is JSX-in-Markdown syntax, not

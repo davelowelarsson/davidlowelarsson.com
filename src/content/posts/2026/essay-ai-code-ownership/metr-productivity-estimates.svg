@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="820" viewBox="0 0 600 820" role="img" aria-labelledby="title desc">
+  <title id="title">METR developer productivity estimates</title>
+  <desc id="desc">A simplified interval chart ordered chronologically from top to bottom, with slower outcomes left of no change and faster outcomes right of no change. The initial study ran from February to June 2025 and estimated a 19 percent slowdown, with a 95 percent confidence interval from 2 to 39 percent slower. The follow-up ran from August 2025 to February 2026. Repeat participants had an estimated 18 percent speed-up, with a confidence interval from 38 percent faster to 9 percent slower. New participants had an estimated 4 percent speed-up, with a confidence interval from 15 percent faster to 9 percent slower.</desc>
+  <style>
+    .background { fill: #f7f5ef; }
+    .ink { fill: #22252a; }
+    .muted { fill: #646870; }
+    .grid { stroke: #d8d4ca; }
+    .baseline { stroke: #777b82; }
+    .early { fill: #a84b37; stroke: #a84b37; }
+    .repeat { fill: #226f9d; stroke: #226f9d; }
+    .new { fill: #21765b; stroke: #21765b; }
+
+    @media (prefers-color-scheme: dark) {
+      .background { fill: #1b1d20; }
+      .ink { fill: #f1f1ed; }
+      .muted { fill: #b2b3b1; }
+      .grid { stroke: #3e4145; }
+      .baseline { stroke: #a5a7a8; }
+      .early { fill: #e27a61; stroke: #e27a61; }
+      .repeat { fill: #67acd4; stroke: #67acd4; }
+      .new { fill: #60b493; stroke: #60b493; }
+    }
+  </style>
+
+  <rect class="background" width="600" height="820" rx="8" />
+  <text class="ink" x="36" y="48" font-family="system-ui, sans-serif" font-size="30" font-weight="650">METR task-time estimates</text>
+  <text class="muted" x="36" y="76" font-family="system-ui, sans-serif" font-size="15">Change in task time when AI use was allowed</text>
+  <text class="muted" x="36" y="102" font-family="system-ui, sans-serif" font-size="14">Studies run top to bottom; faster outcomes point right</text>
+
+  <g font-family="system-ui, sans-serif" font-size="13" text-anchor="middle">
+    <text class="muted" x="80" y="140">40% slower</text>
+    <text class="muted" x="200" y="140">20% slower</text>
+    <text class="ink" x="320" y="140" font-weight="650">No change</text>
+    <text class="muted" x="440" y="140">20% faster</text>
+    <text class="muted" x="560" y="140">40% faster</text>
+  </g>
+
+  <g stroke-width="1">
+    <line class="grid" x1="80" y1="160" x2="80" y2="716" />
+    <line class="grid" x1="200" y1="160" x2="200" y2="716" />
+    <line class="baseline" x1="320" y1="160" x2="320" y2="716" stroke-width="2" />
+    <line class="grid" x1="440" y1="160" x2="440" y2="716" />
+    <line class="grid" x1="560" y1="160" x2="560" y2="716" />
+  </g>
+
+  <g font-family="system-ui, sans-serif">
+    <text class="ink" x="36" y="194" font-size="20" font-weight="650">Initial study</text>
+    <text class="muted" x="36" y="220" font-size="15">Feb-Jun 2025</text>
+    <text class="muted" x="36" y="244" font-size="15">16 developers, 246 tasks</text>
+    <line class="early" x1="86" y1="294" x2="308" y2="294" stroke-width="8" stroke-linecap="round" />
+    <circle class="early" cx="206" cy="294" r="12" />
+    <text class="early" x="206" y="273" font-size="17" text-anchor="middle" font-weight="650">19% slower</text>
+    <text class="muted" x="206" y="326" font-size="13" text-anchor="middle">95% CI: 2% to 39% slower</text>
+
+    <text class="ink" x="36" y="372" font-size="20" font-weight="650">Follow-up, repeat participants</text>
+    <text class="muted" x="36" y="398" font-size="15">Aug 2025-Feb 2026</text>
+    <text class="muted" x="36" y="422" font-size="15">10 developers, 137 tasks</text>
+    <line class="repeat" x1="266" y1="472" x2="548" y2="472" stroke-width="8" stroke-linecap="round" />
+    <circle class="repeat" cx="428" cy="472" r="12" />
+    <text class="repeat" x="428" y="451" font-size="17" text-anchor="middle" font-weight="650">18% faster</text>
+    <text class="muted" x="428" y="504" font-size="13" text-anchor="middle">95% CI: 38% faster to 9% slower</text>
+
+    <text class="ink" x="36" y="550" font-size="20" font-weight="650">Follow-up, new participants</text>
+    <text class="muted" x="36" y="576" font-size="15">Aug 2025-Feb 2026</text>
+    <text class="muted" x="36" y="600" font-size="15">47 developers, 690 tasks</text>
+    <line class="new" x1="266" y1="650" x2="410" y2="650" stroke-width="8" stroke-linecap="round" />
+    <circle class="new" cx="344" cy="650" r="12" />
+    <text class="new" x="344" y="629" font-size="17" text-anchor="middle" font-weight="650">4% faster</text>
+    <text class="muted" x="344" y="682" font-size="13" text-anchor="middle">95% CI: 15% faster to 9% slower</text>
+  </g>
+
+  <g class="muted" font-family="system-ui, sans-serif" font-size="14">
+    <text x="36" y="766">Dots are estimates; lines are 95% confidence intervals.</text>
+    <text x="36" y="791">Follow-up published by METR on Feb 24, 2026.</text>
+  </g>
+</svg>

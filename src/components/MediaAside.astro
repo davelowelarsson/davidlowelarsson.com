@@ -1,0 +1,100 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  src: ImageMetadata;
+  alt: string;
+  side?: 'left' | 'right';
+  caption?: string;
+  sourceHref?: string;
+  sourceLabel?: string;
+}
+
+const { src, alt, side = 'right', caption, sourceHref, sourceLabel = 'Source' } = Astro.props;
+const rasterSizes =
+  '(min-width: 62rem) 28.75rem, (min-width: 52rem) calc((100vw - 4.5rem) / 2), calc(100vw - 2rem)';
+---
+
+<div class={`media-aside media-aside--${side} breakout`} data-media-side={side}>
+  <div class="media-aside__content">
+    <slot />
+  </div>
+  <figure class="media-aside__figure">
+    {
+      src.format === 'svg' ? (
+        <img
+          src={src.src}
+          width={src.width}
+          height={src.height}
+          alt={alt}
+          loading="lazy"
+          decoding="async"
+        />
+      ) : (
+        <Image src={src} alt={alt} widths={[360, 580, 900]} sizes={rasterSizes} />
+      )
+    }
+    {
+      (caption || sourceHref) && (
+        <figcaption>
+          {caption && <span>{caption}</span>}
+          {sourceHref && <a href={sourceHref}>{sourceLabel}</a>}
+        </figcaption>
+      )
+    }
+  </figure>
+</div>
+
+<style>
+  .media-aside {
+    display: grid;
+    gap: 1.5rem;
+    margin: 2.75rem 0;
+  }
+
+  .media-aside__content,
+  .media-aside__figure {
+    min-width: 0;
+  }
+
+  .media-aside__figure {
+    margin: 0;
+  }
+
+  .media-aside__figure :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+    cursor: zoom-in;
+  }
+
+  figcaption {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.15rem 0.5rem;
+    margin-top: 0.65rem;
+    color: var(--muted);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+  }
+
+  @media (min-width: 52rem) {
+    .media-aside {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: start;
+      gap: 2.5rem;
+    }
+
+    .media-aside--left .media-aside__figure {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .media-aside--left .media-aside__content {
+      grid-column: 2;
+      grid-row: 1;
+    }
+  }
+</style>
