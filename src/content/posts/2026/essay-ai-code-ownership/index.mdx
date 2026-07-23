@@ -12,12 +12,12 @@ import MediaAside from '../../../../components/MediaAside.astro';
 import metrProductivityEstimates from './metr-productivity-estimates.svg';
 
 This Sunday I read Dalia Abuadas's GitHub post [The cost of saying yes has
-changed](https://github.blog/engineering/the-cost-of-saying-yes-has-changed/). She describes how saying no was easier at the idea phase before .. while it's now so ieasy to create a prototype/test/draft of a feature that it's almost better to test things and get a good idea of how complicated something is and then discuss if we want to do it for "real".
-Her subject is how AI now helps a lot (and sometimes dosen't help), which reminded me of a presentation
+changed](https://github.blog/engineering/the-cost-of-saying-yes-has-changed/). She describes how saying no was easier at the idea phase before .. while it's now so easy to create a prototype/test/draft of a feature that it's almost better to test things and get a good idea of how complicated something is and then discuss if we want to do it for "real".
+Her subject is how AI now helps a lot (and sometimes doesn't help), which reminded me of a presentation
 I held earlier this year and one example I used, how we might not want to use AI when working 😅.
 
 My example was a big refactor, introducing typing, changing testframework which resulted in three, dependent, pull requests that had to
-merge in order. I had changed 330 files with 10,221 lines added and 7,842 removed. All tests passed, linting looked good, everything was typed, everything looked good... we could probably have merged it 😅.
+merge in order. I had changed 330 files with 10,221 lines added and 7,842 removed. All tests passed, linting looked good, everything was typed, everything looked good... we could probably have merged it.
 
 But we never did. We discussed it in the team and I don't think that would have been responsible. No one would have had the knowledge or the
 understanding to compare my changes with what was already in production and working. I had a note on the slide I was presenting, which read, "We can't responsibly put this into production. (I
@@ -32,7 +32,7 @@ think)". I made a mess and after it was tested, working and good .. we decided n
 
 ## When the output is enough
 
-When the risk is low and the output is the only artifact I care about than whether a piece of code is "AI-generated". I try to start
+When the risk is low and the output is the only artifact I care about, I care less about whether a piece of code is "AI-generated". I try to start
 with "what problem am I solving?", and how much risk sits around that problem. The diagram below is my super simple abstraction on how/why I use AI assisted code generation.
 I still write code both with and without AI
 sometimes 😁, and those changes can go wrong, the blast radius does not care how the mistake was
@@ -48,11 +48,11 @@ flowchart TD
 ```
 
 I use AI for a lot of reading, research, checks and summarization. It can gather context from documentation, issues, logs and code,
-then help me find whats important, which I can then focus on. When the result is a summary or an internal
+then help me find what's important, which I can then focus on. When the result is a summary or an internal
 implementation with a small blast radius, low risk, I am mostly concerned with the input and the output (if it works, it works, right 🤷). If a
 daily digest is slightly wrong I can correct it, no users are affected or impacted by my mistake (or AI's mistake).
 
-This website is an example. For this build I jumped into Astro head first, I've previously had lots of experience in react/nextjs and several other frameworks but never tested Astro.
+This website is an example. For this build I jumped into Astro head first, I've previously had lots of experience in React/Next.js and several other frameworks but never tested Astro.
 Without AI helping me read the documentation, write code and work through unfamiliar parts of the
 framework I wouldn't have been able to go from 0 to a deployed working site in a day, which I did with this. I still review the work and often ask another model for a second
 opinion, but experimenting here does not carry the same risk as taking down the main streaming
