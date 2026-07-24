@@ -38,7 +38,7 @@
     "@types/sanitize-html": "^2.16.1",
     "typescript": "^6.0.3",
     "vitest": "^4.1.10",
-    "wrangler": "^4.112.0",
+    "wrangler": "^4.114.0",
     "yaml": "^2.9.0"
   }
 }
