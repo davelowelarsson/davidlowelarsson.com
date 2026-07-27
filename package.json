@@ -21,18 +21,18 @@
     "verify": "npm run lint && npm run typecheck && npm run test && npm run e2e"
   },
   "dependencies": {
-    "@astrojs/mdx": "^7.0.3",
+    "@astrojs/mdx": "^7.0.4",
     "@astrojs/rss": "^4.0.19",
     "@astrojs/sitemap": "^3.7.3",
-    "astro": "^7.1.2",
+    "astro": "^7.1.4",
     "markdown-it": "^14.3.0",
     "mermaid": "^11.16.0",
     "sanitize-html": "^2.17.6"
   },
   "devDependencies": {
-    "@astrojs/check": "^0.9.9",
-    "@biomejs/biome": "^2.5.4",
-    "@playwright/test": "^1.61.1",
+    "@astrojs/check": "^0.9.10",
+    "@biomejs/biome": "^2.5.5",
+    "@playwright/test": "^1.62.0",
     "@types/markdown-it": "^14.1.2",
     "@types/node": "^26.1.1",
     "@types/sanitize-html": "^2.16.1",
