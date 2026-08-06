@@ -41,6 +41,8 @@
     "yaml": "^2.9.0"
   },
   "overrides": {
-    "undici": "^7.29.0"
+    "wrangler": {
+      "undici": "^7.29.0"
+    }
   }
 }
