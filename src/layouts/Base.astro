@@ -179,6 +179,11 @@ const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
 </html>
 
 <style is:global>
+  /* Colours are defined in src/lib/palette.ts and mirrored here. This block is
+     the ONLY place the sheet may name a colour; src/lib/palette.test.ts asserts
+     both halves of that — that :root matches PALETTE exactly, and that nothing
+     below writes a hex, an rgb() or a light-dark() of its own. Change a colour
+     in the data; the failing test names the line to follow up. */
   :root {
     color-scheme: light dark;
 
@@ -194,6 +199,10 @@ const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
     --focus: light-dark(#2563eb, #93b4ff);
     --status-up: light-dark(#15803d, #4ade80);
     --status-down: light-dark(#b91c1c, #f87171);
+    --tint-essay: light-dark(#4338ca, #a5b4fc);
+    --tint-til: light-dark(#047857, #6ee7b7);
+    --tint-experiment: light-dark(#0e7490, #67e8f9);
+    --tint-project: light-dark(#be185d, #f9a8d4);
   }
 
   * {
@@ -513,19 +522,19 @@ const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
 
   /* Quiet category tints — legible as monochrome, scannable as color */
   .badge-essay {
-    color: light-dark(#4338ca, #a5b4fc);
+    color: var(--tint-essay);
   }
 
   .badge-til {
-    color: light-dark(#047857, #6ee7b7);
+    color: var(--tint-til);
   }
 
   .badge-experiment {
-    color: light-dark(#0e7490, #67e8f9);
+    color: var(--tint-experiment);
   }
 
   .badge-project {
-    color: light-dark(#be185d, #f9a8d4);
+    color: var(--tint-project);
   }
 
   .badge-warning {
