@@ -1,9 +1,13 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
+  AA_FLOOR,
+  AAA_FLOOR,
+  BELOW_FLOOR,
   CONTRAST_FLOOR,
   type ColorPair,
   contrastRatio,
+  NON_TEXT_FLOOR,
   PALETTE,
   relativeLuminance,
   SCHEMES,
@@ -61,18 +65,43 @@ describe('the palette as data', () => {
     }
   });
 
-  // The floor rises to 5.5:1 in #107. Today it guards WCAG AA.
-  it(`clears ${CONTRAST_FLOOR}:1 for every text token, in both schemes`, () => {
-    const failures: string[] = [];
+  /** Every (token, scheme) pair whose ratio falls below `floor`, as `token:scheme`. */
+  function shortOf(floor: number): string[] {
+    const short: string[] = [];
     for (const { token, ground } of TEXT_TOKENS) {
       for (const scheme of SCHEMES) {
-        const ratio = tokenContrast(token, ground, scheme);
-        if (ratio < CONTRAST_FLOOR) {
-          failures.push(`${token} on ${ground} (${scheme}): ${ratio.toFixed(2)}:1`);
-        }
+        if (tokenContrast(token, ground, scheme) < floor) short.push(`${token}:${scheme}`);
       }
     }
-    expect(failures).toEqual([]);
+    return short.sort();
+  }
+
+  it(`clears WCAG AA (${AA_FLOOR}:1) for every text token, no exceptions`, () => {
+    expect(shortOf(AA_FLOOR)).toEqual([]);
+  });
+
+  // The project floor is 5.5:1. BELOW_FLOOR is the countdown of tokens still
+  // short of it — asserted as an exact set, so it can only ever shrink.
+  it(`falls short of ${CONTRAST_FLOOR}:1 exactly where BELOW_FLOOR says`, () => {
+    expect(shortOf(CONTRAST_FLOOR)).toEqual([...BELOW_FLOOR].sort());
+  });
+
+  it(`holds body ink to WCAG AAA (${AAA_FLOOR}:1) on both grounds`, () => {
+    for (const scheme of SCHEMES) {
+      expect(tokenContrast('ink', 'bg', scheme), `ink (${scheme})`).toBeGreaterThanOrEqual(
+        AAA_FLOOR,
+      );
+    }
+  });
+
+  // The focus ring is non-text UI, so WCAG asks 3:1 of it rather than 4.5:1 —
+  // a separate guarantee from the same token's use as `.badge-scheduled` text.
+  it(`keeps the focus ring above the ${NON_TEXT_FLOOR}:1 non-text threshold`, () => {
+    for (const scheme of SCHEMES) {
+      expect(tokenContrast('focus', 'bg', scheme), `focus ring (${scheme})`).toBeGreaterThanOrEqual(
+        NON_TEXT_FLOOR,
+      );
+    }
   });
 });
 
