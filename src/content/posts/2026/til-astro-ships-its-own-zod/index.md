@@ -8,13 +8,13 @@ liveFrom: 2026-08-20
 tags: ["astro", "zod", "typescript", "content-collections"]
 ---
 
-This site is a rebuild of an old WordPress blog, scraped back out of the Wayback Machine and a
+This site (if we are still using Astro when you are reading this 😅) is a rebuild of an old WordPress blog, scraped back out of the Wayback Machine and a
 couple of old database dumps I still had lying around. I was never happy with that WordPress
 site... every time you upgrade a plugin something breaks. So when I started over I jumped
 straight on the latest Astro, mostly because they had added the markdown support I wanted to
 work with.
 
-![Abstract composition of a single shape splitting into two aligned paths](./til-astro-zod-moved.svg)
+![Astro logo alongside a Markdown symbol, connected by a red heart](./til-astro-markdown.svg)
 
 I started the project asking for zod and proper typing, because I like zod and wanted the
 content collections typed from day one. And that's where we started slightly wrong. I don't
@@ -37,3 +37,7 @@ own copy. It works though, and if it works, it works 🤷
 
 **Takeaway:** in Astro, content collection schemas import `z` from `astro/zod`, the zod you
 never installed.
+
+## Links
+
+- [Markdown content in Astro](https://docs.astro.build/en/guides/markdown-content/), the full guide where `.md` and `.mdx` both work out of the box

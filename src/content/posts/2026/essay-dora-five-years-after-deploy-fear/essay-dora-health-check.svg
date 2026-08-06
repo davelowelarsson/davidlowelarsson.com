@@ -1,0 +1,133 @@
+<svg width="540" height="288" viewBox="0 0 540 288" xmlns="http://www.w3.org/2000/svg">
+  <title>Team health check board with one attribute moving from green to red</title>
+  <style>
+    .bg  { fill: #fafafa; }
+    .grid { stroke: #e4e4e7; stroke-width: 0.5; fill: none; }
+    .lbl  { font: 11px/1 ui-sans-serif, system-ui, sans-serif; fill: #52525b; dominant-baseline: middle; }
+    .hdr  { font: 10px/1 ui-sans-serif, system-ui, sans-serif; fill: #71717a; dominant-baseline: middle; text-anchor: middle; }
+    .g   { fill: #22c55e; opacity: 0.72; }
+    .y   { fill: #eab308; opacity: 0.75; }
+    .r   { fill: #ef4444; opacity: 0.85; }
+    .now { stroke: #a1a1aa; stroke-width: 0.5; fill: #f0fdf4; opacity: 0.35; }
+    @media (prefers-color-scheme: dark) {
+      .bg   { fill: #27272a; }
+      .grid { stroke: #3f3f46; }
+      .lbl  { fill: #a1a1aa; }
+      .hdr  { fill: #71717a; }
+      .now  { stroke: #3f3f46; fill: #14532d; }
+    }
+  </style>
+
+  <!-- board background -->
+  <rect class="bg" x="8" y="8" width="524" height="272" rx="8"/>
+
+  <!-- latest-column highlight -->
+  <rect class="now" x="450" y="8" width="82" height="272" rx="0"/>
+  <rect class="now" x="450" y="8" width="82" height="272" rx="8"/>
+
+  <!-- horizontal grid lines -->
+  <line class="grid" x1="8"  y1="38"  x2="532" y2="38"/>
+  <line class="grid" x1="128" y1="62"  x2="532" y2="62"/>
+  <line class="grid" x1="128" y1="86"  x2="532" y2="86"/>
+  <line class="grid" x1="128" y1="110" x2="532" y2="110"/>
+  <line class="grid" x1="128" y1="134" x2="532" y2="134"/>
+  <line class="grid" x1="128" y1="158" x2="532" y2="158"/>
+  <line class="grid" x1="128" y1="182" x2="532" y2="182"/>
+  <line class="grid" x1="128" y1="206" x2="532" y2="206"/>
+  <line class="grid" x1="128" y1="230" x2="532" y2="230"/>
+  <line class="grid" x1="128" y1="254" x2="532" y2="254"/>
+
+  <!-- vertical grid lines -->
+  <line class="grid" x1="128" y1="8"  x2="128" y2="280"/>
+  <line class="grid" x1="208" y1="38" x2="208" y2="280"/>
+  <line class="grid" x1="288" y1="38" x2="288" y2="280"/>
+  <line class="grid" x1="368" y1="38" x2="368" y2="280"/>
+  <line class="grid" x1="448" y1="8"  x2="448" y2="280"/>
+
+  <!-- date column headers (centers: 168, 248, 328, 408, 490) -->
+  <text class="hdr" x="168" y="23">Apr '25</text>
+  <text class="hdr" x="248" y="23">Jun '25</text>
+  <text class="hdr" x="328" y="23">Sep '25</text>
+  <text class="hdr" x="408" y="23">Dec '25</text>
+  <text class="hdr" x="490" y="23">Mar '26</text>
+
+  <!-- row 0: Easy to release (the key row) -->
+  <text class="lbl" x="14" y="50">Easy to release</text>
+  <circle class="g" cx="168" cy="50" r="8"/>
+  <circle class="g" cx="248" cy="50" r="8"/>
+  <circle class="g" cx="328" cy="50" r="8"/>
+  <circle class="g" cx="408" cy="50" r="8"/>
+  <circle class="r" cx="490" cy="50" r="8"/>
+
+  <!-- row 1: Suitable process -->
+  <text class="lbl" x="14" y="74">Suitable process</text>
+  <circle class="g" cx="168" cy="74" r="8"/>
+  <circle class="g" cx="248" cy="74" r="8"/>
+  <circle class="y" cx="328" cy="74" r="8"/>
+  <circle class="g" cx="408" cy="74" r="8"/>
+  <circle class="g" cx="490" cy="74" r="8"/>
+
+  <!-- row 2: Tech quality -->
+  <text class="lbl" x="14" y="98">Tech quality</text>
+  <circle class="y" cx="168" cy="98" r="8"/>
+  <circle class="g" cx="248" cy="98" r="8"/>
+  <circle class="g" cx="328" cy="98" r="8"/>
+  <circle class="g" cx="408" cy="98" r="8"/>
+  <circle class="g" cx="490" cy="98" r="8"/>
+
+  <!-- row 3: Value -->
+  <text class="lbl" x="14" y="122">Value</text>
+  <circle class="g" cx="168" cy="122" r="8"/>
+  <circle class="g" cx="248" cy="122" r="8"/>
+  <circle class="g" cx="328" cy="122" r="8"/>
+  <circle class="g" cx="408" cy="122" r="8"/>
+  <circle class="g" cx="490" cy="122" r="8"/>
+
+  <!-- row 4: Speed -->
+  <text class="lbl" x="14" y="146">Speed</text>
+  <circle class="y" cx="168" cy="146" r="8"/>
+  <circle class="y" cx="248" cy="146" r="8"/>
+  <circle class="g" cx="328" cy="146" r="8"/>
+  <circle class="g" cx="408" cy="146" r="8"/>
+  <circle class="g" cx="490" cy="146" r="8"/>
+
+  <!-- row 5: Mission -->
+  <text class="lbl" x="14" y="170">Mission</text>
+  <circle class="g" cx="168" cy="170" r="8"/>
+  <circle class="g" cx="248" cy="170" r="8"/>
+  <circle class="g" cx="328" cy="170" r="8"/>
+  <circle class="g" cx="408" cy="170" r="8"/>
+  <circle class="g" cx="490" cy="170" r="8"/>
+
+  <!-- row 6: Fun -->
+  <text class="lbl" x="14" y="194">Fun</text>
+  <circle class="g" cx="168" cy="194" r="8"/>
+  <circle class="g" cx="248" cy="194" r="8"/>
+  <circle class="g" cx="328" cy="194" r="8"/>
+  <circle class="g" cx="490" cy="194" r="8"/>
+  <circle class="g" cx="408" cy="194" r="8"/>
+
+  <!-- row 7: Learning -->
+  <text class="lbl" x="14" y="218">Learning</text>
+  <circle class="y" cx="168" cy="218" r="8"/>
+  <circle class="y" cx="248" cy="218" r="8"/>
+  <circle class="y" cx="328" cy="218" r="8"/>
+  <circle class="g" cx="408" cy="218" r="8"/>
+  <circle class="g" cx="490" cy="218" r="8"/>
+
+  <!-- row 8: Support -->
+  <text class="lbl" x="14" y="242">Support</text>
+  <circle class="g" cx="168" cy="242" r="8"/>
+  <circle class="g" cx="248" cy="242" r="8"/>
+  <circle class="g" cx="328" cy="242" r="8"/>
+  <circle class="y" cx="408" cy="242" r="8"/>
+  <circle class="g" cx="490" cy="242" r="8"/>
+
+  <!-- row 9: Teamwork -->
+  <text class="lbl" x="14" y="266">Teamwork</text>
+  <circle class="g" cx="168" cy="266" r="8"/>
+  <circle class="g" cx="248" cy="266" r="8"/>
+  <circle class="g" cx="328" cy="266" r="8"/>
+  <circle class="g" cx="408" cy="266" r="8"/>
+  <circle class="g" cx="490" cy="266" r="8"/>
+</svg>

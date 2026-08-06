@@ -19,5 +19,7 @@ Cloudflare token and skips with a notice when it isn't set, which is exactly why
 perfectly healthy... a green check mark and a step that quietly decided there was nothing for it to
 do.
 
-**Takeaway:** a Dependabot PR's workflow reads secrets from the Dependabot store rather than the
+![Dependabot secrets store](image.png)
+
+**Takeaway:** a Dependabot PR's workflow reads secrets from the Dependabot store (something I did now but needed reminding about) rather than the
 Actions store, so anything guarded by a token check can pass by doing nothing at all.

@@ -14,7 +14,7 @@ like to record a loom now and then and just show how something works instead of 
 while planning I went looking for where video would live, assuming the answer was "put it in the
 repo and let the build ship it".
 
-It isn't. Workers static assets cap a single file at 25 MiB, on free and paid alike (the plans
+It isn't. Cloudflare's workers static assets cap a single file at 25 MiB, on free and paid alike (the plans
 differ on file count, 20,000 against 100,000, not on size). I never hit the cap myself, it turned
 up while planning, which is a much nicer way to learn a limit 😅
 
@@ -34,9 +34,9 @@ request to the bucket. It's warn-only, always exits 0, and runs from a pre-commi
 in CI. That part was deliberate. I don't want a build failing because I renamed something, but I
 do want to be acutely aware of a broken video while there's still time to fix it.
 
-And no YouTube. Someone came here to read something, they shouldn't get served ads for it 🙃
+And no YouTube ads. Someone came here to read something, they shouldn't get served ads for it 🙃
 
-**Takeaway:** Workers static assets stop at 25 MiB per file, so anything longer than a gif belongs
+**Takeaway:** Cloudflare's workers static assets stop at 25 MiB per file, so anything longer than a gif belongs
 in R2 with its zero egress fees, and the repo only remembers what should be in there.
 
 ## Links

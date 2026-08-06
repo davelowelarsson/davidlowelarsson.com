@@ -34,7 +34,7 @@ flowchart LR
 ## The caching turned out to be the experiment
 
 Reading the zone on every request means every visitor, plus anything polling the summary endpoint
-for a status tally, turns into a Cloudflare API call carrying my token. That's a neat way to
+for a status check, turns into a Cloudflare API call carrying my token. That's a neat way to
 rate-limit myself, with my own dashboard as the attacker... So the public view goes through
 the edge cache with a 30 second TTL, and the refresh button is debounced so that leaning on it
 can't force a recompute more often than every 10 seconds.
