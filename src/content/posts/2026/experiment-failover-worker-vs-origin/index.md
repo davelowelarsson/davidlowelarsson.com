@@ -15,12 +15,7 @@ it's supposed to cover?
 
 ## The setup
 
-A route in front of the real origin. On each request, the Worker:
-
-1. Forwards the request to the origin with a short timeout.
-2. On success, returns the origin's response and stores a copy in the Cache API.
-3. On timeout or a 5xx, serves the last good cached copy instead, with a `Stale-Fallback` header
-   so it's visible in the response that this wasn't a live hit.
+A route in front of the real origin. On each request the Worker forwards it to the origin with a short timeout, and on success returns the response and stores a copy in the Cache API. On timeout or a 5xx it serves the last good cached copy instead, with a `Stale-Fallback` header so it's visible in the response that this wasn't a live hit.
 
 ```ts
 export default {

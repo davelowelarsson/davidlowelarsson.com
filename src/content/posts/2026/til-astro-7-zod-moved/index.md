@@ -7,8 +7,6 @@ draft: true
 tags: ["astro", "zod", "typescript", "content-collections"]
 ---
 
-> **WIP/TEST** — placeholder content while the site's design is under construction.
-
 Upgraded this site to Astro 7 and `astro check` started complaining about `z.ZodType` mismatches
 in `content.config.ts`, even though nothing in that file had changed.
 

@@ -7,8 +7,6 @@ draft: true
 tags: ["cloudflare", "workers", "ci"]
 ---
 
-> Draft notes from the day it happened — edit before publishing.
-
 This site deploys previews with `wrangler versions upload`: every push gets an immutable
 version at `https://<hash>-<worker>.<subdomain>.workers.dev`. Great for pinpointing a commit —
 terrible for iterating on copy, because the tab you have open silently stays on the old
@@ -25,5 +23,6 @@ That publishes the same immutable version *and* points a stable alias URL —
 so each PR has one keep-it-open URL that always serves the newest push, and the sticky PR
 comment leads with it.
 
-Constraints worth knowing: lowercase letters, numbers, dashes; must start with a letter; alias
-plus worker name ≤ 63 characters (DNS); the 1000 most recent aliases are kept.
+Worth knowing: alias names are lowercase letters, numbers, and dashes, and must start with a letter. The alias plus worker name combined must stay under 63 characters (a DNS label limit). The 1000 most recent aliases are kept.
+
+**Takeaway:** `--preview-alias` gives each branch one stable URL that always serves the latest push, so the tab you keep open through a review never silently goes stale.

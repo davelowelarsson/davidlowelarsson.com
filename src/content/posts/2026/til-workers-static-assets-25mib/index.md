@@ -7,8 +7,6 @@ draft: true
 tags: ["cloudflare", "workers", "video"]
 ---
 
-> Draft notes from the day it happened — edit before publishing.
-
 Planning how to self-host video on this site (no YouTube, thanks), I assumed the answer was
 "put the mp4 in the repo and let the build ship it". Cloudflare says no: Workers static assets
 have a hard **25 MiB per-file limit** (20,000 files on the free plan, 100,000 on paid — but the
@@ -23,5 +21,7 @@ So the architecture decides itself:
   reason self-hosting media on it is economically sane.
 
 The plan for keeping it honest: a committed manifest of what's been uploaded, and a CI check
-that diffs post references against the bucket — so removing a video from a post at least
+that diffs post references against the bucket, so removing a video from a post at least
 *tells* you the object is now an orphan instead of letting the bucket silently grow.
+
+**Takeaway:** the 25 MiB per-file cap on Workers static assets decides your whole media strategy for you, and R2 with zero egress fees is what makes self-hosting everything else economically sane.

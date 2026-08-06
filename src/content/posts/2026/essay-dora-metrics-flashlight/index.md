@@ -7,8 +7,6 @@ draft: true
 tags: ["dora", "platform-engineering", "leadership", "metrics"]
 ---
 
-> **WIP/TEST** — placeholder content while the site's design is under construction.
-
 Every few months someone forwards me a dashboard with four DORA metrics and a traffic-light
 column per team, and asks whether it's "good." The dashboard is never wrong, exactly. It's just
 answering a different question than the one being asked.
@@ -40,51 +38,24 @@ tooling, definitions, or incentives to report accurately.
 
 ## Where the flashlight is actually useful
 
-> The value of a metric is not what it measures. It's what conversation it starts.
-
-Used well, DORA metrics point a beam at one team's own trend over time:
+Used well, DORA metrics point a beam at one team's own trend over time, and the conversation
+that starts from one number is usually more useful than the number itself:
 
 - Lead time creeping up over a quarter — worth asking why, in a retro, with the people who felt it.
 - Change failure rate spiking after a specific release — worth a blameless look at what changed.
-- MTTR dropping after an on-call rotation change — worth confirming the causal story, not just
-  celebrating the number.
 
 None of that requires comparing the number to another team's. The comparison is the part that
 turns a diagnostic tool into a scoreboard, and scoreboards change behavior in predictable, mostly
 bad ways: people optimize the metric instead of the outcome it was meant to proxy for.
 
-## A small table, because it helps to see the failure modes side by side
-
-| Metric                  | Useful question                          | Scoreboard misuse                          |
-| ------------------------ | ----------------------------------------- | -------------------------------------------- |
-| Deployment frequency     | Is our batch size shrinking over time?    | Ranking teams by deploys/week               |
-| Lead time for changes    | Where does work sit idle in our pipeline? | Bonus targets tied to a lead-time number    |
-| Change failure rate      | Are our tests catching what matters?      | Penalizing teams for reporting failures     |
-| Time to restore          | Can we actually recover fast under load?  | Comparing MTTR across teams with different SLAs |
-
 ## What I do instead, as a lead
 
-When I bring DORA metrics into a conversation with a team, I try to keep three rules:
-
-1. Always plot a team against its own history first. Cross-team comparison, if it happens at all,
-   comes after — and with heavy caveats about differing context.
-2. Pair every metric with a story. A number without a "why" is an invitation to guess, and guesses
-   trend toward blame.
-3. Instrument consistently or don't compare at all. If two teams define "incident" differently,
-   their change failure rates aren't the same unit of measurement.
-
-A small script that pulls deployment events and computes rolling lead time looks something like
-this — deliberately boring, no dashboard framework required to start:
-
-```ts
-type Deployment = { mergedAt: Date; deployedAt: Date };
-
-function leadTimeHours(deployments: Deployment[]): number[] {
-  return deployments.map(
-    (d) => (d.deployedAt.getTime() - d.mergedAt.getTime()) / (1000 * 60 * 60),
-  );
-}
-```
+When I bring DORA metrics into a conversation with a team, I try to plot a team against its own
+history first, because cross-team comparison, if it happens at all, needs heavy caveats about
+differing context. I pair every number with a story, because a number without a "why" is an
+invitation to guess, and guesses trend toward blame. And I only compare when teams instrument
+consistently, because if two teams define "incident" differently, their change failure rates
+aren't the same unit of measurement.
 
 ## The honest version
 
