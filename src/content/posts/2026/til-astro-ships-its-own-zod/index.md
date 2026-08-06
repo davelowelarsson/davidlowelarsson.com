@@ -3,7 +3,8 @@ title: "Astro ships its own zod"
 description: "Content collection schemas import z from astro/zod, and zod was never in my package.json at all."
 pubDate: 2026-06-15
 category: til
-draft: true
+draft: false
+liveFrom: 2026-08-20
 tags: ["astro", "zod", "typescript", "content-collections"]
 ---
 

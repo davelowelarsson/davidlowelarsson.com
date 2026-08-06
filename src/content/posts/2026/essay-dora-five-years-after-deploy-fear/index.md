@@ -1,9 +1,10 @@
 ---
 title: "DORA, five years after the deploy fear"
 description: "A health check attribute went from green to red and nothing had got worse, which is the most useful thing any measurement has told me in years."
-pubDate: 2026-09-08
+pubDate: 2026-09-10
 category: essay
-draft: true
+draft: false
+liveFrom: 2026-09-10
 tags: ["dora", "devops", "platform-engineering", "metrics", "agile"]
 ---
 

@@ -3,7 +3,8 @@ title: "Dependabot workflows read a different secrets store"
 description: "A Dependabot PR's workflow went green and deployed nothing, because those runs read secrets from the Dependabot store instead of the Actions one."
 pubDate: 2026-07-07
 category: til
-draft: true
+draft: false
+liveFrom: 2026-09-24
 tags: ["github", "ci", "dependabot"]
 ---
 

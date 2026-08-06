@@ -3,7 +3,8 @@ title: "Workers static assets cap files at 25 MiB"
 description: "Cloudflare's static-assets hosting refuses any single file over 25 MiB, which settled where the video on this site was going to live before I had uploaded any."
 pubDate: 2026-07-07
 category: til
-draft: true
+draft: false
+liveFrom: 2026-09-03
 tags: ["cloudflare", "workers", "video", "r2"]
 ---
 

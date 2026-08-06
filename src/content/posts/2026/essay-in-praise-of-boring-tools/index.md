@@ -3,7 +3,8 @@ title: "In praise of boring tools"
 description: "The containers we started with at UR were early software, and they were still boring, and that turned out to be the difference that mattered."
 pubDate: 2026-06-19
 category: essay
-draft: true
+draft: false
+liveFrom: 2026-08-25
 tags: ["tooling", "platform-engineering", "kubernetes", "leadership"]
 ---
 

@@ -3,7 +3,8 @@ title: "Stable preview URLs with wrangler --preview-alias"
 description: "Every wrangler versions upload mints a new immutable preview URL ... an alias gives each PR one URL that always serves the latest push."
 pubDate: 2026-07-07
 category: til
-draft: true
+draft: false
+liveFrom: 2026-08-27
 tags: ["cloudflare", "workers", "ci"]
 ---
 

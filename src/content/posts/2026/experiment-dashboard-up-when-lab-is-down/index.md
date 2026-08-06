@@ -4,7 +4,8 @@ description: "The saltast.com dashboard reads my DNS zone from a Worker at the e
 pubDate: 2026-07-03
 category: experiment
 tags: ["cloudflare", "workers", "caching", "homelab", "reliability"]
-draft: true
+draft: false
+liveFrom: 2026-09-01
 ---
 
 Everything I run at home sits behind a `cloudflared` tunnel, the way I set it up in the [home lab

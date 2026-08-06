@@ -3,7 +3,8 @@ title: "A private repo runs out of Actions minutes"
 description: "All the PRs on a private experiment stopped building, because the free plan meters Actions minutes on private repos and I was spending them on end-to-end tests."
 pubDate: 2026-07-07
 category: til
-draft: true
+draft: false
+liveFrom: 2026-09-17
 tags: ["github", "ci", "dependabot"]
 ---
 
