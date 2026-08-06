@@ -10,6 +10,10 @@ coverAlt: MacBook with an executive summary document, notepad, and phone on a wo
 # ghost: published 2020-08-19 on thinking-small (recovered 2026-07-07)
 ---
 
+> **2026 note:** Five years later I came back to this in [DORA, five years after the deploy
+> fear](/posts/essay-dora-five-years-after-deploy-fear/), where the deploy fear described below
+> finally has numbers next to it.
+
 > Disclamer:  
 > These are my thoughts from brain to keyboard.
 
