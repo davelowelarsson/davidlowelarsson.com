@@ -33,12 +33,16 @@
     "@astrojs/check": "^0.9.10",
     "@biomejs/biome": "^2.5.6",
     "@playwright/test": "^1.62.1",
-    "@types/markdown-it": "^14.1.2",
     "@types/node": "^26.1.2",
     "@types/sanitize-html": "^2.16.1",
     "typescript": "^6.0.3",
     "vitest": "^4.1.10",
     "wrangler": "^4.118.0",
     "yaml": "^2.9.0"
+  },
+  "overrides": {
+    "wrangler": {
+      "undici": "^7.29.0"
+    }
   }
 }
