@@ -508,3 +508,22 @@ how the project actually grew.
 - **Same shape as `bylines.ts`:** exported `src/lib` data imported by both a
   Vitest unit test and a Playwright spec, so the source of truth and the
   rendered page are checked against one object.
+
+## Scoping prose styles without a Markdown plugin (2026-08-07, issue #105)
+
+- **Content-collection Markdown renders unclassed elements.** A `<ul>` in a
+  post arrives as a bare `<ul>` — there is no hook to add `class="prose-list"`
+  without a rehype plugin, and Astro 7's native processor has no plugin hooks
+  at all (see the note on issue #100). So prose styling has to be scoped by an
+  ANCESTOR selector (`article ul`), which is the only handle the pipeline
+  gives you.
+  Docs: https://docs.astro.build/en/guides/content-collections/#rendering-body-content
+- **`<style is:global>` really is global.** It is the one Astro style block
+  with no scoping hash, so an element selector in it reaches Markdown output,
+  component output and layout chrome alike. Convenient for prose, dangerous
+  for anything with a bare tag name.
+- **Assert the outcome AND the shape.** An e2e test measures that post rows
+  stay flush (what a reader would see); a Vitest test parses the selectors out
+  of the layout and fails if a list rule loses its `article` prefix (what a
+  reviewer would miss). The second catches the regression before a page is
+  even built.

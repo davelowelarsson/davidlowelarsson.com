@@ -21,13 +21,30 @@ test('research media sits right on desktop and below its text on mobile', async 
     return {
       figureStartsAfterContent: figureBox.x >= contentBox.x + contentBox.width,
       topDifference: Math.abs(figureBox.y - contentBox.y),
-      heightDifference: Math.abs(figureBox.height - contentBox.height),
+      // Proportional, not an absolute pixel budget — see the note below.
+      balance:
+        Math.min(figureBox.height, contentBox.height) /
+        Math.max(figureBox.height, contentBox.height),
     };
   });
   expect(desktopLayout, 'desktop media should have boxes').not.toBeNull();
   expect(desktopLayout?.figureStartsAfterContent).toBe(true);
   expect(desktopLayout?.topDifference).toBeLessThanOrEqual(1);
-  expect(desktopLayout?.heightDifference).toBeLessThan(100);
+
+  // The two columns should read as a pair rather than one dwarfing the other.
+  //
+  // This was `heightDifference < 100` and it was measuring the test runner's
+  // font stack as much as the layout. The figure's height is fixed by the
+  // image's aspect ratio; the text column's is whatever `system-ui` wraps to —
+  // which is SF on macOS and something wider on CI's Linux. The margin was
+  // ~24px, and #105's larger type spent it: 76px locally, 145px on CI, same
+  // commit. A ratio is the same on both, and still fails loudly on the
+  // breakages that matter — a figure whose image never loads collapses to its
+  // caption (~8%), and a figure that loses its column trips
+  // `figureStartsAfterContent` first.
+  expect(desktopLayout?.balance, 'the aside reads as one tall column plus a stub').toBeGreaterThan(
+    0.7,
+  );
 
   await page.setViewportSize({ width: 390, height: 844 });
   const mobileLayout = await aside.evaluate((element) => {
