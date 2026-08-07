@@ -1,30 +1,84 @@
 ---
 import { Image } from 'astro:assets';
+import { figureClass, type MediaKind } from '../lib/figure';
 
+/**
+ * The first component to emit the figure contract (#117) — the tracer bullet.
+ *
+ * The shape every framed medium will take:
+ *
+ *   <figure class="media …" data-media="<kind>">
+ *     <div class="media__body"> … </div>
+ *     <figcaption class="media__caption"> … </figcaption>   (optional)
+ *   </figure>
+ *
+ * `kind` is REQUIRED and has no default. A default would be a decision nobody
+ * made: the kind says what the thing IS, and only the author knows. The
+ * framing for each kind lives in src/styles/media.css, one selector apiece.
+ *
+ * `breakout` opts into the EXISTING layout primitive (ADR 0006, 60rem). The
+ * design's proposed wide-media class is deliberately not introduced — the
+ * primitive already does that job and is tested.
+ */
 interface Props {
   src: ImageMetadata;
   alt: string;
+  /** What this is. See MEDIA_KINDS in src/lib/figure.ts. */
+  kind: MediaKind;
+  /** Optional caption. Stays at the reading measure however wide the figure runs. */
+  caption?: string;
+  /** Break out past the reading measure, using the existing primitive. */
+  breakout?: boolean;
 }
 
-const { src, alt } = Astro.props;
+const { src, alt, kind, caption, breakout = false } = Astro.props;
+
+// A broken-out figure is asking to be seen at size, so it takes the wider
+// candidate set and the wider `sizes`. The constrained case keeps exactly the
+// candidates and `sizes` it had before this ticket — its readers must see no
+// change.
+const widths = breakout ? [560, 960, 1440] : [320, 560, 720];
+const sizes = breakout ? 'min(60rem, calc(100vw - 2rem))' : 'min(34rem, calc(100vw - 2.5rem))';
 ---
 
-<figure class="article-image" data-image-layout="constrained-single">
-  <Image src={src} alt={alt} widths={[320, 560, 720]} sizes="min(34rem, calc(100vw - 2.5rem))" />
+<figure class={figureClass('article-image', { breakout })} data-media={kind}>
+  <div class="media__body">
+    <Image src={src} alt={alt} widths={widths} sizes={sizes} />
+  </div>
+  {caption && <figcaption class="media__caption">{caption}</figcaption>}
 </figure>
 
 <style>
+  /* Sizing and vertical rhythm stay with the component; the SHAPE and the
+     per-kind framing are the contract's (src/styles/media.css). #118 is where
+     the migrated components agree on one answer for spacing — until then,
+     changing it here would move a published Post for no reason. */
   .article-image {
-    max-width: min(34rem, 100%);
     margin: 2rem auto;
   }
 
-  .article-image :global(img) {
+  .article-image .media__body {
+    max-width: min(34rem, 100%);
+    margin-inline: auto;
+  }
+
+  .article-image .media__body :global(img) {
     display: block;
     width: 100%;
     max-height: min(32rem, 72vh);
     height: auto;
     object-fit: cover;
-    border-radius: 8px;
+  }
+
+  /* Broken out, the constraints that make a small figure tidy become wrong:
+     a 34rem cap would defeat the breakout, and cropping to 32rem tall is a
+     thumbnail gesture applied to something asking to be looked at. */
+  .article-image.breakout .media__body {
+    max-width: none;
+  }
+
+  .article-image.breakout .media__body :global(img) {
+    max-height: none;
+    object-fit: contain;
   }
 </style>

@@ -625,3 +625,21 @@ how the project actually grew.
   They ask `src/lib/stylesheets.ts` for every source now. Two of them were also
   anchored on a two-space indent, which a `.css` file at column zero does not
   have — brace-matching instead.
+
+## A component prop can be required, and that is the point (2026-08-07, issue #117)
+
+- **`kind` on `ArticleImage` has no default.** Astro's `Props` interface is a
+  real TypeScript contract, so `astro check` fails a call site that omits it.
+  A default would have been a decision nobody made: the kind says what the
+  thing IS, and only the author knows whether a picture is a photograph or a
+  screenshot. `astro check` runs in `npm run verify`, so this is enforced.
+  Docs: https://docs.astro.build/en/guides/typescript/#component-props
+- **A `class` computed in frontmatter still gets Astro's scope attribute.**
+  `figureClass()` returns a plain string and the compiler adds
+  `data-astro-cid-…` to the element regardless, so shared class-list logic can
+  live in `src/lib/` and be unit-tested without giving up scoping.
+- **Splitting a selector list on every comma is wrong.** `:is(img, picture)` is
+  one selector; the naive split hands you `:is(img` and `picture)`. Any tool
+  that reads CSS as text — including the guards in `src/lib/stylesheets.ts` —
+  has to track paren depth, or it reports violations that do not exist and
+  misses ones that do.

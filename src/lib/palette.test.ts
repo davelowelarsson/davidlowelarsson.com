@@ -212,6 +212,7 @@ const NON_COLOUR_TOKENS = [
   'font-prose',
   'font-mono',
   'measure',
+  'gutter',
   'step-0',
   'leading',
   'space-section',

@@ -1,0 +1,74 @@
+/*
+ * The figure contract.
+ *
+ * One framing vocabulary for every piece of media in a Post, expressed as the
+ * three axes named in src/lib/figure.ts:
+ *
+ *   Layout    `.breakout`      how wide      — unchanged, 60rem, ADR 0006
+ *   Kind      `[data-media]`   what it is    — the rules below
+ *   Placement the side attr    where it sits — untouched by this ticket
+ *
+ * Global rather than scoped, and its own file rather than part of global.css,
+ * for the same reason the contract exists at all: several components emit a
+ * figure, no one of them owns the vocabulary, and the claim this has to earn is
+ * that **adding a seventh kind is one selector**. That is only legible if the
+ * selectors sit together. src/lib/figure.test.ts checks that every kind styled
+ * here is a kind the contract defines, and that the tracer-bullet kind is
+ * reached as `[data-media='<kind>']` rather than through something more exotic.
+ *
+ * #117 proves the shape end to end on ONE kind — `photo`, via ArticleImage.
+ * #118 migrates the rest and adds `embed`. A kind with no rule here simply has
+ * no framing yet; it is not an error.
+ */
+
+/* ── The shape, shared by every kind ── */
+
+.media {
+  /* Vertical rhythm stays with each component until #118 has migrated them all
+     and there is one answer to agree on. This layer owns the SHAPE. */
+  margin-inline: auto;
+}
+
+.media__body {
+  margin: 0;
+}
+
+/* A caption never inherits a broken-out width.
+   A figure may run to 60rem; a line of small grey text at 60rem is unreadable,
+   and the caption is text. So the caption is capped at the reading measure and
+   re-centred inside whatever width the figure took — which is why this is a
+   property of the contract rather than of any one component. */
+.media__caption {
+  max-width: min(calc(var(--measure) - var(--gutter) * 2), 100%);
+  margin: 0.75rem auto 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--muted);
+  text-align: center;
+  text-wrap: pretty;
+}
+
+/* ── photo ──
+   Framed, not restyled: the page must not distort what it is showing, so the
+   treatment is a corner radius and nothing that touches colour balance in
+   light. On a dark ground a bright raster glares against near-black, so it is
+   dimmed slightly — enough to sit in the page, not enough to look faded.
+
+   THE TRAP, as everywhere: `prefers-color-scheme` asks the OPERATING SYSTEM
+   and cannot see a theme the reader forced here, so the query is narrowed to
+   "OS dark AND not forced light" and a forced-dark companion sits outside it.
+   src/lib/theme.test.ts asserts both halves are present, in this file. */
+
+[data-media="photo"] .media__body :is(img, picture) {
+  border-radius: 8px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) [data-media="photo"] .media__body :is(img, picture) {
+    filter: brightness(0.92);
+  }
+}
+
+:root[data-theme="dark"] [data-media="photo"] .media__body :is(img, picture) {
+  filter: brightness(0.92);
+}

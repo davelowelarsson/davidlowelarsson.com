@@ -52,6 +52,17 @@ describe('selectorsIn', () => {
     expect(selectorsIn(css)).toEqual(['.a', '.b']);
   });
 
+  it('does not split inside a functional pseudo-class', () => {
+    // `:is(img, picture)` is ONE selector. Splitting on its comma yields
+    // `:is(img` and `picture)`, neither of which matches what any guard looks
+    // for — so a real rule reads as a violation and a real violation could read
+    // as noise.
+    expect(selectorsIn(`.a :is(img, picture), .b :where(ul, ol) { color: red }`)).toEqual([
+      '.a :is(img, picture)',
+      '.b :where(ul, ol)',
+    ]);
+  });
+
   it('ignores selectors that only appear inside a comment', () => {
     expect(selectorsIn('/* .ghost { color: red } */ .real { margin: 0 }')).toEqual(['.real']);
   });
