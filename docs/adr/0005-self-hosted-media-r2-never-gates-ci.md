@@ -3,6 +3,12 @@
 Date: 2026-07-08
 Status: accepted
 
+> **Note (#115, 2026-08-07).** The decision stands unchanged; only the cast has
+> shrunk. `<Audio>` was deleted at zero usages, so every `<Audio>` below reads as
+> historical — the reconciler now scans `<Video>` alone, and
+> `src/lib/media-manifest.test.ts` pins that it ignores an `<Audio src="…">`.
+> `<Video>` has since become the `embed` kind of the figure contract (ADR 0013).
+
 ## Context
 
 Issue #10 asked for video/audio embeds from the owner's own infrastructure
