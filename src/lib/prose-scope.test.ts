@@ -24,9 +24,25 @@ function selectors(): string[] {
     .filter((selector) => selector.length > 0 && !selector.startsWith('@'));
 }
 
+/**
+ * A list rule that nothing scopes.
+ *
+ * The first version of this only matched selectors STARTING with a list
+ * element, so `main ul`, `body li` and `:where(ul)` all walked straight past
+ * it — the rule reaches every list on the site either way. What actually
+ * matters is whether anything narrows it: a class or id narrows it, and so
+ * does an `article` ancestor. A selector built purely from element names does
+ * not.
+ */
+function isUnscopedListRule(selector: string): boolean {
+  if (!/\b(?:ul|ol|li)\b/.test(selector)) return false;
+  if (/[.#]/.test(selector)) return false;
+  return !/\barticle\b/.test(selector);
+}
+
 describe('prose styling stays inside the article', () => {
   it('scopes every list-element rule', () => {
-    const bare = selectors().filter((selector) => /^(ul|ol|li)\b/.test(selector));
+    const bare = selectors().filter(isUnscopedListRule);
     expect(bare, 'a list rule reaches outside the article').toEqual([]);
   });
 

@@ -4,13 +4,13 @@ import { describe, expect, it } from 'vitest';
 import {
   AA_FLOOR,
   AAA_FLOOR,
-  BELOW_FLOOR,
   CONTRAST_FLOOR,
   type ColorPair,
   contrastRatio,
   HIGH_CONTRAST,
   NON_TEXT_FLOOR,
   PALETTE,
+  parseHex,
   relativeLuminance,
   SCHEMES,
   TEXT_TOKENS,
@@ -50,6 +50,24 @@ describe('contrastRatio', () => {
     expect(contrastRatio('#767676', '#ffffff')).toBeCloseTo(4.54, 2);
   });
 
+  // EVERY other reference here is greyscale or a self-comparison, which means
+  // they pin the shape of the formula but not its channel weights: swapping
+  // WCAG's 0.2126/0.7152/0.0722 for 0.2/0.7/0.1 leaves them all green. These
+  // three separate the channels — one primary at a time against white, so each
+  // ratio depends on exactly one weight.
+  it('weights the channels the way WCAG does', () => {
+    expect(contrastRatio('#ff0000', '#ffffff'), 'red weight').toBeCloseTo(3.998, 2);
+    expect(contrastRatio('#00ff00', '#ffffff'), 'green weight').toBeCloseTo(1.372, 2);
+    expect(contrastRatio('#0000ff', '#ffffff'), 'blue weight').toBeCloseTo(8.592, 2);
+  });
+
+  // Below 0.04045 sRGB is linear, above it is a 2.4 gamma curve. A colour on
+  // the linear side pins the threshold; without this the constant could drift
+  // and only very dark values would be wrong.
+  it('uses the linear segment below the sRGB threshold', () => {
+    expect(relativeLuminance('#0a0a0a')).toBeCloseTo(10 / 255 / 12.92, 6);
+  });
+
   it('does not care which colour is the ground', () => {
     expect(contrastRatio('#1b1b1f', '#ffffff')).toBeCloseTo(
       contrastRatio('#ffffff', '#1b1b1f'),
@@ -82,10 +100,11 @@ describe('the palette as data', () => {
     expect(shortOf(AA_FLOOR)).toEqual([]);
   });
 
-  // The project floor is 5.5:1. BELOW_FLOOR is the countdown of tokens still
-  // short of it — asserted as an exact set, so it can only ever shrink.
-  it(`falls short of ${CONTRAST_FLOOR}:1 exactly where BELOW_FLOOR says`, () => {
-    expect(shortOf(CONTRAST_FLOOR)).toEqual([...BELOW_FLOOR].sort());
+  // The project floor, deliberately above AA. No exceptions and no countdown:
+  // the last one (`tint-til`, 5.28:1 on its locked value) was resolved in #113,
+  // so this is now an unconditional guarantee and the style is frozen with it.
+  it(`clears the ${CONTRAST_FLOOR}:1 project floor for every text token`, () => {
+    expect(shortOf(CONTRAST_FLOOR)).toEqual([]);
   });
 
   it(`holds body ink to WCAG AAA (${AAA_FLOOR}:1) on both grounds`, () => {
@@ -111,13 +130,24 @@ describe('the palette as data', () => {
     }
   });
 
+  // Compare what a reader SEES, not the alpha channel. A hairline set to the
+  // background's own colour at 100% opacity has more alpha and less contrast —
+  // it would pass an alpha comparison while rendering an invisible divider.
   it('firms the hairlines rather than merely recolouring them', () => {
-    const alpha = (value: string) => Number.parseFloat(/\/\s*([\d.]+)%/.exec(value)?.[1] ?? '0');
+    const composite = (value: string, scheme: (typeof SCHEMES)[number]) => {
+      const p = /^rgb\((\d+)\s+(\d+)\s+(\d+)\s*\/\s*([\d.]+)%\)$/.exec(value);
+      if (!p) throw new Error(value);
+      const a = Number(p[4]) / 100;
+      const base = parseHex(PALETTE.bg[scheme]);
+      const ch = [1, 2, 3].map((i) => Math.round(a * Number(p[i]) + (1 - a) * base[i - 1]));
+      return `#${ch.map((v) => v.toString(16).padStart(2, '0')).join('')}`;
+    };
+
     for (const scheme of SCHEMES) {
-      expect(
-        alpha(HIGH_CONTRAST.hairline[scheme]),
-        `hairline (${scheme}) is no firmer`,
-      ).toBeGreaterThan(alpha(PALETTE.hairline[scheme]));
+      const ground = PALETTE.bg[scheme];
+      const base = contrastRatio(composite(PALETTE.hairline[scheme], scheme), ground);
+      const firm = contrastRatio(composite(HIGH_CONTRAST.hairline[scheme], scheme), ground);
+      expect(firm, `hairline (${scheme}) is no more visible`).toBeGreaterThan(base);
     }
   });
 
@@ -180,9 +210,38 @@ function declaredTokens(root: string): Record<string, ColorPair> {
   return tokens;
 }
 
+/** The custom properties in `:root` that are deliberately not colours. */
+const NON_COLOUR_TOKENS = [
+  'font-prose',
+  'font-mono',
+  'measure',
+  'step-0',
+  'leading',
+  'space-section',
+  'space-figure',
+  'divider-reach',
+  'divider-gap',
+];
+
+/** Every rule whose selector starts with `:root`, wherever it appears. */
+function withoutRootRules(css: string): string {
+  return css.replace(/:root[^{]*\{[^{}]*\}/g, '');
+}
+
 describe('the stylesheet mirrors the palette', () => {
   it('declares exactly the tokens PALETTE defines, with the same values', () => {
     expect(declaredTokens(rootBlock(globalStyleBlock()))).toEqual(PALETTE);
+  });
+
+  // The mirror above only inspects `light-dark()` declarations, so a token
+  // written any other way — `--rogue: #f00` — used to sail through it AND
+  // through the literal scan, which exempts all of :root. Invert the question:
+  // every custom property in :root is either a known non-colour or a PALETTE
+  // key. There is no third category.
+  it('declares no custom property in :root that PALETTE does not know about', () => {
+    const names = [...rootBlock(globalStyleBlock()).matchAll(/--([\w-]+)\s*:/g)].map((m) => m[1]);
+    const unknown = names.filter((name) => !NON_COLOUR_TOKENS.includes(name) && !(name in PALETTE));
+    expect(unknown, 'a token in :root is defined outside src/lib/palette.ts').toEqual([]);
   });
 
   // `--focus` became `--accent` in #108: the design reserves ONE colour for
@@ -210,18 +269,25 @@ describe('the stylesheet mirrors the palette', () => {
   });
 
   it('writes no colour outside :root', () => {
-    const css = globalStyleBlock();
-    // The high-contrast block is a second, deliberate home for two tokens —
-    // and the test above proves it mirrors HIGH_CONTRAST exactly.
-    const outside = css
-      .replace(/@media\s*\(prefers-contrast:\s*more\)\s*\{[\s\S]*?\n {2}\}/, '')
-      .replace(rootBlock(css), '');
+    // Strip every :root rule WHEREVER it appears — including the one nested in
+    // the prefers-contrast query. Previously the whole media block was exempted,
+    // which also excused any ordinary rule inside it: a
+    // `@media (prefers-contrast: more) { .post-description { color: #fff } }`
+    // passed both tests while making secondary text nearly invisible.
+    const outside = withoutRootRules(globalStyleBlock());
+
+    // Every colour syntax CSS has, not just the three this project happens to
+    // use. `oklch()`, `hsl()`, a named colour or an uppercase `RGB()` are all
+    // ways to define a colour somewhere other than the palette.
     const literals = [
-      ...(outside.match(/#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{4}|[0-9a-fA-F]{3})\b/g) ??
-        []),
-      ...(outside.match(/\blight-dark\(/g) ?? []),
-      ...(outside.match(/\brgba?\(/g) ?? []),
+      ...(outside.match(/#(?:[0-9a-f]{8}|[0-9a-f]{6}|[0-9a-f]{4}|[0-9a-f]{3})\b/gi) ?? []),
+      ...(outside.match(
+        /\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color|color-mix|light-dark)\(/gi,
+      ) ?? []),
+      ...(outside.match(
+        /:\s*(?:red|blue|green|white|black|gray|grey|yellow|orange|purple|pink|brown|cyan|magenta|silver|gold|teal|navy|olive|maroon|lime|aqua|fuchsia)\b/gi,
+      ) ?? []),
     ];
-    expect(literals).toEqual([]);
+    expect(literals, 'a colour is defined outside the palette').toEqual([]);
   });
 });

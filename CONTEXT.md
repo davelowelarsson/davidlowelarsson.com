@@ -43,8 +43,8 @@ An optional 3–5 bullet summary near the start of a Post. Author it as ordinary
 Markdown: `## TL;DR` immediately followed by a list. That single shape works in
 both `.md` and `.mdx`, and the Core Site styles the rendered `#tldr` heading and
 adjacent list as one summary band. It is not a blockquote — David is summarizing
-his own Post, not quoting another source. The current style is a baseline for the
-iterative design work in issue #11, not a frozen visual decision.
+his own Post, not quoting another source. Its styling is part of the frozen
+non-media style (see Frozen Style below).
 
 ## Scheduled Post
 
@@ -89,3 +89,26 @@ professional narrative and the writing. Experiments do not live here.
 
 saltast.com (separate, future). The landing zone for home-lab experiments and
 interactive playgrounds. Absorbs all risk so the Core Site stays boring.
+
+## Frozen Style
+
+The non-media visual design settled by issue #11: the palette, the contrast
+floor, the rhythm, the masthead, the theme control, the Post header and the
+section dividers. Frozen means future issues do not adjust it in passing — a
+change to any of it is its own decision, with its own reason.
+
+What is frozen, and where it is decided:
+
+- **Colour** — `src/lib/palette.ts` is the only place a colour is defined; the
+  stylesheet mirrors it and a test enforces both directions. Two rules govern
+  what colours *mean*: ADR 0009.
+- **The contrast floor** — 5.5:1 for text, deliberately above WCAG AA's 4.5:1
+  so a token cannot drift into "technically passing". WCAG AA is a second floor
+  with no exceptions at all.
+- **Theme** — three states, auto being the absence of `data-theme`: ADR 0010.
+- **Rhythm** — measure, type size, leading and section/figure spacing, as
+  tokens in `Base.astro`'s `:root`.
+
+**This freeze covers the non-media slice only.** The media system — the figure
+contract, the `data-media` vocabulary, Mermaid theming and the media component
+migration — is a separate effort and is not frozen by it.

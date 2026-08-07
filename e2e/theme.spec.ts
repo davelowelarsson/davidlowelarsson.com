@@ -74,6 +74,7 @@ test('no-flash contract: the theme script is inline, classic, and pre-stylesheet
 
     const stylesheet = document.head.querySelector('link[rel="stylesheet"], style');
     return {
+      body: themeScript.textContent ?? '',
       hasSrc: themeScript.hasAttribute('src'),
       type: themeScript.getAttribute('type') ?? '',
       isDeferred: themeScript.hasAttribute('defer') || themeScript.hasAttribute('async'),
@@ -86,6 +87,12 @@ test('no-flash contract: the theme script is inline, classic, and pre-stylesheet
   }, THEME_ATTRIBUTE);
 
   expect(shape, 'no inline theme script found in <head>').not.toBeNull();
+  // Being inline and in <head> is not the same as running before paint: a body
+  // wrapped in DOMContentLoaded / setTimeout / requestAnimationFrame satisfies
+  // every positional assertion here and still paints the wrong ground first.
+  expect(shape?.body, 'the theme is applied after paint, not during parse').not.toMatch(
+    /DOMContentLoaded|setTimeout|requestAnimationFrame|addEventListener\s*\(\s*['"]load/,
+  );
   expect(shape?.hasSrc, 'became an external/bundled file').toBe(false);
   expect(shape?.type, 'became a module (deferred, so post-paint)').not.toBe('module');
   expect(shape?.isDeferred, 'defer/async makes it post-paint').toBe(false);

@@ -25,12 +25,12 @@ export const PALETTE = {
   // read as chosen rather than as leftover #888.
   bg: { light: '#fafbfa', dark: '#111310' },
   ink: { light: '#1e211d', dark: '#e6eae3' },
-  muted: { light: '#5f665d', dark: '#a3aa9f' },
+  muted: { light: '#5a6158', dark: '#a3aa9f' },
   hairline: { light: 'rgb(30 33 29 / 13%)', dark: 'rgb(230 234 227 / 14%)' },
   chip: { light: 'rgb(30 33 29 / 5%)', dark: 'rgb(230 234 227 / 7%)' },
   // The accent means STATE — link, focus, current, scheduled. Nothing else.
-  accent: { light: '#0f6b74', dark: '#6fcdd9' },
-  warn: { light: '#8a5800', dark: '#eebd5c' },
+  accent: { light: '#0e646c', dark: '#6fcdd9' },
+  warn: { light: '#835300', dark: '#eebd5c' },
   // Retuned to sit with the green-biased ground. The locked design has no
   // equivalent for these two; the light values are what changed, because the
   // old `#15803d` measured 4.84:1 against the new ground.
@@ -38,7 +38,13 @@ export const PALETTE = {
   'status-down': { light: '#b01818', dark: '#f87171' },
   // Category tints. These only ever colour the Category WORD — see ADR 0009.
   'tint-essay': { light: '#4338ca', dark: '#b4bdfc' },
-  'tint-til': { light: '#0f766e', dark: '#5eead4' },
+  // Darkened from the locked #0f766e, which measured 5.28:1 — below this
+  // project's own 5.5 floor. The prototype's §1b note recorded the tint range
+  // as "5.3–7.6" while setting the floor at 5.5, so the locked design
+  // contradicted itself; #94 carries the finding. 5.97:1 puts til in line with
+  // every other tint rather than leaving one scraping the floor, and the hue
+  // barely moves (ΔE 0.4 from the locked value).
+  'tint-til': { light: '#0c665e', dark: '#5eead4' },
   'tint-experiment': { light: '#155e75', dark: '#7dd3fc' },
   'tint-project': { light: '#a21caf', dark: '#f0abfc' },
 } as const satisfies Record<string, ColorPair>;
@@ -55,18 +61,36 @@ export interface TextToken {
 // because `.badge-scheduled` and link hover paint text with it, not only
 // because it draws the focus ring — the ring's own (non-text, 3:1) threshold
 // is a separate, lower guarantee.
-export const TEXT_TOKENS = [
-  { token: 'ink', ground: 'bg' },
-  { token: 'muted', ground: 'bg' },
-  { token: 'warn', ground: 'bg' },
-  { token: 'accent', ground: 'bg' },
-  { token: 'status-up', ground: 'bg' },
-  { token: 'status-down', ground: 'bg' },
-  { token: 'tint-essay', ground: 'bg' },
-  { token: 'tint-til', ground: 'bg' },
-  { token: 'tint-experiment', ground: 'bg' },
-  { token: 'tint-project', ground: 'bg' },
-] as const satisfies readonly TextToken[];
+const TEXT_COLOURS = [
+  'ink',
+  'muted',
+  'warn',
+  'accent',
+  'status-up',
+  'status-down',
+  'tint-essay',
+  'tint-til',
+  'tint-experiment',
+  'tint-project',
+] as const satisfies readonly TokenName[];
+
+/**
+ * Every ground text is actually painted on — NOT just the page.
+ *
+ * `--chip` is the second one and it was missed: it backs a hovered post row,
+ * inline code and the TL;DR band, all of which carry text. Because it darkens
+ * the light page it costs about 0.55 of contrast, which was enough to put four
+ * tokens under the floor on hover while every test still passed.
+ *
+ * Adding a ground here is cheap; forgetting one is how a frozen guarantee
+ * becomes false. If a new surface ever sits under text, it belongs in this
+ * list on the same commit.
+ */
+const GROUNDS = ['bg', 'chip'] as const satisfies readonly TokenName[];
+
+export const TEXT_TOKENS: readonly TextToken[] = TEXT_COLOURS.flatMap((token) =>
+  GROUNDS.map((ground) => ({ token, ground })),
+);
 
 /**
  * The floor this project holds itself to, deliberately above WCAG AA's 4.5:1
@@ -82,26 +106,6 @@ export const NON_TEXT_FLOOR = 3;
 
 /** WCAG AAA for body text — the standard `--ink` is held to. */
 export const AAA_FLOOR = 7;
-
-/**
- * Text tokens that do not yet clear CONTRAST_FLOOR. This is a countdown, not a
- * set of exemptions — everything here still clears AA_FLOOR, which has no
- * exceptions at all.
- *
- * The test asserts this list is EXACTLY the set that falls short — a token
- * cannot quietly join it, and a token that gets fixed cannot quietly stay on
- * it.
- *
- * One entry left, and it is a contradiction inside the locked design rather
- * than an unfinished job: the locked `--tint-til` is `#0f766e`, which measures
- * 5.28:1 against the locked ground — the prototype's own §1b note records the
- * tint range as "5.3–7.6" while setting the floor at 5.5. Changing the hex
- * would be reopening a locked decision, so it is reported on #94 instead.
- * `#0e7168` is the smallest same-hue darkening that clears the floor (5.65:1).
- */
-export const BELOW_FLOOR = [
-  'tint-til:light',
-] as const satisfies readonly `${TokenName}:${Scheme}`[];
 
 /**
  * Overrides for a reader who has asked their OS for more contrast.
@@ -155,7 +159,30 @@ export function contrastRatio(a: string, b: string): number {
   return (lighter + 0.05) / (darker + 0.05);
 }
 
-/** The contrast between two tokens in one scheme. */
+/**
+ * The opaque colour a reader actually sees where `token` is used as a ground.
+ *
+ * `--chip` is translucent, so the ratio that matters is against what it
+ * composites to over the page, not against the layer itself. Missing this is
+ * how a hovered post row shipped four tokens below the floor while every test
+ * passed: the tests only ever modelled `--bg`.
+ */
+export function resolveGround(token: TokenName, scheme: Scheme): string {
+  const value = PALETTE[token][scheme];
+  if (value.startsWith('#')) return value;
+
+  const parts = /^rgb\((\d+)\s+(\d+)\s+(\d+)\s*\/\s*([\d.]+)%\)$/.exec(value);
+  if (!parts) throw new Error(`cannot resolve ${token} as a ground: ${value}`);
+
+  const alpha = Number(parts[4]) / 100;
+  const base = parseHex(PALETTE.bg[scheme]);
+  const channels = [1, 2, 3].map((i) =>
+    Math.round(alpha * Number(parts[i]) + (1 - alpha) * base[i - 1]),
+  );
+  return `#${channels.map((v) => v.toString(16).padStart(2, '0')).join('')}`;
+}
+
+/** The contrast between a token and a ground, in one scheme. */
 export function tokenContrast(token: TokenName, ground: TokenName, scheme: Scheme): number {
-  return contrastRatio(PALETTE[token][scheme], PALETTE[ground][scheme]);
+  return contrastRatio(PALETTE[token][scheme], resolveGround(ground, scheme));
 }

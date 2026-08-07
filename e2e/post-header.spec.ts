@@ -20,6 +20,27 @@ test('the header reads eyebrow, then title, then date', async ({ page }) => {
 
   expect(eyebrowBox?.y, 'eyebrow is not above the title').toBeLessThan(titleBox?.y ?? 0);
   expect(metaBox?.y, 'date is not below the title').toBeGreaterThan(titleBox?.y ?? 0);
+
+  // Geometry alone is not reading order. CSS `order` or `flex-direction:
+  // column-reverse` can put the boxes in the right places while a screen
+  // reader gets Category, title and date in whatever sequence the DOM has —
+  // so assert the DOM sequence too.
+  const domOrder = await page
+    .locator('.post-header')
+    .evaluate((header) =>
+      [...header.children].map((child) =>
+        child.classList.contains('eyebrow')
+          ? 'eyebrow'
+          : child.classList.contains('post-meta')
+            ? 'meta'
+            : child.tagName.toLowerCase(),
+      ),
+    );
+  expect(domOrder, 'the header reads in the wrong order to assistive tech').toEqual([
+    'eyebrow',
+    'h1',
+    'meta',
+  ]);
 });
 
 test('the Category eyebrow carries the word, tinted, and links to its Category', async ({
