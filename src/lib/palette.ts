@@ -22,11 +22,11 @@ export interface ColorPair {
 
 export const PALETTE = {
   ink: { light: '#1b1b1f', dark: '#e6e6e9' },
-  muted: { light: '#6f6f78', dark: '#9c9ca6' },
+  muted: { light: '#5f665d', dark: '#9c9ca6' },
   hairline: { light: 'rgb(0 0 0 / 12%)', dark: 'rgb(255 255 255 / 16%)' },
   chip: { light: 'rgb(0 0 0 / 5%)', dark: 'rgb(255 255 255 / 9%)' },
   bg: { light: '#ffffff', dark: '#111113' },
-  warn: { light: '#a16207', dark: '#fbbf24' },
+  warn: { light: '#8a5800', dark: '#fbbf24' },
   focus: { light: '#2563eb', dark: '#93b4ff' },
   'status-up': { light: '#15803d', dark: '#4ade80' },
   'status-down': { light: '#b91c1c', dark: '#f87171' },
@@ -61,8 +61,36 @@ export const TEXT_TOKENS = [
   { token: 'tint-project', ground: 'bg' },
 ] as const satisfies readonly TextToken[];
 
-/** The ratio every text token must clear. Raised to 5.5:1 by #107. */
-export const CONTRAST_FLOOR = 4.5;
+/**
+ * The floor this project holds itself to, deliberately above WCAG AA's 4.5:1
+ * so a token cannot drift into "technically passing" without breaking a build.
+ */
+export const CONTRAST_FLOOR = 5.5;
+
+/** WCAG AA for body text. Nothing is ever excused from this one. */
+export const AA_FLOOR = 4.5;
+
+/** Non-text UI (the focus ring) has its own, lower WCAG threshold. */
+export const NON_TEXT_FLOOR = 3;
+
+/** WCAG AAA for body text — the standard `--ink` is held to. */
+export const AAA_FLOOR = 7;
+
+/**
+ * Text tokens that do not yet clear CONTRAST_FLOOR. This is a countdown, not a
+ * set of exemptions: #108 gives each of these its locked value and empties the
+ * list. Everything here still clears AA_FLOOR, which has no exceptions.
+ *
+ * The test asserts this list is EXACTLY the set that falls short — a token
+ * cannot quietly join it, and a token that gets fixed cannot quietly stay on
+ * it. Deleting the last entry is how #108 knows it is finished.
+ */
+export const BELOW_FLOOR = [
+  'focus:light',
+  'status-up:light',
+  'tint-til:light',
+  'tint-experiment:light',
+] as const satisfies readonly `${TokenName}:${Scheme}`[];
 
 /** The three sRGB channels of an opaque hex colour, 0–255. */
 export function parseHex(hex: string): [number, number, number] {
