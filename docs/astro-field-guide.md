@@ -547,3 +547,18 @@ how the project actually grew.
 - **Two scripts, deliberately.** The pre-paint one must be in `<head>`; the one
   that syncs `aria-pressed` and wires clicks must be next to the control in
   `<body>`. Splitting them is what keeps the first one where it has to be.
+
+## Marking the current page from the layout (2026-08-07, issue #109)
+
+- **`Astro.url.pathname` is available in any component's frontmatter**, not
+  just a page's — so a layout can decide `aria-current` without every page
+  passing its own path down as a prop.
+  Docs: https://docs.astro.build/en/reference/api-reference/#url
+- **An attribute set to `null` or `undefined` is omitted entirely.** So
+  `aria-current={isCurrent ? 'page' : null}` renders either
+  `aria-current="page"` or no attribute at all — no `aria-current="false"`,
+  which screen readers would announce as a state rather than as nothing.
+- **Exact match, not prefix.** `/` is a prefix of every path, so prefix
+  matching lights `home` up everywhere; and `aria-current="page"` on a section
+  a reader is merely inside is a lie. `src/lib/nav.ts` keeps that decision
+  pure and unit-tested, away from the template.
