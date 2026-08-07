@@ -751,3 +751,30 @@ how the project actually grew.
   button in that window did nothing. Gating on `querySelector('svg')` fixes it,
   and the MutationObserver fires again when the SVG lands. It showed up as a
   test that passed alone and failed in a full run.
+
+## A fixture can be the authoring reference, if the two cannot drift (2026-08-07, issue #124)
+
+- **A fenced block cannot contain a fenced block**, so a `mermaid` example
+  cannot be shown as a snippet inside a `md` fence without switching to
+  four-backtick fences. Said in the fixture rather than worked around: the
+  limitation is itself worth an author knowing.
+- **MDX tells a component from an HTML element by case alone**, which is what
+  makes `componentUsages()` need no list of component names — `<Video` is a
+  component, `<img` is not. It also means the guard must blank fenced blocks
+  first, or every snippet counts as a second usage of the component it documents.
+  Docs: https://docs.astro.build/en/guides/integrations-guide/mdx/
+- **A post's identity comes from its FOLDER**, not its filename
+  (`postIdFromEntry`). So `index.md` and `index.mdx` in one bundle are two
+  entries claiming one id — which is why the `.mdx` template is its own
+  directory, since the documented flow is `cp -r` and would have copied both.
+- **`git checkout -- <file>` is the wrong way to undo a planted regression** in
+  a file that also carries uncommitted work: it reverts to HEAD, not to the
+  pre-mutation state, and silently discarded an entire pass of edits here. Back
+  the file up by content and write it back.
+- **A long inline-code token is an unbreakable word, and the 320px guard is what
+  finds it.** `` `src/content/posts/<year>/<slug>/` `` measured 302px inside a
+  280px prose column and pushed the whole document 2px wide — five specs failed,
+  on five different pages, none of them about the fixture. Nothing *visibly*
+  overflowed: `getBoundingClientRect()` showed no element past the viewport,
+  because the leak only shows as `scrollWidth - clientWidth` on the ancestors.
+  Probe for that, not for right edges.

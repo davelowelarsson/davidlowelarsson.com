@@ -11,7 +11,8 @@ Superseded in part by: [ADR 0012 — The legibility floor](0012-the-legibility-f
 > also closes #75). §4's deferral of selective image breakout
 > is discharged — with a refusal, not a mechanism — as is §4's compare-mode
 > deferral (#123, prototyped and answered without shipping the feature). Each
-> section below is marked.
+> section below is marked. §2's `.breakout` is now the **layout axis** of the
+> figure contract: [ADR 0013](0013-the-figure-contract.md).
 
 ## Context
 

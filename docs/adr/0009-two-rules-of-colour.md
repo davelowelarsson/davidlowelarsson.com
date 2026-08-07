@@ -61,17 +61,34 @@ with the accent is a thing the reader can act on or is currently on.
 
 ## Notes
 
-Two measurements sit behind the palette and are worth keeping next to the rules:
+Two measurements sit behind the palette and are worth keeping next to the rules.
+**Both notes below were written before the media tickets landed and both were
+stale; corrected here by #124 (ADR 0013) rather than left reading as debt.**
 
-- `--tint-til` at its locked `#0f766e` measures **5.28:1** against the locked
-  light ground — short of this project's 5.5:1 floor, though comfortably clear
-  of WCAG AA. The locked design's own contrast note records the tint range as
-  "5.3–7.6" while setting the floor at 5.5, so the design contradicts itself by
-  0.22. Rather than change a locked hex mid-implementation, the token is
-  carried on `BELOW_FLOOR` in `src/lib/palette.ts` and reported on #94.
-- `--plate` (`#eef0ed` light) is part of the locked palette but is **not
-  adopted here**, because it has no consumer yet that would not break the
-  floor: `muted`, `accent` and `warn` measure 5.17, 5.43 and 5.27 against the
-  plate. The prototype only ever puts a plate behind a screenshot, which
-  carries no text. It arrives with the media tickets (#117/#118), for
-  text-free surfaces.
+- `--tint-til` at the locked design's `#0f766e` measured **5.28:1** against the
+  locked light ground — short of this project's 5.5:1 floor, though comfortably
+  clear of WCAG AA. The locked design's own contrast note records the tint range
+  as "5.3–7.6" while setting the floor at 5.5, so the design contradicts itself
+  by 0.22; #94 carries that finding.
+
+  **That value never shipped.** The token was darkened to `#0c665e` before
+  adoption (ΔE 0.4 from the locked hue) and measures **6.58:1** on the light
+  ground and **5.97:1** on `--chip`. There is no `BELOW_FLOOR` list in
+  `src/lib/palette.ts` — an earlier version of this note pointed at one, and it
+  does not exist. **Every text token clears 5.5:1 on both grounds in both
+  schemes.** The tightest margin in the system is `tint-project` on `--chip` at
+  **5.53**, 0.03 above the floor — worth knowing before anyone nudges a tint or
+  a surface.
+
+- `--plate` (`#eef0ed` light) is part of the locked palette and is **not
+  adopted, here or later**. It was deferred for want of a consumer that would
+  not break the floor: `muted`, `accent` and `warn` measure 5.17, 5.43 and 5.27
+  against the plate, and the prototype only ever puts a plate behind a
+  screenshot, which carries no text.
+
+  **That consumer arrived and did not need the token.** The `screenshot` kind
+  (#124) plates with `--chip`, which over the light ground resolves to
+  `#eff0ef` against the locked plate's `#eef0ed` — the same colour to within
+  (1, 0, 2) of 255. The locked plate was already in the palette under another
+  name, and unlike `--plate` it has a dark value and is already validated as a
+  ground. No token is owed.

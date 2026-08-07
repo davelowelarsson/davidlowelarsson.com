@@ -87,6 +87,58 @@ visual itself is being discussed and its license allows reuse; keep its branding
 intact and name the creator, license, and source in a visible caption. Alt text
 describes the image for accessibility — it is never the attribution.
 
+## Figure
+
+Any piece of framed media in a Post. A Figure is described by **three axes**,
+named separately so that adding a Kind never touches layout and moving something
+never changes what it is (ADR 0013):
+
+- **Layout** — *how wide.* The `.breakout` primitive at 60rem (ADR 0006 §2).
+  Breaking the reading measure is a deliberate act, so it is a component gesture:
+  a plain Markdown image does not get one.
+- **Kind** — *what it is.* The `data-media` attribute, one of the six Kinds below.
+- **Placement** — *where it sits.* The `data-placement` attribute. Distinct from
+  Kind on purpose: Kind says what a thing **is**, Placement says where it sits.
+
+## Kind
+
+What a Figure **is** — never how wide it is, and never where it sits. There are
+six, and the list is closed until something earns a seventh: a Kind exists only
+when it answers the framing questions **differently from every existing Kind**.
+
+- **diagram** — a Mermaid diagram, drawn from the design tokens so it follows
+  the reader's theme. Subject to the legibility floor (ADR 0012).
+- **chart** — a drawn data visual, typically a Research Visual. Framed and
+  otherwise left alone: dimming a drawing treats it as a photograph.
+- **screenshot** — a picture of an interface. Never cropped, never dimmed, and
+  given an edge by the page — every answer the opposite of **photo**, which is
+  what makes it a Kind rather than a photograph with a different caption.
+- **photo** — a photograph. Framed, not restyled; dimmed slightly on a dark
+  ground so a bright raster does not glare.
+- **sketch** — an Excalidraw drawing (`*.excalidraw.svg`), inverted on a dark
+  ground. Authored as plain Markdown; it has no component and is not getting one.
+- **embed** — a third-party iframe or a video. Its own Kind because **the page
+  controls the box and never the interior**.
+
+**Compare is not a Kind.** The things being compared are screenshots, or photos,
+or diagrams; comparison is how two of them are *presented*, so it belongs on the
+Layout axis. The feature is #55 and is not built.
+
+## The two-tier contract
+
+The figure contract covers components and plain Markdown images **unequally**,
+and the inequality is deliberate rather than unfinished work (ADR 0013):
+
+- **The component tier** emits the whole Figure — a `<figure class="media">`
+  carrying a Kind, a body, and a caption.
+- **The Markdown tier** gives a plain `![alt](path)` image *equivalent framing
+  through CSS* and nothing more. Those images never become a `<figure>`, never
+  carry a Kind, and never take a caption.
+
+So "one contract for all media" is true for components and **approximately** true
+for Markdown. Say "the component tier" or "the Markdown tier" when the difference
+matters — most of the surprises in this system live exactly on that line.
+
 ## Production
 
 The build of the `main` branch served at davidlowelarsson.com, with drafts
@@ -121,6 +173,21 @@ What is frozen, and where it is decided:
 - **Rhythm** — measure, type size, leading and section/figure spacing, as
   tokens in `Base.astro`'s `:root`.
 
-**This freeze covers the non-media slice only.** The media system — the figure
-contract, the `data-media` vocabulary, Mermaid theming and the media component
-migration — is a separate effort and is not frozen by it.
+**The media system is now frozen too**, on the same terms. #113 froze the
+non-media slice; #124 closes the media effort — the Figure's three axes, the six
+Kinds, the two-tier contract, Mermaid theming and the legibility floor. Together
+they complete #11.
+
+Where the media half is decided:
+
+- **The framing contract** — three axes, six Kinds, the two-tier limit and the
+  two refusals: ADR 0013. The Kinds live as data in `src/lib/figure.ts`; a test
+  enforces that the stylesheet and the list agree in both directions.
+- **Breakout and the lightbox** — ADR 0006, §1 superseded in part by ADR 0012.
+- **The legibility floor** — 9px, ADR 0012.
+- **What the system can render** — the two kitchen-sink Fixtures, which carry a
+  copyable snippet beside every example and are guarded against drifting from
+  it (ADR 0011).
+
+Frozen means the same thing here as everywhere: a change to any of it is its own
+decision, with its own reason — not something a future ticket adjusts in passing.

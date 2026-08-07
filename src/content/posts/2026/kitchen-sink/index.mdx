@@ -19,6 +19,7 @@ import testCardPairB from './test-card-pair-b.png';
 import testCardTall from './test-card-tall.png';
 import screenshotLight from './screenshot-light-chrome.png';
 import screenshotDark from './screenshot-dark-chrome.png';
+import fixtureVector from './fixture-vector.svg';
 
 This is a fixture, not writing. It exists so that the e2e specs which are really
 about *rendering* have somewhere to point that is not a published Post, and so
@@ -128,6 +129,28 @@ both sides.
 
 ## Figures emitted by components
 
+Every example below is followed by the source that produces it. Copy the
+snippet, not the rendered result — and note the language tag on each: `mdx`
+means the file has to be `.mdx`. The Markdown tier next door shows what the same
+idea looks like when it cannot be.
+
+A component has to be imported before it is used, once per file, under the
+frontmatter:
+
+```mdx
+---
+title: Your post
+---
+
+import ArticleImage from '../../../../components/ArticleImage.astro';
+import myImage from './my-image.png';
+```
+
+The `../../../../` climbs out of the post's own bundle — four levels, because a
+Post sits at `<year>/<slug>/` inside the collection. Images are imported too
+rather than referenced as strings; that is what gets them a `srcset`, a width
+and a height.
+
 ### A constrained single image
 
 The figure contract: a `figure.media` carrying a `data-media` kind, its content
@@ -139,6 +162,13 @@ that is the layout axis, and it is off by default.
   alt="Test card: a wide slate ground with a 100px grid, corner markers and a centre cross"
   kind="photo"
 />
+
+```mdx
+<ArticleImage src={myImage} alt="What the image shows" kind="photo" />
+```
+
+`kind` is required and has no default. A figure that cannot say what it is has
+no business being framed.
 
 ### The same figure, captioned and broken out
 
@@ -154,6 +184,20 @@ at 60rem is unreadable and a caption is text.
   caption="A caption stays at the reading measure however wide the figure above it runs. This one is deliberately long enough to wrap, because a caption that fits on one line proves nothing about its measure."
 />
 
+```mdx
+<ArticleImage
+  src={myImage}
+  alt="What the image shows"
+  kind="photo"
+  breakout
+  caption="What the reader should notice about it."
+/>
+```
+
+`breakout` is the layout axis and `caption` is the component tier. Neither is
+available to a plain Markdown image — that is the two-tier limit, and this is
+the line where it bites.
+
 ### A compact pair
 
 <ImagePair
@@ -164,6 +208,17 @@ at 60rem is unreadable and a caption is text.
   ]}
   caption="A pair is one figure with one caption, not two figures side by side."
 />
+
+```mdx
+<ImagePair
+  kind="photo"
+  images={[
+    { src: imageA, alt: 'What the first one shows' },
+    { src: imageB, alt: 'What the second one shows' },
+  ]}
+  caption="One caption for the pair, because it is one figure."
+/>
+```
 
 ### Screenshots, in both chromes
 
@@ -188,6 +243,48 @@ page.
   caption="Dark chrome. Same problem, the other way round."
 />
 
+```mdx
+<ArticleImage
+  src={myScreenshot}
+  alt="Screenshot of the settings pane, with the sync toggle switched on"
+  kind="screenshot"
+  caption="What the reader should notice in it."
+/>
+```
+
+Same component, one word different — and every framing decision inverts. This is
+the only way to get the plate: the Markdown tier cannot tell a screenshot from a
+photograph, because the path is its only hook and a filename is too fragile to
+carry the distinction.
+
+### A chart, which is drawn rather than photographed
+
+The kind a Research Visual arrives as. Framed and otherwise left alone — no
+dimming on a dark ground, because dimming a drawing is treating it as a
+photograph and a research visual's whole job is to be read accurately. It is the
+one kind whose caption usually carries an attribution, which is why the aside
+below it takes `sourceHref` and `sourceLabel` rather than folding the credit
+into the caption text.
+
+<ArticleImage
+  src={fixtureVector}
+  alt="Fixture vector chart: four bars of increasing height above a baseline"
+  kind="chart"
+  caption="A chart states what it measures. This one measures nothing — it is a fixture."
+/>
+
+```mdx
+<ArticleImage
+  src={myChart}
+  alt="Interval chart showing the 2025 estimates, two of which cross no change"
+  kind="chart"
+  caption="My simplified reading of the source's estimates."
+/>
+```
+
+Alt text describes the image; it is never the attribution. The source goes in
+the caption, visibly — see **Research Visual** in `CONTEXT.md`.
+
 ### An aside that breaks out, with its media beside the text
 
 <MediaAside
@@ -210,11 +307,36 @@ page.
   runner's is not this machine's.
 </MediaAside>
 
+```mdx
+<MediaAside
+  src={myImage}
+  alt="What the image shows"
+  kind="photo"
+  placement="right"
+  caption="What the reader should notice about it."
+  sourceHref="https://example.com/the-source"
+  sourceLabel="Data: Example"
+>
+  The text that sits beside the figure. Two or three paragraphs read as a pair
+  with the media; one paragraph looks dwarfed by it.
+</MediaAside>
+```
+
+`placement` is the third axis — where it sits — and it is deliberately not part
+of `kind`. Moving a figure to the other side never changes what it is.
+
 ### A click-to-load embed
 
 Nothing is fetched from Google or YouTube until the reader presses play.
 
 <YouTube id="dQw4w9WgXcQ" title="Fixture clip" poster={testCardWide} />
+
+```mdx
+<YouTube id="dQw4w9WgXcQ" title="What the clip is" poster={myPoster} />
+```
+
+The `id` is the part of the URL after `watch?v=`. `title` is required — it names
+the frame for a screen reader, and "YouTube video player" names nothing.
 
 ### Self-hosted video, with a poster and without
 
@@ -230,6 +352,16 @@ A video with no poster falls back to its own first frame rather than being given
 a mismatched image:
 
 <Video src="video_sample.mp4" />
+
+```mdx
+<Video src="my_clip.mp4" poster={myPoster} />
+
+<Video src="my_clip.mp4" />
+```
+
+`src` is an R2 key, not a local import — video is the one medium that does not
+travel in the bundle. `poster` is optional and omitting it is a real choice: no
+poster gives the browser's first frame, which beats a mismatched image.
 
 ## A diagram
 
@@ -286,6 +418,30 @@ A plain vector SVG, which is drawn rather than sketched and must not be inverted
     { label: 'All posts', href: '/posts/', description: 'An internal link, which does not.' },
   ]}
 />
+
+```mdx
+<ArticleLinks
+  title="Further reading"
+  links={[
+    { label: 'A source', href: 'https://example.com/', description: 'Why it is worth the click.' },
+    { label: 'All posts', href: '/posts/', description: 'Internal links do not open a new tab.' },
+  ]}
+/>
+```
+
+## Images without a component
+
+A plain Markdown image needs no import and works identically in `.md` — it is
+the Markdown tier, sitting inside an `.mdx` file. It gets framing keyed on its
+path, and never a figure or a caption:
+
+```md
+![What the image shows](./my-image.png)
+```
+
+A diagram is a fenced block tagged `mermaid`, written exactly as the two above
+are written in this file's source. It is not shown as a snippet here for a
+mechanical reason worth knowing: a fenced block cannot contain a fenced block.
 
 ## The tail
 

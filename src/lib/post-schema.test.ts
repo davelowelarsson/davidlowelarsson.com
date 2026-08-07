@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { parse } from 'yaml';
@@ -66,15 +66,45 @@ describe('postFrontmatterSchema', () => {
   });
 });
 
-describe('templates/new-post', () => {
-  it('is always a valid post — the template IS the frontmatter contract example', () => {
-    const template = readFileSync(join(process.cwd(), 'templates/new-post/index.md'), 'utf8');
+describe('the post templates', () => {
+  const TEMPLATES = [
+    ['templates/new-post', 'index.md'],
+    ['templates/new-post-mdx', 'index.mdx'],
+  ] as const;
 
-    const parsed = postFrontmatterSchema.parse(frontmatterOf(template));
+  it.each(TEMPLATES)(
+    '%s is always a valid post — the template IS the frontmatter contract example',
+    (dir, file) => {
+      const template = readFileSync(join(process.cwd(), dir, file), 'utf8');
 
-    expect(parsed.draft).toBe(true);
-    expect(parsed.title.length).toBeGreaterThan(0);
-    expect(parsed.description).toBeTruthy();
+      const parsed = postFrontmatterSchema.parse(frontmatterOf(template));
+
+      expect(parsed.draft).toBe(true);
+      expect(parsed.title.length).toBeGreaterThan(0);
+      expect(parsed.description).toBeTruthy();
+    },
+  );
+
+  /**
+   * The reason the `.mdx` template is its own directory rather than a second
+   * file beside `index.md`.
+   *
+   * `postIdFromEntry` derives a post's identity from its FOLDER, so a bundle
+   * holding both `index.md` and `index.mdx` is two entries claiming one id.
+   * The documented flow is `cp -r <template> src/content/posts/…`, which would
+   * copy both — so the collision would be created by following the
+   * instructions, and it would surface as a duplicate-id warning rather than
+   * as anything that names the cause.
+   */
+  it.each(TEMPLATES)('%s holds exactly one index file', (dir) => {
+    const indexes = readdirSync(join(process.cwd(), dir)).filter((name) =>
+      /^index\.mdx?$/.test(name),
+    );
+    expect(indexes, `${dir} must hold exactly one index — a bundle is one post`).toHaveLength(1);
+  });
+
+  it('offers a template for each tier of the figure contract', () => {
+    expect(TEMPLATES.map(([, file]) => file)).toEqual(['index.md', 'index.mdx']);
   });
 });
 

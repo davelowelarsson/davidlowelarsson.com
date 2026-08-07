@@ -21,12 +21,22 @@ Individually: `npm run lint`, `npm run typecheck`, `npm test`, `npm run e2e`.
 
 ## Write a post
 
-Start from the template — it is CI-tested against the frontmatter schema, so
-it is always a valid post:
+Start from a template — both are CI-tested against the frontmatter schema, so
+they are always valid posts:
 
 ```sh
-cp -r templates/new-post src/content/posts/2026/my-post-slug
+cp -r templates/new-post      src/content/posts/2026/my-post-slug   # .md  — the default
+cp -r templates/new-post-mdx  src/content/posts/2026/my-post-slug   # .mdx — components
 ```
+
+Copy **one**, not both: a post's identity comes from its folder name, so an
+`index.md` and an `index.mdx` in one bundle are two posts claiming one URL.
+
+Use `.md` unless you need a component. A plain Markdown image gets framing from
+its path but never a caption and never a breakout; `.mdx` adds captions,
+breakout, the screenshot plate, video, YouTube embeds and side-by-side asides.
+The full catalogue with copyable snippets is the kitchen-sink Fixture, at
+`/posts/kitchen-sink/` and `/posts/kitchen-sink-markdown/` on any preview.
 
 A post is a **bundle**: a folder named after its slug, holding `index.md` plus
 everything that belongs to it (images, diagrams). Parent folders organize by
@@ -171,7 +181,7 @@ copy it — and anything it references — into a post bundle in this repo:
 cp -r ~/vault/publish/my-post src/content/posts/2026/my-post-slug
 ```
 
-That's the same shape `templates/new-post` produces: a folder named after the slug, `index.md`
+That's the same shape the templates produce: a folder named after the slug, one `index.md(x)`
 plus colocated images, `draft: true` while you finetune it against the preview URL. Open a PR,
 review on the preview deployment, flip `draft: false`, merge.
 

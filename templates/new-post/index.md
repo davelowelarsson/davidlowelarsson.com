@@ -33,6 +33,19 @@ echo "hello"
 
 > Blockquotes, **bold**, [links](https://example.com), lists and tables all work — see docs/astro-field-guide.md.
 
+A `mermaid` fenced block renders as a diagram, here in `.md` exactly as in `.mdx`.
+
+## When you need more than this
+
+A plain Markdown image gets framing from its path, but **never a caption and
+never a breakout** — those belong to the component tier, which needs `.mdx`.
+Reach for `templates/new-post-mdx` when you want a caption, a breakout, the
+screenshot plate, a video, a YouTube embed, or a side-by-side aside.
+
+The full catalogue, with a copyable snippet beside every example, is the
+kitchen-sink Fixture — `/posts/kitchen-sink-markdown/` for this tier and
+`/posts/kitchen-sink/` for the component tier, on any Preview Deployment.
+
 ## How to use this template
 
 ```sh
@@ -40,3 +53,7 @@ cp -r templates/new-post src/content/posts/2026/my-post-slug
 # edit src/content/posts/2026/my-post-slug/index.md
 # push a branch, open a PR, check the preview URL comment
 ```
+
+A bundle holds exactly one `index.md` **or** `index.mdx`, never both: a post's
+identity comes from its folder name, so two index files are two posts claiming
+one URL. Copy one template, not both.
