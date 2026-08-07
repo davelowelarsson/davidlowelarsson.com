@@ -4,6 +4,7 @@ import Lightbox from '../components/Lightbox.astro';
 import Mermaid from '../components/Mermaid.astro';
 import { SALTAST_URL } from '../lib/saltast';
 import { AUTHOR } from '../lib/seo';
+import { THEME_ATTRIBUTE, THEME_STORAGE_KEY, THEMES } from '../lib/theme';
 
 interface Props {
   title: string;
@@ -35,6 +36,29 @@ const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {/*
+      THE NO-FLASH CONTRACT. This must stay an inline, parser-blocking classic
+      script at the top of <head>, ahead of the stylesheet. It runs before the
+      first paint, so a reader who chose dark never sees a white page flash.
+      Bundling it, making it a module, or moving it below the stylesheet all
+      break that silently — nothing errors, the flash just comes back. So the
+      guarantee is asserted STRUCTURALLY in e2e/theme.spec.ts, the same way the
+      byline rotation's is. `define:vars` implies is:inline; both are written
+      out so the intent survives a refactor.
+    */}
+    <script
+      is:inline
+      define:vars={{ storageKey: THEME_STORAGE_KEY, attribute: THEME_ATTRIBUTE }}
+    >
+      try {
+        var stored = localStorage.getItem(storageKey);
+        if (stored === 'light' || stored === 'dark') {
+          document.documentElement.setAttribute(attribute, stored);
+        }
+      } catch (e) {
+        /* storage blocked (private mode, embedded webview) — follow the OS */
+      }
+    </script>
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex" />}
     <link rel="canonical" href={canonical} />
@@ -74,6 +98,64 @@ const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
         <a href="/">David Lowe Larsson</a>
         <a href="/posts/">Posts</a>
       </nav>
+      {/*
+        A labelled group reporting which option is active — not a mystery icon,
+        and not a toggle that hides the third state. Three buttons, one pressed.
+      */}
+      <div class="theme" role="group" aria-label="Colour theme">
+        {
+          THEMES.map((theme) => (
+            <button type="button" data-theme-set={theme} aria-pressed="false">
+              {theme === 'system' ? 'auto' : theme}
+            </button>
+          ))
+        }
+      </div>
+      {/*
+        Adjacent inline script, the byline pattern: the buttons are in <body>,
+        so this cannot be the pre-paint step (that one is in <head>) — its job
+        is to make the control agree with the attribute already applied, before
+        the reader can see a wrong `aria-pressed`, and to wire the clicks.
+      */}
+      <script
+        is:inline
+        define:vars={{ storageKey: THEME_STORAGE_KEY, attribute: THEME_ATTRIBUTE }}
+      >
+        (function () {
+          var root = document.documentElement;
+          var buttons = Array.prototype.slice.call(
+            document.querySelectorAll('[data-theme-set]'),
+          );
+
+          function paint(value) {
+            for (var i = 0; i < buttons.length; i++) {
+              buttons[i].setAttribute(
+                'aria-pressed',
+                String(buttons[i].dataset.themeSet === value),
+              );
+            }
+          }
+
+          function apply(value) {
+            if (value === 'light' || value === 'dark') root.setAttribute(attribute, value);
+            else root.removeAttribute(attribute);
+            try {
+              localStorage.setItem(storageKey, value);
+            } catch (e) {
+              /* storage blocked — the choice still applies for this page */
+            }
+            paint(value);
+          }
+
+          paint(root.getAttribute(attribute) || 'system');
+
+          for (var i = 0; i < buttons.length; i++) {
+            buttons[i].addEventListener('click', function (event) {
+              apply(event.currentTarget.dataset.themeSet);
+            });
+          }
+        })();
+      </script>
     </header>
     <main>
       <slot />
@@ -213,6 +295,16 @@ const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
     --tint-project: light-dark(#a21caf, #f0abfc);
   }
 
+  /* Three states, and auto is the ABSENCE of the attribute. Because every token
+     is a light-dark() pair, one property flips the whole page. See ADR 0010. */
+  :root[data-theme='light'] {
+    color-scheme: light;
+  }
+
+  :root[data-theme='dark'] {
+    color-scheme: dark;
+  }
+
   * {
     box-sizing: border-box;
   }
@@ -341,11 +433,23 @@ const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
   /* Excalidraw exports dark strokes on a transparent background — legible on
      a white page, invisible on a dark one. Invert lightness and spin the hue
      back so black-on-transparent reads as light-on-transparent in dark mode,
-     without touching the exported SVG file itself. */
+     without touching the exported SVG file itself.
+
+     THE TRAP: `prefers-color-scheme` asks the OPERATING SYSTEM and cannot see
+     a theme the reader forced here. On a light OS with dark forced, the page
+     goes dark via color-scheme and this rule never fires — dark strokes on a
+     dark ground, invisible. So the query is narrowed to "OS dark AND not
+     forced light", and a forced-dark companion sits outside it. Every
+     prefers-color-scheme query in this sheet needs both halves;
+     src/lib/theme.test.ts asserts that structurally. */
   @media (prefers-color-scheme: dark) {
-    img[src*='excalidraw'] {
+    :root:not([data-theme='light']) img[src*='excalidraw'] {
       filter: invert(0.92) hue-rotate(180deg);
     }
+  }
+
+  :root[data-theme='dark'] img[src*='excalidraw'] {
+    filter: invert(0.92) hue-rotate(180deg);
   }
 
   /* In-article images and diagrams: centered, with room to breathe.
@@ -375,11 +479,52 @@ const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
 
   /* ── Header / footer ── */
 
+  header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 4rem;
+  }
+
   header nav {
     display: flex;
     align-items: baseline;
     gap: 1.5rem;
-    margin-bottom: 4rem;
+  }
+
+  /* The theme control. Each button clears the WCAG 2.2 24px target minimum on
+     its own, before any spacing exception is invoked. */
+  .theme {
+    display: flex;
+    gap: 0.15rem;
+    padding: 0.15rem;
+    border: 1px solid var(--hairline);
+    border-radius: 6px;
+  }
+
+  .theme button {
+    min-height: 24px;
+    min-width: 34px;
+    padding: 0.15rem 0.5rem;
+    border: 0;
+    border-radius: 4px;
+    background: none;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+  }
+
+  .theme button:hover {
+    color: var(--accent);
+  }
+
+  .theme button[aria-pressed='true'] {
+    background: var(--chip);
+    color: var(--ink);
   }
 
   header nav a {
