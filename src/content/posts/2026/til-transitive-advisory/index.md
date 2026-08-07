@@ -16,10 +16,10 @@ A dependency, any dependency, failing a full project is not uncommon... but just
 
 The vulnerability itself wasn't even the main concern. `wrangler` is a dev dependency and `undici` never ends up in the deployed artifact. The problem was a red job every morning, which is worse than having no security job at all, because you start scrolling past it.
 
-Fix: a root `overrides` entry in `package.json`:
+Fix: a wrangler spcific `overrides` entry in `package.json`:
 
 ```json
-"overrides": { "undici": "^7.29.0" }
+"overrides": "wrangler": { { "undici": "^7.29.0" } }
 ```
 
 Caret, not exact. An exact pin one level up repeats the same mistake. The tripwire is a test that asserts every copy of `undici` the lockfile resolves sits at or above the advisory floor, so if the override is ever dropped or a transitive bump reintroduces an old copy, something complains before the security job goes red again.
