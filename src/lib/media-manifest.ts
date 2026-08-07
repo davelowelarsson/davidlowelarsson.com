@@ -107,9 +107,9 @@ export function findOrphans(manifest: Manifest, referencedKeys: Iterable<string>
   return Object.keys(manifest).filter((key) => !referenced.has(key));
 }
 
-const MEDIA_TAG_SRC = /<(?:Video|Audio)\b[^>]*\bsrc=["']([^"']+)["']/g;
+const MEDIA_TAG_SRC = /<Video\b[^>]*\bsrc=["']([^"']+)["']/g;
 
-/** Every relative R2 key referenced by a `<Video|Audio src="...">` in a post body. Absolute http(s) URLs are not R2-managed, so they're excluded. */
+/** Every relative R2 key referenced by a `<Video src="...">` in a post body. Absolute http(s) URLs are not R2-managed, so they're excluded. */
 export function extractMediaRefs(source: string): string[] {
   const refs: string[] = [];
   for (const match of source.matchAll(MEDIA_TAG_SRC)) {
