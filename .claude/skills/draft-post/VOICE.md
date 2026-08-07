@@ -119,13 +119,15 @@ David's explicit instruction.
   David may name them one after another and repeat the conclusion ("All tests
   passed, linting looked good, everything was typed, everything looked good")
   instead of compressing them into "the pipeline was green." The repetition
-  carries the feeling of why saying no was difficult.
+  carries the feeling of why saying no was difficult. It can also carry the
+  grind of the same failure happening again and again.
 - **Decisions include the room.** Preserve who discussed and decided something:
   "we discussed it in the team" and "we decided not to merge it" are more
   truthful than turning a shared decision into one engineer's abstract rule.
 - **Risk lands in ordinary consequences.** Name the service, the users, or the
   hassle a mistake creates. Prefer plain stakes such as a streaming service not
-  working or creating bad will over polished phrases like "operational impact."
+  working, creating bad will, or a red job becoming something David scrolls
+  past over polished phrases like "operational impact."
 - **Parentheses can question the thought in real time.** They are not only for
   jokes; "(I think)" and "if it works, it works, right 🤷" let confidence and
   doubt sit in the same paragraph.
@@ -133,6 +135,15 @@ David's explicit instruction.
   into Astro head first," "from 0 to a deployed working site in a day," and
   "my super simple abstraction" when they are David's words. Do not translate
   them into portfolio language.
+- **Technical detail stays understandable.** "Keep it simple" applies to the
+  writing too. A draft must not outrun David's own understanding or vocabulary;
+  if he cannot readily explain a sentence, interview him or rewrite it plainly.
+  Specialist shorthand is fine once explained, not as a compressed substitute
+  for the explanation.
+- **Specific claims carry their source.** Keep verified versions, counts, and
+  dependency chains; they make the investigation real. For important claims
+  such as security advisories, name where David found them and link the source
+  naturally in the story.
 
 ## Deliberate 2026 conventions (David's explicit choices)
 
@@ -169,21 +180,25 @@ mode must not flag them:
   block (a manifest, a one-liner, a recipe). No snippet/regular subtypes —
   tags and the text say what was learned. The point is saving it publicly,
   attached to David.
+- **TIL closers vary** (decided 2026-08-07) — keep the same base shape, but let
+  the final wording follow the post. **Takeaway:**, **Learnings:**, **What I
+  learned:**, and what David would do differently next time are examples, not
+  a fixed list.
 
 ## Genre shapes and budgets
 
 | Genre | Budget (words) | Shape |
-|---|---|---|
+| --- | --- | --- |
 | essay / personal story | 350–900 | concrete trigger → 2–4 plain-phrase sections → hedged, forward-looking close |
 | experiment | 600–1000 | what I wanted (boring goal) → what I did, narrated → what it cost / doesn't solve → "next iteration" close |
-| til | 200–300 prose (blocks don't count) | one thing learned, any domain (code, kids, cooking, wood); hook on the moment of surprise → what I learned → bold **Takeaway:** one-liner; optionally carries a copyable block (config, command, recipe); tags carry the subject |
+| til | 200–300 prose (blocks don't count) | one thing learned, any domain (code, kids, cooking, wood); hook on the moment of surprise → brief final learning in wording that follows the post; optionally carries a copyable block (config, command, recipe); tags carry the subject |
 | Swedish personal | 120–400 | no headings, images, plain close |
 
-The **Takeaway:** closer and the honest-limitations section are site
-conventions from the 2026 era that David keeps — render them, but in canon
-voice. `dev-sec-and-ops` (1562 words) shows the budget stretches when David
-is genuinely worked up about something; a draft should not grant itself that
-license.
+The brief TIL closer and the honest-limitations section are site conventions
+from the 2026 era that David keeps — render them, but in canon voice and without
+forcing the same label onto every post. `dev-sec-and-ops` (1562 words) shows the
+budget stretches when David is genuinely worked up about something; a draft
+should not grant itself that license.
 
 ## Anti-patterns (the LLM tells — check mode flags these)
 
