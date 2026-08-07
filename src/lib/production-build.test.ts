@@ -66,6 +66,19 @@ function bodyProbe(source: string, slug: string): string | undefined {
     .find((word) => word.length >= 8 && !legitimate.includes(word.toLowerCase()));
 }
 
+/**
+ * The teaser's rendered markup with inline `<script>`/`<style>` bodies removed.
+ * A leak would show up as visible content; the site's own bundled JS carries
+ * ordinary English words ("… ${total} experiment(s)" in the saltast tally),
+ * which would otherwise collide with a probe word and fail the check for a
+ * page that leaked nothing.
+ */
+function visibleHtml(html: string): string {
+  return html
+    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '')
+    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, '');
+}
+
 function rssItemLink(slug: string): string {
   // Published posts may intentionally link to scheduled teaser URLs in their
   // article bodies. Only an item's canonical link means RSS published the post.
@@ -113,7 +126,15 @@ describe('production build (SHOW_DRAFTS=false)', () => {
       const source = postSource(slug);
       expect(html, `${slug} teaser missing its title`).toContain(frontmatterTitle(source));
       const probe = bodyProbe(source, slug);
-      if (probe) expect(html, `${slug} teaser leaked article body`).not.toContain(probe);
+      if (probe) {
+        const visible = visibleHtml(html);
+        // Guard against a vacuous check: the stripped markup must still be the
+        // teaser (title present), so "probe not found" means not leaked.
+        expect(visible, `${slug} teaser markup vanished when scripts were stripped`).toContain(
+          frontmatterTitle(source),
+        );
+        expect(visible, `${slug} teaser leaked article body`).not.toContain(probe);
+      }
 
       // Article-only metadata must be absent — a teaser is not the article.
       expect(html, `${slug} teaser carries og:type article`).not.toContain(

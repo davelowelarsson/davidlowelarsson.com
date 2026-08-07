@@ -3,7 +3,8 @@ title: "The unexpected value of Dev Sec and Ops? 😱"
 description: "Some small insights around DevOps with security included"
 pubDate: 2020-08-19
 category: essay
-draft: true
+draft: false
+liveFrom: 2026-09-08
 tags: ["devops", "devsecops", "agile", "scrum", "kanban"]
 cover: ./cover.jpg
 coverAlt: MacBook with an executive summary document, notepad, and phone on a wooden deck

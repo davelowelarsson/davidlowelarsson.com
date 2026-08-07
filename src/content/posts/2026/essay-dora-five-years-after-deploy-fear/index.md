@@ -1,21 +1,23 @@
 ---
 title: "DORA, five years after the deploy fear"
 description: "A health check attribute went from green to red and nothing had got worse, which is the most useful thing any measurement has told me in years."
-pubDate: 2026-09-08
+pubDate: 2026-09-10
 category: essay
-draft: true
+draft: false
+liveFrom: 2026-09-10
 tags: ["dora", "devops", "platform-engineering", "metrics", "agile"]
 ---
 
-We run a team health check at UR, ten attributes that everyone rates green, yellow or red, and
+We run a team health check with some teams at UR, ten attributes that everyone rates green, yellow or red, and
 I've been doing it for years now. A while back one of the attributes went from green to red, and my
 first reaction was that something had broken... so we talked about it, and it turned out nothing had
 got worse at all. What had changed was us. We had quietly raised what we count as good, and the old
 green didn't qualify anymore. That's a strange sort of good news, and it's the clearest evidence
 I've had that the small iterative improvements were actually landing 😄
 
-<!-- image slot: the team health check board, one attribute mid-change from green to red.
-     alt: "the team health check board with one attribute moving from green to red" -->
+![Team health check board with one attribute moving from green to red](./essay-dora-health-check.svg)
+
+*Five quarters of health checks. Easy to release, green all the way through... and then red.*
 
 ## TL;DR
 
@@ -73,3 +75,8 @@ owns the code AI writes](/posts/essay-ai-code-ownership/) from the ownership sid
 same question from the delivery side... measuring the application itself, and not only how fast we
 ship it, so we don't end up crushing out features while the downtime quietly climbs. I don't have
 that part measured yet 🤔
+
+## Links
+
+- [DORA research and capabilities model](https://dora.dev/), the four key metrics, what predicts them, and the outcomes they tie back to
+- [DevLake](https://devlake.apache.org/), one of the open source DORA dashboards worth looking at

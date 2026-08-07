@@ -3,7 +3,8 @@ title: "In praise of boring tools"
 description: "The containers we started with at UR were early software, and they were still boring, and that turned out to be the difference that mattered."
 pubDate: 2026-06-19
 category: essay
-draft: true
+draft: false
+liveFrom: 2026-08-25
 tags: ["tooling", "platform-engineering", "kubernetes", "leadership"]
 ---
 
@@ -11,9 +12,9 @@ A couple of years ago (must be something like 15 years ago) I was still working 
 mootools for years. But someone sat down years before I got there, weighed mootools against jquery,
 and picked the one that lost, and then I was the one living with it.
 
-![Abstract composition of a single solid grounded shape surrounded by faded, drifting shapes](./essay-boring-tools.svg)
+![XKCD comic 2347: a teetering tower of named blocks represents all of modern digital infrastructure, held up at the base by a single unlabelled block maintained by one person in Nebraska](./xkcd-dependency.png)
 
-<!-- Maybe use this image here - https://imgs.xkcd.com/comics/dependency.png -->
+*[Dependency](https://xkcd.com/2347/) by [xkcd](https://xkcd.com), [CC BY-NC 2.5](https://creativecommons.org/licenses/by-nc/2.5/). The whole system, balanced on something nobody is paying for.*
 
 So that's what I'm actually thinking about whenever we discuss at work whether something is too
 new to run in production. Not the feature list. Who is going to be living inside this decision in
@@ -57,13 +58,19 @@ career.
 Jenkins is the one we should have let go earlier than we did. We built a very competent shared
 workflow, and also a complicated one that was genuinely hard to make sense of at some points, and
 I've written about [where that started creating its own
-friction](/posts/essay-3d-art-to-platform-engineering/) already. And ur.se on Ruby on Rails is
-probably something we never should have moved to. It was never easy to edit or make changes in,
-and it gave us issues more than once. Moving that over to Next.js and TypeScript has taken six or
-seven years and is only mainly done now.
+friction](/posts/essay-3d-art-to-platform-engineering/#i-called-it-automation) already. And Ruby
+on Rails is probably something we hung on to for too long. It was never easy to edit or make
+changes in, and it gave us issues more than once, and really we should have jumped ship
+earlier... though I'm proud of how we did eventually move it, path by path to Next.js and
+TypeScript, six or seven years and without incident.
 
 The tools that never seem to be in the way are ssh, bash, grep, find and vim/neovim. Kubernetes
 and docker are not boring, they're incredible, so maybe boring is the wrong word for what I look
 for... what I look for is a tool somebody else has already found the edges of. Six or seven years
 for one migration is a good reminder of how long these decisions keep being someone's daily work
 after the meeting where they were made. We'll see what I'm still living inside in 2033 🤷
+
+## Links
+
+- [Rancher](https://www.rancher.com/), the platform we've used to run Kubernetes and still the opinionated setup I like
+- [CNCF landscape](https://landscape.cncf.io/), useful for checking how settled a tool actually is before committing to it

@@ -3,7 +3,8 @@ title: "Dependabot workflows read a different secrets store"
 description: "A Dependabot PR's workflow went green and deployed nothing, because those runs read secrets from the Dependabot store instead of the Actions one."
 pubDate: 2026-07-07
 category: til
-draft: true
+draft: false
+liveFrom: 2026-09-24
 tags: ["github", "ci", "dependabot"]
 ---
 
@@ -18,5 +19,7 @@ Cloudflare token and skips with a notice when it isn't set, which is exactly why
 perfectly healthy... a green check mark and a step that quietly decided there was nothing for it to
 do.
 
-**Takeaway:** a Dependabot PR's workflow reads secrets from the Dependabot store rather than the
+![Dependabot secrets store](image.png)
+
+**Takeaway:** a Dependabot PR's workflow reads secrets from the Dependabot store (something I did now but needed reminding about) rather than the
 Actions store, so anything guarded by a token check can pass by doing nothing at all.
