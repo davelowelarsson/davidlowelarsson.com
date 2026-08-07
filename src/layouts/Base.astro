@@ -311,6 +311,12 @@ const THEME_ICONS: Record<string, string> = {
     --space-section: 4.5rem; /* air above a section break */
     --space-figure: 3rem; /* air around any piece of media */
 
+    /* How far a divider's rule reaches from its label toward the margin.
+       THIS IS THE KNOB: 0 removes the rules entirely and leaves the label;
+       100% brings full-width rules back. Nothing else needs to change. */
+    --divider-reach: 4.5rem;
+    --divider-gap: 1.25rem;
+
     --bg: light-dark(#fafbfa, #111310);
     --ink: light-dark(#1e211d, #e6eae3);
     --muted: light-dark(#5f665d, #a3aa9f);
@@ -762,19 +768,53 @@ const THEME_ICONS: Record<string, string> = {
     color: var(--muted);
   }
 
-  /* ── The meta rail (signature element) ── */
+  /* ── Section dividers ──
+     A centred label with rules reaching --divider-reach toward each margin and
+     stopping. The span that used to be rule is now breathing room.
 
-  /* Year dividers in archive listings — the quiet signal that a 2013 study
-     is a 2013 study. Same mono voice as the meta rail. */
-  .year-heading {
-    margin: 2.5rem 0 0.25rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--hairline);
+     ONE KNOB: --divider-reach at 0 removes the rules and leaves the label;
+     at 100% full-width rules come back. Nothing else changes. Asserted in
+     e2e/dividers.spec.ts, because a knob nobody turns is just a constant.
+
+     Accessibility: the elements are <h2> headings and STAY headings — they
+     carry the document outline (and .section-heading names a <section> via
+     aria-labelledby). The rules are ::before/::after pseudo-elements, which
+     never enter the accessibility tree, so the decoration is decorative and
+     the structure is structural. Both, correctly, on purpose.
+
+     .year-heading and .section-heading survive as markup hooks only — a
+     locator for the archive test and the aria-labelledby target. All the
+     styling is here. */
+  .divider {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: var(--divider-gap);
+    margin: var(--space-section) 0 1.25rem;
+    padding: 0;
+    border: 0;
     font-family: var(--font-mono);
-    font-size: 0.8125rem;
-    font-weight: 500;
-    letter-spacing: 0.06em;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
     color: var(--muted);
+  }
+
+  .divider::before,
+  .divider::after {
+    content: '';
+    width: 100%;
+    max-width: var(--divider-reach);
+    border-top: 1px solid var(--hairline);
+  }
+
+  .divider::before {
+    justify-self: end;
+  }
+
+  .divider::after {
+    justify-self: start;
   }
 
   .tagline {
@@ -871,18 +911,6 @@ const THEME_ICONS: Record<string, string> = {
     border: 1px solid var(--hairline);
     max-width: 100%;
     height: auto;
-  }
-
-  .section-heading {
-    margin-top: var(--space-section);
-    padding-top: 1.25rem;
-    border-top: 1px solid var(--hairline);
-    font-family: var(--font-mono);
-    font-size: 0.8125rem;
-    font-weight: 500;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--muted);
   }
 
   .all-posts {
@@ -1006,6 +1034,16 @@ const THEME_ICONS: Record<string, string> = {
   @media (prefers-reduced-motion: no-preference) {
     .post-link {
       transition: background 120ms ease;
+    }
+  }
+
+  /* On a phone there is no room for a 4.5rem reach either side of a label and
+     any air worth the name — so the knob turns down rather than the treatment
+     changing shape. */
+  @media (max-width: 30rem) {
+    :root {
+      --divider-reach: 2rem;
+      --space-section: 3.25rem;
     }
   }
 </style>

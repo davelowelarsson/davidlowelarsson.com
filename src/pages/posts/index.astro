@@ -27,7 +27,7 @@ const site = Astro.site?.href ?? 'https://davidlowelarsson.com';
     years.length > 0 ? (
       years.map(({ year, posts: yearPosts }) => (
         <>
-          <h2 class="year-heading">{year}</h2>
+          <h2 class="divider year-heading"><span>{year}</span></h2>
           <PostList posts={yearPosts} />
         </>
       ))
