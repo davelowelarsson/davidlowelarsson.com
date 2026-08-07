@@ -4,7 +4,6 @@ import { describe, expect, it } from 'vitest';
 import {
   AA_FLOOR,
   AAA_FLOOR,
-  BELOW_FLOOR,
   CONTRAST_FLOOR,
   type ColorPair,
   contrastRatio,
@@ -82,10 +81,11 @@ describe('the palette as data', () => {
     expect(shortOf(AA_FLOOR)).toEqual([]);
   });
 
-  // The project floor is 5.5:1. BELOW_FLOOR is the countdown of tokens still
-  // short of it — asserted as an exact set, so it can only ever shrink.
-  it(`falls short of ${CONTRAST_FLOOR}:1 exactly where BELOW_FLOOR says`, () => {
-    expect(shortOf(CONTRAST_FLOOR)).toEqual([...BELOW_FLOOR].sort());
+  // The project floor, deliberately above AA. No exceptions and no countdown:
+  // the last one (`tint-til`, 5.28:1 on its locked value) was resolved in #113,
+  // so this is now an unconditional guarantee and the style is frozen with it.
+  it(`clears the ${CONTRAST_FLOOR}:1 project floor for every text token`, () => {
+    expect(shortOf(CONTRAST_FLOOR)).toEqual([]);
   });
 
   it(`holds body ink to WCAG AAA (${AAA_FLOOR}:1) on both grounds`, () => {

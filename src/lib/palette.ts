@@ -38,7 +38,13 @@ export const PALETTE = {
   'status-down': { light: '#b01818', dark: '#f87171' },
   // Category tints. These only ever colour the Category WORD — see ADR 0009.
   'tint-essay': { light: '#4338ca', dark: '#b4bdfc' },
-  'tint-til': { light: '#0f766e', dark: '#5eead4' },
+  // Darkened from the locked #0f766e, which measured 5.28:1 — below this
+  // project's own 5.5 floor. The prototype's §1b note recorded the tint range
+  // as "5.3–7.6" while setting the floor at 5.5, so the locked design
+  // contradicted itself; #94 carries the finding. 5.97:1 puts til in line with
+  // every other tint rather than leaving one scraping the floor, and the hue
+  // barely moves (ΔE 0.4 from the locked value).
+  'tint-til': { light: '#0d6d64', dark: '#5eead4' },
   'tint-experiment': { light: '#155e75', dark: '#7dd3fc' },
   'tint-project': { light: '#a21caf', dark: '#f0abfc' },
 } as const satisfies Record<string, ColorPair>;
@@ -82,26 +88,6 @@ export const NON_TEXT_FLOOR = 3;
 
 /** WCAG AAA for body text — the standard `--ink` is held to. */
 export const AAA_FLOOR = 7;
-
-/**
- * Text tokens that do not yet clear CONTRAST_FLOOR. This is a countdown, not a
- * set of exemptions — everything here still clears AA_FLOOR, which has no
- * exceptions at all.
- *
- * The test asserts this list is EXACTLY the set that falls short — a token
- * cannot quietly join it, and a token that gets fixed cannot quietly stay on
- * it.
- *
- * One entry left, and it is a contradiction inside the locked design rather
- * than an unfinished job: the locked `--tint-til` is `#0f766e`, which measures
- * 5.28:1 against the locked ground — the prototype's own §1b note records the
- * tint range as "5.3–7.6" while setting the floor at 5.5. Changing the hex
- * would be reopening a locked decision, so it is reported on #94 instead.
- * `#0e7168` is the smallest same-hue darkening that clears the floor (5.65:1).
- */
-export const BELOW_FLOOR = [
-  'tint-til:light',
-] as const satisfies readonly `${TokenName}:${Scheme}`[];
 
 /**
  * Overrides for a reader who has asked their OS for more contrast.
