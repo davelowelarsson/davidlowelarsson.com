@@ -10,6 +10,14 @@ import {
 import { cssIn, selectorsIn, stripComments } from './stylesheets';
 
 const CONTRACT_STYLESHEET = 'src/styles/media.css';
+const PROSE_COMPONENT = 'src/components/Prose.astro';
+
+/** Every `filter:` value declared in a file, in source order. */
+function filters(path: string): string[] {
+  return [...stripComments(cssIn(path)).matchAll(/filter:\s*([^;}]+)/g)].map((match) =>
+    (match[1] as string).trim(),
+  );
+}
 
 describe('MEDIA_KINDS', () => {
   it('is the six kinds the spec names, and nothing else', () => {
@@ -85,5 +93,33 @@ describe('the contract stylesheet', () => {
       [...new Set(named)].filter((kind) => !isMediaKind(kind)),
       'the stylesheet styles a kind that is not in MEDIA_KINDS',
     ).toEqual([]);
+  });
+});
+
+// ── The two tiers must not drift apart ──
+//
+// #114 promises plain Markdown images "equivalent framing" to the component
+// tier. Equivalent has to MEAN equivalent, and the two live in different files
+// for good reasons — the contract is global, the Markdown rules are scoped to
+// the Prose component because that is the only thing slotted content can be
+// scoped to. Nothing but a test keeps the values in step.
+describe('the Markdown tier matches the component tier', () => {
+  it('dims a raster by the same amount in both tiers', () => {
+    const contract = filters(CONTRACT_STYLESHEET).filter((value) => value.includes('brightness'));
+    const markdown = filters(PROSE_COMPONENT).filter((value) => value.includes('brightness'));
+
+    expect(contract.length, 'the contract dims no raster').toBeGreaterThan(0);
+    expect(markdown.length, 'the Markdown tier dims no raster').toBeGreaterThan(0);
+    expect(
+      new Set([...contract, ...markdown]).size,
+      `the two tiers dim differently: ${[...new Set([...contract, ...markdown])].join(' vs ')}`,
+    ).toBe(1);
+  });
+
+  it('leaves a drawn vector alone in both tiers', () => {
+    // A vector is already ink on the page's own ground. Dimming or inverting it
+    // would be treating a drawing as a photograph.
+    const css = stripComments(cssIn(PROSE_COMPONENT));
+    expect(css, 'the raster treatment is not excluding SVGs').toContain("img:not([src$='.svg'])");
   });
 });

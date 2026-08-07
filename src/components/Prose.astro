@@ -99,11 +99,83 @@
     cursor: zoom-in;
   }
 
-  /* The Excalidraw sketch inversion is deliberately NOT here. It applies to
-     `img[src*='excalidraw']` anywhere on the page, not only inside a Post
-     body, and this ticket is a prefactor: narrowing it to `.prose` would be a
-     behaviour change smuggled in as a move. It stays in src/styles/global.css
-     until #121 takes sketch theming as its own decision. */
+  /* ── The Markdown tier of the figure contract (#119) ──
+     41 plain images across 35 Posts, framed with no author edits and no syntax
+     to remember. The only hook a Markdown image offers is the element itself,
+     so the rules are keyed on the PATH — which is not a trick, it is the only
+     door: Astro's native Markdown processor has no remark/rehype hooks, and
+     adding one would not add a plugin, it would migrate the whole pipeline
+     onto unified. Refused twice before, refused again here.
+
+     The corpus already follows conventions, so the path is enough:
+
+       *.excalidraw.svg   sketch  — inverted on a dark ground
+       other .svg         drawn   — no plate, no dimming; it is already ink
+       raster             one framed treatment, dimmed on a dark ground
+
+     Photo versus screenshot is NOT inferred from a filename. Too fragile for
+     the gain, and one raster treatment serves both.
+
+     THE LIMIT, stated rather than glossed: this is FRAMING, not the figure.
+     These images never become a `<figure>`, never carry a `data-media` kind
+     and never take a caption — that is the component tier's, and it is why
+     the contract is described as two-tier. Breakout is likewise a component
+     gesture and is deliberately not offered here; that discharges ADR 0006 §4
+     with a refusal rather than a mechanism.
+
+     Astro rewrites a processed raster to `/_astro/<name>.<hash>.webp` and
+     leaves an SVG as `.svg`, keeping the original basename in both — which is
+     what makes `[src*='excalidraw']` and `[src$='.svg']` reliable. */
+
+  /* Raster. The same treatment the `photo` kind gets in src/styles/media.css,
+     because "equivalent framing" has to mean equivalent — asserted in
+     src/lib/figure.test.ts so the two tiers cannot drift apart. */
+  .prose > :global(img:not([src$='.svg'])),
+  .prose :global(p) > :global(img:not([src$='.svg'])) {
+    border-radius: 8px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme='light'])) .prose > :global(img:not([src$='.svg'])),
+    :global(:root:not([data-theme='light']))
+      .prose
+      :global(p)
+      > :global(img:not([src$='.svg'])) {
+      filter: brightness(0.92);
+    }
+  }
+
+  :global(:root[data-theme='dark']) .prose > :global(img:not([src$='.svg'])),
+  :global(:root[data-theme='dark']) .prose :global(p) > :global(img:not([src$='.svg'])) {
+    filter: brightness(0.92);
+  }
+
+  /* Sketch. Excalidraw exports dark strokes on a transparent background —
+     legible on a white page, invisible on a dark one. Invert lightness and spin
+     the hue back so black-on-transparent reads as light-on-transparent, without
+     maintaining two exported files.
+
+     This rule moved here from the global sheet in #119, narrowed from "any
+     sketch on the page" to "a sketch in a Post body", which is the only place
+     one has ever appeared. It also OVERRIDES the raster dimming above by
+     source order — a sketch is not a photograph and must not be dimmed as
+     well as inverted.
+
+     THE TRAP: `prefers-color-scheme` asks the OPERATING SYSTEM and cannot see
+     a theme the reader forced here. On a light OS with dark forced, the page
+     goes dark via color-scheme and this rule never fires — dark strokes on a
+     dark ground, invisible. So the query is narrowed to "OS dark AND not
+     forced light", and a forced-dark companion sits outside it.
+     src/lib/theme.test.ts asserts both halves are present, in this file. */
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme='light'])) .prose :global(img[src*='excalidraw']) {
+      filter: invert(0.92) hue-rotate(180deg);
+    }
+  }
+
+  :global(:root[data-theme='dark']) .prose :global(img[src*='excalidraw']) {
+    filter: invert(0.92) hue-rotate(180deg);
+  }
 
   /* ── Code ── */
 
