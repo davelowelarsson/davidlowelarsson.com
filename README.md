@@ -91,12 +91,12 @@ import poster from './poster.jpg';
 pipeline) or a plain path served as-is. `id` is the YouTube video id; an
 optional `start` prop sets a start offset in seconds.
 
-### Embedding video/audio (self-hosted on R2)
+### Embedding video (self-hosted on R2)
 
 Longer explanations can be self-hosted instead of pushed to YouTube: media
 lives in a Cloudflare R2 bucket at `assets.davidlowelarsson.com`, never in
 the repo (Workers static assets cap at 25 MiB/file — R2 is the source of
-truth, and `<Video>`/`<Audio>` work fine even with nothing local at all).
+truth, and `<Video>` works fine even with nothing local at all).
 
 **1. Encode locally.** A short h264/aac mp4 plays everywhere:
 
@@ -130,9 +130,15 @@ import poster from './poster.jpg';
 <Video src="2026/my-post-slug/clip.mp4" poster={poster} />
 ```
 
-`<Audio src="..." />` works the same way for audio-only clips. Both accept
-an optional `type` (defaults to `video/mp4` / `audio/mpeg`) and a `<track
-kind="captions" .../>` child for captions.
+`<Video>` accepts an optional `type` (defaults to `video/mp4`) and a `<track
+kind="captions" .../>` child for captions. It is the `embed` kind of the figure
+contract, so the page frames the box and never reaches inside it (ADR 0013).
+
+**There is no `<Audio>` component.** It was deleted in #115 at zero usages — a
+component for zero current Posts is the gold-plating this project keeps
+refusing. If a Post ever wants audio, `Video.astro` and the R2 flow above are
+the shape to copy; that is a smaller job than keeping an unused component alive
+was.
 
 **Never blocks CI.** `npm run media:check` reconciles every embed against
 R2, the manifest, and local disk, but only ever warns (exit 0) — it runs
