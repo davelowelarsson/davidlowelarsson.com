@@ -11,12 +11,12 @@ coverAlt: The pixel-art Retrospelsmässan website still advertising its annual e
 ---
 
 A couple of years ago (must be something like 15 years ago) I was still working in a codebase relying heavily on mootools. Nobody had used
-mootools for years. But someone sat down years before I got there, weighed mootools against jquery,
-and picked the one that lost, and then I was the one living with it.
+mootools for years. Someone had sat down long before I got there, weighed mootools against jquery,
+and picked the one that lost... and then I was the one living with it.
 
 So that's what I'm actually thinking about whenever we discuss at work whether something is too
-new to run in production. Not the feature list. Who is going to be living inside this decision in
-2033, and will they understand why it was made 🤔
+new to run in production. Never the feature list, but who is going to be living inside this
+decision in 2033, and will they understand why it was made 🤔
 
 ## Docker in 2016
 
@@ -27,7 +27,7 @@ moved to RKE, so that became the next step rather than a rewrite. Today it's kub
 still like the opinionated way Rancher sets things up, enough that I [built a k3s cluster out of
 raspberry pis at home](/posts/raspberry-pi-cluster/) to keep learning it.
 
-Every one of those steps was early. None of them was new. Other people had already run the thing
+Every one of those steps was early, but none of them was new. Other people had already run the thing
 we were about to run, it was already a big part of the CNCF landscape, and the failure modes were
 written down somewhere by someone who had hit them first. That's the whole trick, and it has
 nothing to do with how old the software is.
@@ -37,11 +37,11 @@ nothing to do with how old the software is.
 Trust and workflows around containers were very limited in the beginning, and people had a really
 hard time seeing the benefit. The abstraction levels are the hard part... taking the leap from
 "frontend, application, backend" all the way down to infrastructure is a long journey, and a lot
-of coworkers and others I've worked with have not completed it yet. Neither had I, for years.
+of coworkers and others I've worked with have not completed it yet, and I hadn't either, for years.
 
-That's the cost I never see in anyone's evaluation of a tool. The tool arrives more or less on the
-day we install it. The understanding arrives whenever it arrives, and until it does, the tool is
-something most of the team has to trust rather than reason about.
+That's the cost I never see in anyone's evaluation of a tool. The tool is there the day we install
+it, but the understanding turns up whenever it turns up... and until it does, most of the team has
+to trust the tool rather than reason about it.
 
 I keep thinking about [retrospelsmassan.se](https://retrospelsmassan.se/) here too. [I was already
 making work for it around 2011](/posts/portfolio-retrospelsmassan-8-bit-ftw/), and I built much, if
@@ -58,9 +58,10 @@ We have continuous discussions about tools and newness, and the rule we land on 
 itself: anything that isn't 1.0 or GA we evaluate, try out, play with, but don't put in
 production. We do bend that for some kubernetes tooling, which I notice and am not entirely
 comfortable with. Beyond that it's tried and true, preferably open source, because that gives me
-much more confidence about what happens when the vendor loses interest. And never build it
-yourself. Not-invented-here is a dangerous and very maintenance heavy road to walk through a
-career.
+much more confidence about what happens when the vendor loses interest. My rule of thumb is to lean
+into the open source option even when the fit is only 95%. With AI it's cheaper than ever to just
+build it yourself, but building it also means maintaining it, and not-invented-here is a dangerous
+and very maintenance heavy road to walk through a career.
 
 Jenkins is the one we should have let go earlier than we did. We built a very competent shared
 workflow, and also a complicated one that was genuinely hard to make sense of at some points, and

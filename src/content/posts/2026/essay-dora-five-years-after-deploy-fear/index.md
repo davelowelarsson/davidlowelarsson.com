@@ -10,7 +10,7 @@ cover: ./cover.png
 coverAlt: Team health check board showing Easy to release move from green to red after five quarters
 ---
 
-We run a team health check with some teams at UR, ten attributes that everyone rates green, yellow or red, and
+We run a team health check with some teams at my company, ten attributes that everyone rates green, yellow or red, and
 I've been doing it for years now. A while back one of the attributes went from green to red, and my
 first reaction was that something had broken... so we talked about it, and it turned out nothing had
 got worse at all. What had changed was us. We had quietly raised what we count as good, and the old
@@ -19,7 +19,7 @@ I've had that the small iterative improvements were actually landing 😄
 
 ![Team health check board with one attribute moving from green to red](./cover.png)
 
-*Five quarters of health checks. Easy to release, green all the way through... and then red.*
+*Five quarters of health checks. Easy to release, green all the way through... and then red. (the image is made up to not share the actual healthcheck 😉)*
 
 ## TL;DR
 
@@ -91,4 +91,6 @@ that part measured yet 🤔
 ## Links
 
 - [DORA research and capabilities model](https://dora.dev/), the five delivery metrics, what predicts them, and the outcomes they tie back to
+- [DORA's metrics guide](https://dora.dev/guides/dora-metrics/), where the five metrics are actually defined
+- [DORA on well-being](https://dora.dev/capabilities/well-being/), the research behind the health-check angle
 - [DevLake](https://devlake.apache.org/), one of the open source DORA dashboards worth looking at

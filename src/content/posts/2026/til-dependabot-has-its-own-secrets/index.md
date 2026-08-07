@@ -37,3 +37,7 @@ production token there would make the security boundary a lot less useful.
 
 **Takeaway:** a Dependabot PR's workflow reads secrets from the Dependabot store (something I did now but needed reminding about) rather than the
 Actions store, so anything guarded by a token check can pass by doing nothing at all.
+
+## Links
+
+- [Dependabot on Actions](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-on-actions/), where GitHub documents the separate secrets store and the fork-like permissions

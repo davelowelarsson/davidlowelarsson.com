@@ -72,9 +72,9 @@ moment.
 Minutes of staleness is usually fine for me, which is exactly where a content site lives, and
 where Astro is good at this. Anything that needs direct feedback doesn't really suit this shape at
 all. At work we have the opposite problem, a very big Next.js application with around ten services
-that all need their caches cleared when something changes, so we built a cachebuster: a Kafka queue
-we can work through until every cache that needs clearing has been cleared. It works pretty well
-actually, and it's a lot more machinery than two constants 😅
+that all need their caches cleared when something changes. So we built a cachebuster, a Kafka queue
+we work through until every cache that needs clearing has been cleared... it works pretty well
+actually, but it's a lot more machinery than two constants 😅
 
 What this doesn't solve is the original thing I went looking for. The dashboard tells me a host is
 down, it doesn't serve the missing thing from a cached copy, and I still like the idea of a Worker

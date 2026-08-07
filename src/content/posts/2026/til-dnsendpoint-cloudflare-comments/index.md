@@ -40,3 +40,4 @@ spec:
 ## Links
 
 - [external-dns CRD source](https://kubernetes-sigs.github.io/external-dns/latest/docs/sources/crd/)
+- [Cloudflare DNS record attributes](https://developers.cloudflare.com/dns/manage-dns-records/reference/record-attributes/), where the 100-character comment limit on the free plan is documented

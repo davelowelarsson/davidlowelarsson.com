@@ -127,7 +127,19 @@ David's explicit instruction.
 - **Risk lands in ordinary consequences.** Name the service, the users, or the
   hassle a mistake creates. Prefer plain stakes such as a streaming service not
   working, creating bad will, or a red job becoming something David scrolls
-  past over polished phrases like "operational impact."
+  past over polished phrases like "operational impact." The reverse flags too:
+  a technical judgment with no cost attached ("more best practice") is as much
+  a tell as a polished one.
+- **Rules of thumb, not absolutes** (confirmed 2026-08-07). David states
+  tooling preferences as his own rule of thumb with the trade-off named ("lean
+  into the open source option even when the fit is only 95%"), never as
+  universal advice ("never build it yourself"). When the world has moved he
+  says so in the same breath ("with AI it's cheaper than ever to just build it
+  yourself") — the hedge travels with the rule.
+- **Hedges are not AI tells** (confirmed 2026-08-07). "Not entirely
+  comfortable with", "I hadn't either, for years" — plain hedges are core
+  canon. Check mode must not flag them or sand them off; flag antithesis,
+  aphorism pairs, colon-subtitles, and recap structure instead.
 - **Parentheses can question the thought in real time.** They are not only for
   jokes; "(I think)" and "if it works, it works, right 🤷" let confidence and
   doubt sit in the same paragraph.
@@ -183,7 +195,10 @@ mode must not flag them:
 - **TIL closers vary** (decided 2026-08-07) — keep the same base shape, but let
   the final wording follow the post. **Takeaway:**, **Learnings:**, **What I
   learned:**, and what David would do differently next time are examples, not
-  a fixed list.
+  a fixed list. The learning named must be something David controlled — a
+  choice he made or would make differently — not the behavior of a tool or
+  dependency (evidence: til-transitive-advisory, where the real lesson was the
+  `^7.29.0` override and the regression test, not Miniflare's exact pin).
 
 ## Genre shapes and budgets
 
@@ -206,7 +221,9 @@ Measured against the canon, these are absent or near-absent; their presence
 marks prose that isn't David:
 
 1. Antithesis set-pieces — "That is not X. It is Y." / "not X, but Y" — max
-   once per post, ideally zero.
+   once per post, ideally zero. Symmetric aphorism pairs ("The tool arrives on
+   install day. The understanding arrives whenever it arrives.") count as the
+   same tell: state the contrast plainly with "but" and keep the "..." pause.
 2. Colon-subtitle headings.
 3. One-sentence punch paragraphs as recurring rhythm (>2 per post).
 4. Instructional "you".

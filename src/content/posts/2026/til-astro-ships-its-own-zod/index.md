@@ -40,4 +40,5 @@ never installed.
 
 ## Links
 
+- [The astro/zod reference](https://docs.astro.build/en/reference/modules/astro-zod/), where Astro documents the re-export so you never install zod yourself
 - [Markdown content in Astro](https://docs.astro.build/en/guides/markdown-content/), the full guide where `.md` and `.mdx` both work out of the box

@@ -38,3 +38,7 @@ something like ten times first, looking for anything I didn't want out there.
 **Takeaway:** on the free plan a private repo meters Actions minutes and keeps branch protection
 behind Pro, so for a personal site whose whole output is public anyway, public is also the cheaper
 answer.
+
+## Links
+
+- [GitHub Actions billing](https://docs.github.com/en/billing/concepts/product-billing/github-actions), where the 2,000 free private-repo minutes and the public-repo exemption live
