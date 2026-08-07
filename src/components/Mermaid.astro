@@ -16,9 +16,63 @@
 // (`script-src 'self'`) is satisfied without a CDN allowance, and pages
 // with no mermaid block never fetch that chunk at all (the early return
 // below happens before the import is ever reached).
+//
+// #120 adds the legibility floor. The DECISION is arithmetic and lives in
+// src/lib/legibility.ts, where its boundaries are unit-tested; this file only
+// measures the DOM, applies the answer, and re-applies it when the container
+// changes width.
 ---
 
 <script>
+  import { decideRender, LEGIBILITY_FLOOR_PX } from '../lib/legibility';
+
+  /** The label size a diagram is drawn with, in its own units. */
+  function baseLabelPx(svg: SVGSVGElement): number {
+    // Mermaid renders labels as HTML inside <foreignObject> by default, and
+    // falls back to <text> when htmlLabels is off. Either way the computed
+    // font-size is in user units — the viewBox scaling happens at paint, so it
+    // does not move — which is exactly the number the floor is expressed in.
+    const label = svg.querySelector<Element>('.nodeLabel, .edgeLabel, text');
+    if (!label) return Number.NaN;
+    return Number.parseFloat(getComputedStyle(label).fontSize);
+  }
+
+  /** Measure, decide, apply. Safe to call repeatedly. */
+  function applyFloor(figure: HTMLElement, scroll: HTMLElement) {
+    const svg = scroll.querySelector('svg');
+    if (!svg) return;
+
+    const decision = decideRender({
+      naturalWidth: svg.viewBox?.baseVal?.width ?? Number.NaN,
+      containerWidth: figure.clientWidth,
+      baseLabelPx: baseLabelPx(svg),
+      floorPx: LEGIBILITY_FLOOR_PX,
+    });
+
+    svg.style.width = `${decision.renderWidth}px`;
+    // Mermaid's `useMaxWidth` pins a max-width at the natural size, which would
+    // veto the floor's answer whenever the floor wants to grow a diagram.
+    svg.style.maxWidth = 'none';
+    svg.style.height = 'auto';
+
+    const scrolls = decision.mode === 'scroll';
+    scroll.classList.toggle('is-scrollable', scrolls);
+
+    // A scroll region is only announced, and only focusable, when it actually
+    // scrolls. A tabindex on a container that fits is a tab stop that does
+    // nothing, and a role="region" with nothing to reach is noise for a screen
+    // reader — so both are attached and removed with the behaviour.
+    if (scrolls) {
+      scroll.setAttribute('tabindex', '0');
+      scroll.setAttribute('role', 'region');
+      scroll.setAttribute('aria-label', 'Diagram, scrollable sideways');
+    } else {
+      scroll.removeAttribute('tabindex');
+      scroll.removeAttribute('role');
+      scroll.removeAttribute('aria-label');
+    }
+  }
+
   async function renderMermaid() {
     const blocks = document.querySelectorAll<HTMLElement>('pre > code.language-mermaid');
     if (blocks.length === 0) return;
@@ -32,16 +86,29 @@
       const pre = block.parentElement;
       if (!pre) continue;
       const { svg, bindFunctions } = await mermaid.render(`mermaid-${i++}`, block.textContent ?? '');
+
+      // `breakout` lets the diagram render wider than the prose column so it
+      // stays legible without shrinking to the paragraph measure (see the
+      // `.breakout` rule + ADR 0006). The inner element is what scrolls when
+      // the floor says it must: the OUTER box keeps its place in the layout, so
+      // the page itself never scrolls sideways whatever the diagram is doing.
       const figure = document.createElement('div');
-      // `breakout` lets the diagram render wider than the 42rem prose column so
-      // it stays legible without shrinking to the paragraph measure (see the
-      // `.breakout` rule + ADR 0006). The diagram still fits its (wider)
-      // container — `useMaxWidth` keeps it from ever scrolling sideways — and a
-      // click opens it at natural size in the shared lightbox.
       figure.className = 'mermaid-diagram breakout';
-      figure.innerHTML = svg;
+      const scroll = document.createElement('div');
+      scroll.className = 'mermaid-diagram__scroll';
+      scroll.innerHTML = svg;
+      figure.append(scroll);
       pre.replaceWith(figure);
-      bindFunctions?.(figure);
+      bindFunctions?.(scroll);
+
+      applyFloor(figure, scroll);
+
+      // A phone that rotates, a window that resizes, or a font that loads late
+      // all change the answer. Without this the decision is made once against a
+      // width that may no longer exist.
+      if (typeof ResizeObserver !== 'undefined') {
+        new ResizeObserver(() => applyFloor(figure, scroll)).observe(figure);
+      }
     }
   }
 
@@ -51,18 +118,29 @@
 <style is:global>
   .mermaid-diagram {
     margin: 2rem 0;
-    /* Safety net only: `useMaxWidth` keeps the SVG fitted to this container, so
-       this should never actually scroll — but if a future diagram ever exceeds
-       it, scroll beats clipping. */
-    overflow-x: auto;
     /* Signals the click-to-enlarge affordance the Lightbox wires up (matches
        `article img`); harmless with JS disabled. */
     cursor: zoom-in;
   }
 
+  /* The scroll lives HERE, one level in, so a diagram that has to be wider than
+     the viewport pushes nothing else sideways. WCAG 1.4.10 exempts content
+     requiring two-dimensional layout, which a diagram is — but the exemption
+     covers the diagram, not the page around it. */
+  .mermaid-diagram__scroll {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+  }
+
+  /* Only a container that actually scrolls gets a focus ring worth showing —
+     it is only focusable in that state (see applyFloor). */
+  .mermaid-diagram__scroll.is-scrollable:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
   .mermaid-diagram svg {
     display: block;
     margin: 0 auto;
-    max-width: 100%;
   }
 </style>
