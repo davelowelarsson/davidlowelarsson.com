@@ -689,3 +689,25 @@ how the project actually grew.
   and `role="region"` are attached and removed with the behaviour: a tab stop
   that goes nowhere and an announced region with nothing to reach are both worse
   than leaving it alone.
+
+## A custom property is not resolved until something paints it (2026-08-07, issue #121)
+
+- **`getPropertyValue('--ink')` returns the token as WRITTEN**, not as resolved.
+  Custom properties are substituted lazily, so a `light-dark(#1e211d, #e6eae3)`
+  comes back verbatim — useless to a script that needs a colour. Paint it onto a
+  throwaway element (`style.color = 'var(--ink)'`) and read the *computed*
+  colour back; that resolves it against whichever ground is currently in force.
+  Docs: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_cascading_variables
+- **Which means the tokens carry the theme for free.** The fix for "the diagram
+  ignored a forced theme" was not to feed the OS-preference switch a better
+  signal — it was to delete the switch. Values read from the live document
+  already reflect the chosen ground, so there is nothing left to get wrong.
+- **A `MutationObserver` on `documentElement`'s `data-theme` is the re-theme
+  signal**, paired with a `matchMedia` change listener for readers on `system`.
+  Both are registered only after a diagram is found, so a page without one still
+  never loads the library — the guarantee that makes client-side rendering worth
+  it.
+- **Verify that a knob does anything before keeping it.** `darkMode` looked like
+  the theme fix and changed nothing once `themeVariables` were supplied — the
+  rendered SVG was byte-identical either way. A knob that looks load-bearing and
+  is not is worse than no knob.
