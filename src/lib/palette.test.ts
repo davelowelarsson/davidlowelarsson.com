@@ -1,4 +1,5 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   AA_FLOOR,
@@ -98,9 +99,10 @@ describe('the palette as data', () => {
   // a separate guarantee from the same token's use as `.badge-scheduled` text.
   it(`keeps the focus ring above the ${NON_TEXT_FLOOR}:1 non-text threshold`, () => {
     for (const scheme of SCHEMES) {
-      expect(tokenContrast('focus', 'bg', scheme), `focus ring (${scheme})`).toBeGreaterThanOrEqual(
-        NON_TEXT_FLOOR,
-      );
+      expect(
+        tokenContrast('accent', 'bg', scheme),
+        `focus ring (${scheme})`,
+      ).toBeGreaterThanOrEqual(NON_TEXT_FLOOR);
     }
   });
 });
@@ -155,6 +157,23 @@ function declaredTokens(root: string): Record<string, ColorPair> {
 describe('the stylesheet mirrors the palette', () => {
   it('declares exactly the tokens PALETTE defines, with the same values', () => {
     expect(declaredTokens(rootBlock(globalStyleBlock()))).toEqual(PALETTE);
+  });
+
+  // `--focus` became `--accent` in #108: the design reserves ONE colour for
+  // state, so a separate focus token was a contradiction. A leftover
+  // `var(--focus)` would resolve to nothing and paint the element invisible,
+  // which is exactly the failure a rename leaves behind.
+  it('has no trace of the retired --focus token anywhere in src/', () => {
+    const offenders: string[] = [];
+    for (const entry of readdirSync('src', { recursive: true }) as string[]) {
+      const path = join('src', entry.toString());
+      // This file is the one place allowed to name the retired token — it has
+      // to write it down in order to look for it.
+      if (path.endsWith('palette.test.ts')) continue;
+      if (!/\.(astro|ts|css)$/.test(path) || statSync(path).isDirectory()) continue;
+      if (readFileSync(path, 'utf8').includes('--focus')) offenders.push(path);
+    }
+    expect(offenders).toEqual([]);
   });
 
   it('writes no colour outside :root', () => {

@@ -67,3 +67,22 @@ for (const [category, token] of TINTED_CATEGORIES) {
     );
   });
 }
+
+// ADR 0009's first rule of colour: a tint colours the Category WORD, never a
+// swatch and never a chart segment. `til` and `experiment` sit ΔE 6.7 apart —
+// as two coloured words they are unambiguous, because the word carries the
+// meaning; as two adjacent bar segments nobody could tell them apart. So the
+// guarantee to hold is that the word is always there to read.
+test('Category is never conveyed by colour alone', async ({ page }) => {
+  for (const [category] of TINTED_CATEGORIES) {
+    await page.goto(`/category/${category}/`);
+    const badges = page.locator(`.badge-${category}`);
+    const count = await badges.count();
+    expect(count, `expected tinted badges on /category/${category}/`).toBeGreaterThan(0);
+
+    for (let i = 0; i < count; i++) {
+      const text = ((await badges.nth(i).textContent()) ?? '').trim().toLowerCase();
+      expect(text, `a ${category} badge carried colour but no word`).toContain(category);
+    }
+  }
+});
