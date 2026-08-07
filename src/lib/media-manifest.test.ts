@@ -150,9 +150,13 @@ describe('extractMediaRefs', () => {
     expect(extractMediaRefs(body)).toEqual(['2026/my-post/clip.mp4']);
   });
 
-  it('finds a relative key from an <Audio src="...">', () => {
+  // The Audio component was deleted (#115): zero usages, no audio-only content
+  // planned. The reconciler follows it out — a tag no component can render is
+  // not a media reference, and MDX already fails the build on an undefined
+  // component, so nothing is lost by narrowing the scan to <Video>.
+  it('ignores an <Audio src="..."> — the component no longer exists', () => {
     const body = `<Audio src="2026/my-post/clip.mp3" />`;
-    expect(extractMediaRefs(body)).toEqual(['2026/my-post/clip.mp3']);
+    expect(extractMediaRefs(body)).toEqual([]);
   });
 
   it('ignores already-absolute http(s) src values', () => {
@@ -169,9 +173,9 @@ describe('extractMediaRefs', () => {
     const body = `
       <Video src="2026/a/clip.mp4" poster={poster} />
       some text
-      <Audio src="2026/b/clip.mp3" />
+      <Video src="2026/b/clip.mp4" poster={poster} />
     `;
-    expect(extractMediaRefs(body)).toEqual(['2026/a/clip.mp4', '2026/b/clip.mp3']);
+    expect(extractMediaRefs(body)).toEqual(['2026/a/clip.mp4', '2026/b/clip.mp4']);
   });
 
   it('returns an empty array when nothing is embedded', () => {

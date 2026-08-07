@@ -1,5 +1,5 @@
 // Thin CLI wrapper around the pure logic in src/lib/media-manifest.ts
-// (issue #10). Reconciles every media key referenced by a `<Video|Audio
+// (issue #10). Reconciles every media key referenced by a `<Video
 // src="...">` in a post against the two sources that decide whether it will
 // actually work: R2 (a HEAD against MEDIA_ORIGIN — authoritative) and the
 // local disk (is it here to sync?). The manifest is media:sync's record for

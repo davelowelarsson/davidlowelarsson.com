@@ -562,3 +562,16 @@ how the project actually grew.
   matching lights `home` up everywhere; and `aria-current="page"` on a section
   a reader is merely inside is a lie. `src/lib/nav.ts` keeps that decision
   pure and unit-tested, away from the template.
+
+## Deleting a component means following it out of the scanners (2026-08-07, issue #115)
+
+- **A zero-usage component is not zero-cost.** `Audio.astro` was used in no
+  Post, but its *name* had leaked into a regex (`media-manifest.ts`), a CLI
+  wrapper's comment, and this guide — so "delete the file" was four edits, not
+  one. The entanglement is the argument against speculative components, not
+  just the unused code itself.
+- **MDX fails the build on an undefined component**, which is what makes
+  narrowing the R2 reconciler to `<Video>` safe: a leftover `<Audio src="…">`
+  in a post body can no longer be silently ignored, because the page will not
+  compile at all. The scanner does not need to be the safety net here.
+  Docs: https://docs.astro.build/en/guides/integrations-guide/mdx/#using-components
