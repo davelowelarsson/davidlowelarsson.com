@@ -103,6 +103,24 @@ export const BELOW_FLOOR = [
   'tint-til:light',
 ] as const satisfies readonly `${TokenName}:${Scheme}`[];
 
+/**
+ * Overrides for a reader who has asked their OS for more contrast.
+ *
+ * Only the tokens that carry the page's quiet parts: secondary text and the
+ * hairlines. An override that does not measurably improve contrast is
+ * decoration, so `palette.test.ts` asserts each of these beats its base value
+ * AND clears a higher floor — `muted` reaches AAA in both schemes.
+ *
+ * No `[data-theme]` companion is needed here, unlike the `prefers-color-scheme`
+ * rules: `prefers-contrast` is orthogonal to the scheme, and the values are
+ * `light-dark()` pairs resolved by `color-scheme` — which a forced theme sets.
+ * So the override follows a forced theme for free.
+ */
+export const HIGH_CONTRAST = {
+  muted: { light: '#3f453d', dark: '#cdd3c8' },
+  hairline: { light: 'rgb(30 33 29 / 34%)', dark: 'rgb(230 234 227 / 34%)' },
+} as const satisfies Partial<Record<TokenName, ColorPair>>;
+
 /** The three sRGB channels of an opaque hex colour, 0–255. */
 export function parseHex(hex: string): [number, number, number] {
   const match = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(hex.trim());
