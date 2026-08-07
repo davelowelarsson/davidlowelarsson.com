@@ -2,12 +2,17 @@
 title: "Retrospelsmässan 8-bit FTW"
 description: "A free trailer made for a friend's growing annual retro-games conference."
 pubDate: 2011-03-23
+liveFrom: 2026-08-23
 category: project
-draft: true
+draft: false
 tags: ["archive", "3d", "portfolio", "animation", "showreel"]
 ---
 
 > Recovered from the [Wayback Machine](https://web.archive.org/web/20160802224839id_/http://davidlowelarsson.com/portfolio/retrospelsmassan-8-bit-ftw/) — the portfolio page itself carries no publish date; dated to its journal counterpart (23 Mar 2011) on the old WordPress site. Lightly reformatted; images preserved.
+>
+> **2026 note:** I came back to Retrospelsmässan fifteen years later in [In praise of boring
+> tools](/posts/essay-in-praise-of-boring-tools/). The site still carries much of the design and
+> functionality I built, even though I don't maintain it anymore.
 
 ![Retrospelsmässan 2011 feature banner](./feature.png)
 

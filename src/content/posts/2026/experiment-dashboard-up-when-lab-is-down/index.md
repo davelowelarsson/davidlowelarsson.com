@@ -6,6 +6,8 @@ category: experiment
 tags: ["cloudflare", "workers", "caching", "homelab", "reliability"]
 draft: false
 liveFrom: 2026-09-01
+cover: ./cover.png
+coverAlt: The saltast.com public dashboard showing five experiments, three online and one offline
 ---
 
 Everything I run at home sits behind a `cloudflared` tunnel, the way I set it up in the [home lab
@@ -18,6 +20,8 @@ registry. The Worker lists the zone, keeps the records whose comment carries a `
 same [record comments I'm using as a tiny metadata DB](/posts/til-dnsendpoint-cloudflare-comments/)),
 renders a card per hostname and health-checks each host. The lab being unreachable stopped being
 an outage of the dashboard. It's a red card.
+
+![The saltast.com public dashboard showing five experiments, three online and one offline](./cover.png)
 
 ```mermaid
 flowchart LR

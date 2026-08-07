@@ -6,6 +6,8 @@ category: essay
 draft: false
 liveFrom: 2026-09-10
 tags: ["dora", "devops", "platform-engineering", "metrics", "agile"]
+cover: ./cover.png
+coverAlt: Team health check board showing Easy to release move from green to red after five quarters
 ---
 
 We run a team health check with some teams at UR, ten attributes that everyone rates green, yellow or red, and
@@ -15,7 +17,7 @@ got worse at all. What had changed was us. We had quietly raised what we count a
 green didn't qualify anymore. That's a strange sort of good news, and it's the clearest evidence
 I've had that the small iterative improvements were actually landing 😄
 
-![Team health check board with one attribute moving from green to red](./essay-dora-health-check.svg)
+![Team health check board with one attribute moving from green to red](./cover.png)
 
 *Five quarters of health checks. Easy to release, green all the way through... and then red.*
 
@@ -27,10 +29,12 @@ I've had that the small iterative improvements were actually landing 😄
   target on it.
 
 So I like DORA metrics, mostly because of what sits behind them. There's real research under those
-four numbers, and what it keeps finding is that the places where delivery health is good are also
-the places where people are happier at work. That matches everything I've seen. It's also why
-deployment frequency reads as a real signal to me and not a productivity score, because a feature
-that isn't deployed is just dead code, and dead code isn't giving any user a better day.
+five numbers now (the 2026 model replaces MTTR with Failed Deployment Recovery Time, aimed at the
+same recovery question but narrowed to failed deployments, and adds Deployment Rework Rate), and
+what it keeps finding is that the places where delivery health is good are also the places where
+people are happier at work. That matches everything I've seen. It's also why deployment frequency
+reads as a real signal to me and not a productivity score, because a feature that isn't deployed
+is just dead code, and dead code isn't giving any user a better day.
 
 ## The velocity years
 
@@ -54,9 +58,17 @@ the teams yet, because a number I can't defend is worse than no number at all.
 Which is worth holding next to where this started. When I wrote [the unexpected value of Dev Sec
 and Ops](/posts/dev-sec-and-ops/) in 2020, we deployed maybe once every two weeks and often
 postponed that, every project deployed differently, the checklists were out of date, and one of
-the deploy scripts had a skull in it for the production step ☠ Five years later the deploy button
-is mostly gone and the pipeline decides. I'm not going to quote a change failure rate yet, but I
-don't need a dashboard to tell me which of those two worlds I'd rather be on call in.
+the deploy scripts had a skull in it for the production step ☠ The posts land six years apart on
+the calendar, but the change I'm talking about happened over roughly five of them, and now the
+deploy button is mostly gone and the pipeline decides. I'm not going to quote a change failure
+rate yet, but I don't need a dashboard to tell me which of those two worlds I'd rather be on call
+in.
+
+I remember another version of that fear from when I reworked [sturebadet.se](https://sturebadet.se/).
+The payment service had a debug environment, and when we switched over and went live in production,
+no payments worked. The client was waiting with champagne and we were about to celebrate, and I was
+mashing at the keyboard like a monkey/cat and hoping I was fast enough to solve it. We did finally
+solve it... but it was a stressful hour, and exactly the kind of release I don't miss.
 
 ## What the numbers can't see
 
@@ -78,5 +90,5 @@ that part measured yet 🤔
 
 ## Links
 
-- [DORA research and capabilities model](https://dora.dev/), the four key metrics, what predicts them, and the outcomes they tie back to
+- [DORA research and capabilities model](https://dora.dev/), the five delivery metrics, what predicts them, and the outcomes they tie back to
 - [DevLake](https://devlake.apache.org/), one of the open source DORA dashboards worth looking at

@@ -151,3 +151,43 @@ describe('Git and AI ownership publication pair', () => {
     expect(postFrontmatterSchema.parse(frontmatterOf(cgfxPost)).liveFrom).toBe('2026-07-31');
   });
 });
+
+describe('reviewed 2026 essay and experiment covers', () => {
+  const POSTS = [
+    'essay-dora-five-years-after-deploy-fear',
+    'experiment-dashboard-up-when-lab-is-down',
+    'essay-in-praise-of-boring-tools',
+  ] as const;
+
+  it.each(POSTS)('%s has a cover with descriptive alt text', (slug) => {
+    const post = readFileSync(
+      join(process.cwd(), 'src/content/posts/2026', slug, 'index.md'),
+      'utf8',
+    );
+    const frontmatter = frontmatterOf(post) as Record<string, unknown>;
+    const body = post.replace(/^---\n[\s\S]*?\n---\n/, '');
+
+    expect(frontmatter.cover).toMatch(/^\.\/.+\.(png|jpe?g)$/);
+    expect(frontmatter.coverAlt).toEqual(expect.any(String));
+    expect((frontmatter.coverAlt as string).length).toBeGreaterThan(20);
+    expect(body).toContain(`(${frontmatter.cover})`);
+  });
+});
+
+describe('Retrospelsmassan and boring tools publication pair', () => {
+  it('publishes the archive root first and cross-links both posts', () => {
+    const archive = readFileSync(
+      join(process.cwd(), 'src/content/posts/2011/portfolio-retrospelsmassan-8-bit-ftw/index.md'),
+      'utf8',
+    );
+    const essay = readFileSync(
+      join(process.cwd(), 'src/content/posts/2026/essay-in-praise-of-boring-tools/index.md'),
+      'utf8',
+    );
+
+    expect(postFrontmatterSchema.parse(frontmatterOf(archive)).liveFrom).toBe('2026-08-23');
+    expect(postFrontmatterSchema.parse(frontmatterOf(essay)).liveFrom).toBe('2026-08-25');
+    expect(archive).toContain('/posts/essay-in-praise-of-boring-tools/');
+    expect(essay).toContain('/posts/portfolio-retrospelsmassan-8-bit-ftw/');
+  });
+});
