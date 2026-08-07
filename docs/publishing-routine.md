@@ -40,11 +40,18 @@ that completes.
 ## Current cycle
 
 Locator that survives renumbering: **the open issue labelled `content` whose
-title starts `Content roadmap — cycle`.** As of 2026-07-07 that is:
+title starts `Content roadmap — cycle`.** Trust the locator, not the snapshot
+below — the snapshot is dated for a reason, and a closed tracker named here has
+simply gone stale.
 
-- Tracker: **#40** — Content roadmap, cycle 1
+As of 2026-08-07:
+
+- Tracker: **#93** — Content roadmap, cycle 2
 - Flagship writes: **#38** (Gateway API migration), **#39** (alt-text @ 20k)
-- Milestone: **Content cycle 1**, due 2026-07-31
+- Milestone: **Content cycle 2**
+
+Cycle 1 (**#40**, milestone due 2026-07-31) is closed: it published 11 Posts and
+filled the schedule through 2026-09-24.
 
 ## Editorial principles
 
