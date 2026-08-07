@@ -90,13 +90,13 @@
      the body or of a paragraph ONLY — an image inside a component (an
      ArticleImage figure, a MediaAside, a YouTube poster) is that component's
      to place, and this rule must not reach it.
-     cursor: zoom-in signals the Lightbox component's click-to-enlarge
-     affordance (progressive enhancement — harmless with JS disabled). */
+     The zoom cursor is NOT set here: it follows the lightbox's
+     `data-examinable`, so every examinable figure gets the same affordance
+     whether or not its component remembered to ask. */
   .prose > :global(img),
   .prose :global(p) > :global(img) {
     display: block;
     margin: var(--space-figure) auto;
-    cursor: zoom-in;
   }
 
   /* ── The Markdown tier of the figure contract (#119) ──

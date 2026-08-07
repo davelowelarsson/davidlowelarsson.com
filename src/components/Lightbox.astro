@@ -1,31 +1,73 @@
 ---
-// Dependency-free progressive enhancement: click an in-article image OR a
-// Mermaid diagram to see it full-size in a native <dialog>. No JS → images and
-// diagrams stay inline, no broken affordance (there's no "click to zoom" chrome
-// that would then do nothing). Escape and backdrop-click both close the dialog.
+// Dependency-free progressive enhancement: examine any figure in an article
+// full-screen, in a native <dialog>. No JS → images and diagrams stay inline
+// and nothing advertises a capability that would then do nothing.
+//
+// PURPOSE, restated in #122. ADR 0006 §3 introduced this as the escape hatch
+// for diagrams that could not be made legible inline. The legibility floor
+// (ADR 0012) handles that inline now, so that justification is gone — but the
+// lightbox survives, because its real constituency was never diagrams. It is
+// bound to every article image, and there are 41 of those against 3 diagrams.
+// What it is FOR is examining any figure full-screen.
 //
 // Images open a copy of themselves (capped to the viewport). Diagrams open a
 // clone of their inline SVG with the fit-to-container cap stripped, so it
-// renders at natural size and can be panned by scrolling the dialog — the
-// "really examine it" escape hatch for wide diagrams that read small inline.
+// renders at natural size and can be panned by scrolling the dialog.
 // Deliberately minimal: no pan/zoom library, native <dialog> gives us Escape,
-// focus trapping and the backdrop for free. See ADR 0006.
-// Docs: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog
+// focus trapping and the backdrop for free. That constraint from ADR 0006 §3
+// still stands. Pinch-to-zoom remains the documented next step if this proves
+// insufficient; it is not built.
+//
+// KEYBOARD (#122, closes #75). Until now this was pointer-only, which is a
+// capability that exists for mouse users and not for keyboard users — not
+// something that can ship into a frozen accessibility floor. Each examinable
+// figure gets its own button, rather than the media element being made
+// focusable, for two reasons:
+//   1. An <img> given role="button" stops being announced as an image.
+//   2. A diagram already contains a focusable scroll region (ADR 0012), so
+//      wrapping it would nest interactive content inside interactive content.
+// The button uses the site's own skip-link idiom: visually hidden until it
+// takes focus. Mouse users see no new chrome and keep click-to-open; keyboard
+// users reach a real, named, visible control; screen readers get it either way.
 ---
 
 <dialog id="lightbox" aria-label="Enlarged view">
+  <!--
+    A real close control. Escape and a backdrop click both still work, but
+    neither exists for a reader on a phone: there is no Escape key, and the
+    backdrop is a thin ring around a figure that nearly fills the screen.
+    Leaving them as the only way out is how a lightbox feels like a trap.
+  -->
+  <button type="button" class="lightbox-close" aria-label="Close enlarged view">
+    <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false">
+      <path d="M3 3 L13 13 M13 3 L3 13" stroke="currentColor" stroke-width="1.75" fill="none" stroke-linecap="round" />
+    </svg>
+  </button>
   <div class="lightbox-content"></div>
 </dialog>
 
 <style is:global>
   /* No open/close animation at all — the simplest way to respect
      prefers-reduced-motion is to never add motion in the first place. */
+  /* An OPAQUE plate in the page's own ground, not a transparent box.
+     Transparent was the obvious choice and it was wrong: an SVG has no
+     background of its own, so a diagram or a sketch opened over the 75%-black
+     scrim was drawn straight onto it. In light mode that is near-black ink on
+     near-black — the enlarged view was less legible than the inline one it was
+     supposed to improve on. A raster hid the problem because a photograph
+     brings its own opacity.
+
+     `--bg` rather than white: whatever ground the reader is on is the ground
+     the figure was designed against, and it is what the diagram's own token
+     colours were resolved against by #121. */
   #lightbox {
-    padding: 0;
+    padding: 1rem;
     border: none;
+    border-radius: 10px;
     max-width: 92vw;
     max-height: 92vh;
-    background: transparent;
+    background: var(--bg);
+    color: var(--ink);
     overscroll-behavior: contain;
   }
 
@@ -34,8 +76,28 @@
   }
 
   #lightbox[data-lightbox-kind='diagram'] {
-    /* A natural-size diagram can exceed the dialog box — scroll to pan it. */
+    /* A natural-size diagram can exceed the dialog box — scroll to pan it.
+       `showModal()` leaves focus on the dialog itself (it holds nothing
+       focusable), so this is also what makes the arrow keys pan it. */
     overflow: auto;
+  }
+
+  /* NOT full-screen on a phone, and this was tried and reverted.
+     Sizing the dialog to `100vw/100vh` made it stop centring — a <dialog> is
+     centred by the UA's `margin: auto`, which does nothing once the box fills
+     the viewport, so the figure sat at the top-left — and the opaque plate then
+     covered the scrim entirely, so there was no longer any sign the page was
+     still behind it. It read as a navigation, not an overlay.
+     A lightbox has to keep saying "this is on top of what you were reading".
+     The scrim stays visible on every screen; the phone gets a smaller inset and
+     less padding so the figure still gets nearly all the width. */
+  @media (max-width: 40rem) {
+    #lightbox {
+      max-width: 94vw;
+      max-height: 94vh;
+      padding: 0.5rem;
+      border-radius: 8px;
+    }
   }
 
   #lightbox::backdrop {
@@ -44,68 +106,348 @@
 
   /* An image fits the viewport (as before). A diagram SVG keeps its natural
      size so it stays sharp and legible; the dialog scrolls to reach the edges. */
+  .lightbox-close {
+    position: absolute;
+    top: 0.35rem;
+    right: 0.35rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    /* WCAG 2.2 target size, and a comfortable thumb target on a phone. */
+    min-width: 32px;
+    min-height: 32px;
+    padding: 0;
+    border: 1px solid var(--hairline);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--muted);
+    cursor: pointer;
+  }
+
+  .lightbox-close:hover {
+    color: var(--ink);
+  }
+
   .lightbox-content img {
     display: block;
-    max-width: 92vw;
-    max-height: 92vh;
+    /* Less the plate's padding on both sides, or the image overflows the box
+       it is supposed to sit inside. */
+    max-width: calc(92vw - 2rem);
+    max-height: calc(92vh - 2rem);
     object-fit: contain;
   }
 
   .lightbox-content svg {
     display: block;
   }
+
+  /* A sketch is inverted inline on a dark ground (see Prose.astro), and the
+     clone in here is outside that component — so without these it opens
+     un-inverted: dark strokes on the dark plate, invisible. The enlarged view
+     has to answer the theme the same way the inline one does.
+
+     Both halves, as everywhere: `prefers-color-scheme` cannot see a forced
+     theme, so the query is narrowed to "OS dark AND not forced light" and a
+     forced-dark companion sits outside it. src/lib/theme.test.ts asserts the
+     pair is present in this file. */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) .lightbox-content img[src*='excalidraw'] {
+      filter: invert(0.92) hue-rotate(180deg);
+    }
+  }
+
+  :root[data-theme='dark'] .lightbox-content img[src*='excalidraw'] {
+    filter: invert(0.92) hue-rotate(180deg);
+  }
+
+  /* The affordance follows the CAPABILITY, in one rule.
+     It used to be set per component — Prose set it on plain Markdown images,
+     Mermaid on diagrams, MediaAside on its figure — and ArticleImage and
+     ImagePair never set it at all. So the same picture offered a zoom cursor
+     in a `.md` post and none in an `.mdx` one, purely by which component had
+     remembered. Keyed on `data-examinable` instead: the attribute this script
+     puts on exactly the things it will open, so the cursor cannot disagree with
+     what clicking does. */
+  [data-examinable] {
+    cursor: zoom-in;
+  }
+
+  /* Visually hidden until focused — the same idiom as `.skip-link` and
+     `.theme-label`. NOT `display: none`, which cannot take focus, and not
+     permanently visible, which would put a control under all 41 article
+     images for the readers who already have one (their pointer). */
+  .examine {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+  }
+
+  .examine:focus {
+    position: static;
+    display: block;
+    width: auto;
+    /* Clears the WCAG 2.2 24px target minimum once it is a real control. */
+    min-height: 24px;
+    height: auto;
+    margin: 0.5rem auto 0;
+    padding: 0.35rem 0.75rem;
+    overflow: visible;
+    clip-path: none;
+    border: 1px solid var(--hairline);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    cursor: zoom-in;
+  }
 </style>
 
 <script>
+  import { decideRender, LEGIBILITY_FLOOR_PX } from '../lib/legibility';
+
+
+
+  /**
+   * The size a diagram's labels are drawn at, in its own units — the same
+   * measurement Mermaid.astro makes, for the same reason. Duplicated rather
+   * than shared because the two components have no other reason to know about
+   * each other, and it is three lines.
+   */
+  function labelSizeIn(svg: SVGSVGElement): number {
+    const label = svg.querySelector<Element>('.nodeLabel, .edgeLabel, text');
+    if (!label) return Number.NaN;
+    return Number.parseFloat(getComputedStyle(label).fontSize);
+  }
+
   const dialog = document.querySelector<HTMLDialogElement>('#lightbox');
   const content = dialog?.querySelector<HTMLElement>('.lightbox-content');
+  const article = document.querySelector('article');
 
-  if (dialog && content) {
+  if (dialog && content && article) {
+    /** Which figure each examine button belongs to. */
+    const examines = new WeakMap<HTMLElement, Element>();
+
+    // Two things the platform already does, verified by removing them and
+    // watching the tests keep passing rather than by assuming:
+    //
+    //   PANNING. `showModal()` focuses the dialog itself when it holds no
+    //   focusable descendant, so the arrow keys pan it with no `tabindex` and
+    //   no explicit `.focus()` call.
+    //   FOCUS RETURN. Closing a dialog restores focus to whatever had it when
+    //   the dialog opened, so no opener needs tracking.
+    //
+    // Both are in the HTML standard, and both are asserted in
+    // e2e/lightbox.spec.ts — so if a browser ever stopped doing them, the
+    // suite would say so rather than the reader discovering it.
     const open = (node: Node, kind: 'image' | 'diagram') => {
       dialog.dataset.lightboxKind = kind;
       content.replaceChildren(node);
       dialog.showModal();
+      // No explicit `.focus()`, and that was checked rather than assumed.
+      // Adding the close button DOES move `showModal`'s initial focus onto it —
+      // but a button does not consume the arrow keys, so the dialog (the scroll
+      // container) still pans. Focus landing on "close" is a reasonable first
+      // stop anyway. The spec guards the behaviour either way.
     };
 
-    // One delegated listener on the article covers both media types — and,
-    // crucially, diagrams that Mermaid.astro swaps in *after* this script runs
-    // (its render is async), which a one-shot querySelectorAll would miss.
-    document.querySelector('article')?.addEventListener('click', (event) => {
+    /**
+     * Grow a vector to the room the OPEN plate actually has.
+     *
+     * Measured after `showModal`, not computed from `92vw` and a padding
+     * constant copied out of the stylesheet. Those numbers were duplicated in
+     * two languages and already disagreed with reality: on a phone the plate is
+     * narrower than the inline breakout column, so the "enlarged" diagram came
+     * out SMALLER than the one that was clicked — the same bug, one screen size
+     * down. Reading the box removes the class of mistake, not just the instance.
+     *
+     * `floor` is passed for a diagram, whose labels have a size to respect;
+     * a sketch has none to measure, so it simply fills.
+     */
+    const fillPlate = (
+      node: SVGSVGElement | HTMLImageElement,
+      ratio: number,
+      inlineWidth: number,
+      floor?: { naturalWidth: number; baseLabelPx: number },
+    ) => {
+      const style = getComputedStyle(dialog);
+      // The dialog's MAX size, not its current size. A <dialog> is shrink-to-fit,
+      // so `clientWidth` reports whatever the content already is — measuring it
+      // to decide how big the content should be is circular, and quietly
+      // reports success at any size. `max-width: 92vw` resolves to pixels here,
+      // which is the number that was wanted all along, without duplicating it.
+      const limit = (value: string, fallback: number) => {
+        const parsed = Number.parseFloat(value);
+        return Number.isFinite(parsed) ? parsed : fallback;
+      };
+      const inner =
+        limit(style.maxWidth, window.innerWidth) -
+        Number.parseFloat(style.paddingLeft) -
+        Number.parseFloat(style.paddingRight);
+      const innerHeight =
+        limit(style.maxHeight, window.innerHeight) -
+        Number.parseFloat(style.paddingTop) -
+        Number.parseFloat(style.paddingBottom);
+
+      const safeRatio = Number.isFinite(ratio) && ratio > 0 ? ratio : 1;
+      // Both axes: a tall figure sized only by the width is pushed off the
+      // bottom of the plate, which is a different way of being unreadable.
+      const containerWidth = Math.min(inner, innerHeight * safeRatio);
+
+      const decided = floor
+        ? decideRender({
+            naturalWidth: floor.naturalWidth,
+            containerWidth,
+            baseLabelPx: floor.baseLabelPx,
+            floorPx: LEGIBILITY_FLOOR_PX,
+            fill: true,
+          }).renderWidth
+        : containerWidth;
+
+      // Never smaller than the figure that was clicked. On a phone the plate is
+      // narrower than the inline breakout column (`100vw - 2rem`), so fitting
+      // to it would hand back something smaller than the reader already had —
+      // which is the complaint that started this. Bigger than the plate simply
+      // means it pans, and for a diagram that is the only way to stay legible
+      // at that width anyway.
+      const width = Math.max(decided, inlineWidth);
+
+      node.style.maxWidth = 'none';
+      node.style.maxHeight = 'none';
+      node.style.width = `${width}px`;
+      node.style.height = 'auto';
+    };
+
+    /** Build the enlarged node for a piece of media and show it. */
+    const examine = (media: Element) => {
+      if (media instanceof HTMLImageElement) {
+        const clone = document.createElement('img');
+        clone.src = media.src;
+        clone.alt = media.alt;
+        // Raster or vector, and an <img> can be either. A sketch is an SVG
+        // delivered through an <img>, so it scales losslessly and should fill
+        // the plate like a diagram; a photograph must stay capped at its
+        // natural size or it goes soft. Without this a sketch opened at exactly
+        // the size it already was, which is not an enlarged view.
+        const isVector = /\.svg(\?|#|$)/i.test(new URL(media.src, location.href).pathname);
+        open(clone, 'image');
+        if (isVector) {
+          const box = media.getBoundingClientRect();
+          fillPlate(clone, box.width / box.height, box.width);
+        }
+        return;
+      }
+
+      const svg = media.querySelector('svg');
+      if (!svg) return;
+      const clone = svg.cloneNode(true) as SVGSVGElement;
+
+      // Pinning the clone to its viewBox was giving the reader a SMALLER
+      // diagram than the one they clicked: the simple fixture diagram is 453
+      // units wide, and its inline breakout column is wider than that. "Open
+      // it bigger" has to mean bigger.
+      //
+      // The distinction that matters is raster versus vector. A photograph
+      // cannot honour the request past its natural size — upscaling just goes
+      // soft — so an <img> stays capped. A diagram is a vector and scales
+      // losslessly, so it fills the space it has, and the SAME legibility floor
+      // that governs it inline decides whether filling is enough or it needs to
+      // be bigger still and pan.
+      const natural = clone.viewBox?.baseVal;
+      clone.removeAttribute('width');
+      clone.removeAttribute('height');
+      open(clone, 'diagram');
+      fillPlate(
+        clone,
+        natural?.width && natural?.height ? natural.width / natural.height : 1,
+        svg.getBoundingClientRect().width,
+        { naturalWidth: natural?.width ?? Number.NaN, baseLabelPx: labelSizeIn(svg) },
+      );
+    };
+
+    /** Give one piece of media its own examine button, once. */
+    const addButton = (media: Element, label: string) => {
+      if (media.hasAttribute('data-examinable')) return;
+      media.setAttribute('data-examinable', '');
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'examine';
+      button.textContent = label;
+      examines.set(button, media);
+      media.after(button);
+    };
+
+    const enhance = () => {
+      for (const img of article.querySelectorAll('img')) {
+        // Same exclusion the click path uses: an image inside a button or a
+        // link already has an owner, and the YouTube facade's poster is one.
+        if (img.closest('button, a')) continue;
+        addButton(img, img.alt ? `Examine “${img.alt}” full screen` : 'Examine image full screen');
+      }
+      for (const diagram of article.querySelectorAll('.mermaid-diagram')) {
+        // Only once it HAS a diagram in it. The container appears first and is
+        // filled a tick later (Mermaid renders async, and #121 draws on the
+        // resolved theme in a second pass), so a button attached to the empty
+        // container is a control that silently does nothing if pressed in that
+        // window. The observer fires again when the SVG lands, and it gets its
+        // button then. Showed up as a spec that passed alone and failed in a
+        // full run — the load changes the timing, not the correctness.
+        if (!diagram.querySelector('svg')) continue;
+        addButton(diagram, 'Examine diagram full screen');
+      }
+    };
+
+    enhance();
+    // Mermaid swaps its diagrams in AFTER this script runs (its render is
+    // async), and re-renders them again on every theme change. A one-shot pass
+    // would miss every diagram — the same latent ordering bug ADR 0006 records
+    // for the click listener, which is why that one is delegated.
+    new MutationObserver(enhance).observe(article, { childList: true, subtree: true });
+
+    // One delegated listener covers the button, the images, and diagrams that
+    // did not exist when this ran.
+    article.addEventListener('click', (event) => {
       const target = event.target as Element | null;
+
+      const button = target?.closest?.<HTMLElement>('.examine');
+      const owned = button && examines.get(button);
+      if (button && owned) {
+        examine(owned);
+        return;
+      }
 
       const img = target?.closest?.<HTMLImageElement>('img');
       if (img && !img.closest('button, a')) {
-        const clone = document.createElement('img');
-        clone.src = img.src;
-        clone.alt = img.alt;
-        open(clone, 'image');
+        examine(img);
         return;
       }
 
       const diagram = target?.closest?.('.mermaid-diagram');
-      const svg = diagram?.querySelector('svg');
-      if (svg) {
-        const clone = svg.cloneNode(true) as SVGSVGElement;
-        // Strip the fit-to-container cap Mermaid applies (useMaxWidth) and pin
-        // the intrinsic dimensions from the viewBox, so the clone renders at
-        // full size inside the scrollable dialog instead of shrinking again.
-        clone.style.maxWidth = 'none';
-        clone.style.width = '';
-        clone.style.height = '';
-        const box = clone.viewBox?.baseVal;
-        if (box?.width) {
-          clone.setAttribute('width', String(box.width));
-          clone.setAttribute('height', String(box.height));
-        }
-        open(clone, 'diagram');
-      }
+      if (diagram) examine(diagram);
     });
 
-    // A click that lands on the backdrop reports the <dialog> itself as the
-    // target (the backdrop isn't a real descendant node) — that's how we
-    // tell it apart from a click on the content. Escape already closes a
-    // showModal() dialog natively, so it needs no handler here.
+    // Escape already closes a showModal() dialog natively, so it needs no
+    // handler here.
     dialog.addEventListener('click', (event) => {
+      const target = event.target as Element | null;
+      // The close control lives inside the dialog, so the article's delegated
+      // listener never sees it — this is the listener that can.
+      if (target?.closest?.('.lightbox-close')) {
+        dialog.close();
+        return;
+      }
+      // A click that lands on the backdrop reports the <dialog> itself as the
+      // target (the backdrop isn't a real descendant node) — that's how we tell
+      // it apart from a click on the content.
       if (event.target === dialog) dialog.close();
     });
 

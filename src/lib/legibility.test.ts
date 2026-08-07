@@ -131,4 +131,44 @@ describe('decideRender', () => {
   it('falls back to fitting when the container has not been laid out', () => {
     expect(decideRender({ ...BASE, containerWidth: 0 }).mode).toBe('fit');
   });
+
+  // ── fill: the enlarged view ──
+  //
+  // A reader who opens a figure is asking to see it BIGGER. Pinning a diagram
+  // to its viewBox gave them a smaller one than the inline figure they clicked
+  // whenever the diagram was narrower than its breakout column — which the
+  // simple fixture diagram (453 units) is.
+
+  it('fills the space when asked, even past natural size', () => {
+    const decision = decideRender({ ...BASE, naturalWidth: 453, containerWidth: 1200, fill: true });
+    expect(decision.mode).toBe('fit');
+    expect(decision.renderWidth).toBe(1200);
+  });
+
+  it('still refuses to upscale when not asked', () => {
+    const decision = decideRender({ ...BASE, naturalWidth: 453, containerWidth: 1200 });
+    expect(decision.mode).toBe('fit');
+    expect(decision.renderWidth).toBe(453);
+  });
+
+  it('does not let fill override the floor — a wide diagram still scrolls', () => {
+    // Filling is about growing a SMALL diagram, not about shrinking a large one
+    // below legibility. On a phone the enlarged view still scrolls.
+    const decision = decideRender({ ...BASE, naturalWidth: 1826, containerWidth: 359, fill: true });
+    expect(decision.mode).toBe('scroll');
+    expect(decision.renderWidth).toBeCloseTo((1826 * LEGIBILITY_FLOOR_PX) / 16, 6);
+  });
+
+  it('fills up to the point the floor is still met on a wide screen', () => {
+    // 1826 natural, 1150 available: labels land at 16 * (1150/1826) = 10.1px,
+    // above the 9px floor, so it fits rather than scrolling.
+    const decision = decideRender({
+      ...BASE,
+      naturalWidth: 1826,
+      containerWidth: 1150,
+      fill: true,
+    });
+    expect(decision.mode).toBe('fit');
+    expect(decision.renderWidth).toBe(1150);
+  });
 });
