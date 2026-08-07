@@ -36,3 +36,27 @@ const site = Astro.site?.href ?? 'https://davidlowelarsson.com';
     )
   }
 </Base>
+
+<style>
+  .filter-rail {
+    display: flex;
+    gap: 1rem;
+    margin: 0.75rem 0 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    letter-spacing: 0.03em;
+  }
+
+  .filter-rail a {
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  .filter-rail a:hover {
+    color: var(--ink);
+  }
+
+  .filter-rail [aria-current] {
+    color: var(--ink);
+  }
+</style>

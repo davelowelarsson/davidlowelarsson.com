@@ -1,0 +1,166 @@
+---
+/**
+ * Layer 2 of three: everything that styles a rendered Post body.
+ *
+ * Markdown arrives through a `<slot />` as already-rendered HTML with no
+ * component of its own, so Astro cannot add its scope attribute to any of it.
+ * Prose styling therefore CANNOT be scoped in the ordinary sense — but it can
+ * be *housed*, and that is what this component is for. Two things follow:
+ *
+ * 1. It is testable. `Prose.test.ts` renders slotted content through the
+ *    Container API and asserts the wrapper it lands in — the first coverage
+ *    article prose has ever had.
+ * 2. The list rules stop being scoped by a prefix someone has to remember.
+ *    `.prose :global(ul)` compiles to `.prose[data-astro-cid-…] ul`: the
+ *    narrowing comes from a scope attribute Astro generates, not from an
+ *    `article ` someone typed. `.post-list` sits outside this element, so a
+ *    prose list rule cannot reach it however specific it becomes. That is the
+ *    guarantee the old comment could only ask for.
+ *
+ * `:global()` on the descendant, never on the whole selector. Wrapping the
+ * `.prose` end would opt the rule out of scoping entirely and put us back
+ * where we started.
+ */
+---
+
+<div class="prose"><slot /></div>
+
+<style>
+  /* Markdown-native TL;DR: an ordinary heading immediately followed by a list.
+     This works unchanged in .md and .mdx. Its styling is part of the frozen
+     non-media style. */
+  .prose :global(h2#tldr),
+  .prose :global(h2#tldr + ul) {
+    background: var(--chip);
+    border-left: 3px solid var(--accent);
+  }
+
+  .prose :global(h2#tldr) {
+    margin: 2.25rem 0 0;
+    padding: 0.9rem 1.25rem 0.25rem;
+    border-radius: 4px 4px 0 0;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    font-weight: 650;
+    letter-spacing: 0;
+  }
+
+  .prose :global(h2#tldr + ul) {
+    margin: 0 0 2.25rem;
+    padding: 0.25rem 1.25rem 1rem 2.75rem;
+    border-radius: 0 0 4px 4px;
+  }
+
+  .prose :global(h2#tldr + ul li + li) {
+    margin-top: 0.35rem;
+  }
+
+  /* Prose list rules live here and nowhere else.
+     A bare `ul { padding-left }` reaches every list on the site — the post
+     list, and any nav or footer list added later — and indents rows meant to
+     sit flush. Housing them in this component makes that structurally
+     impossible rather than merely unlikely: the compiled selector carries this
+     component's scope attribute, and `.post-list` is never inside it.
+     e2e/post-list-alignment.spec.ts asserts the rows line up; the unit test in
+     src/lib/prose-scope.test.ts asserts no list rule anywhere in the codebase
+     goes unscoped. */
+  .prose :global(ul),
+  .prose :global(ol) {
+    padding-left: 1.25rem;
+  }
+
+  .prose :global(li + li) {
+    margin-top: 0.4rem;
+  }
+
+  .prose :global(blockquote) {
+    margin: 1.5rem 0;
+    padding: 0.25rem 0 0.25rem 1.25rem;
+    border-left: 2px solid var(--hairline);
+    color: var(--muted);
+  }
+
+  .prose :global(hr) {
+    border: 0;
+    border-top: 1px solid var(--hairline);
+    margin: 2.5rem 0;
+  }
+
+  /* Plain Markdown images: centered, with room to breathe. Direct children of
+     the body or of a paragraph ONLY — an image inside a component (an
+     ArticleImage figure, a MediaAside, a YouTube poster) is that component's
+     to place, and this rule must not reach it.
+     cursor: zoom-in signals the Lightbox component's click-to-enlarge
+     affordance (progressive enhancement — harmless with JS disabled). */
+  .prose > :global(img),
+  .prose :global(p) > :global(img) {
+    display: block;
+    margin: var(--space-figure) auto;
+    cursor: zoom-in;
+  }
+
+  /* The Excalidraw sketch inversion is deliberately NOT here. It applies to
+     `img[src*='excalidraw']` anywhere on the page, not only inside a Post
+     body, and this ticket is a prefactor: narrowing it to `.prose` would be a
+     behaviour change smuggled in as a move. It stays in src/styles/global.css
+     until #121 takes sketch theming as its own decision. */
+
+  /* ── Code ── */
+
+  .prose :global(code) {
+    font-family: var(--font-mono);
+  }
+
+  .prose :global(:not(pre) > code) {
+    font-size: 0.875em;
+    padding: 0.1em 0.35em;
+    border-radius: 4px;
+    background: var(--chip);
+  }
+
+  .prose :global(pre) {
+    margin: 1.5rem 0;
+    padding: 1rem 1.25rem;
+    border-radius: 8px;
+    border: 1px solid var(--hairline);
+    overflow-x: auto;
+    font-size: 0.875rem;
+    line-height: 1.55;
+  }
+
+  /* ── Tables ── */
+
+  .prose :global(table) {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1.5rem 0;
+    font-size: 0.9375rem;
+  }
+
+  .prose :global(th) {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  .prose :global(th),
+  .prose :global(td) {
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--hairline);
+    /* `anywhere`, not `break-word`. Only `anywhere` reduces a cell's MIN-CONTENT
+       width, which is what an auto-layout table uses to decide it cannot fit —
+       `break-word` wraps the rendered text but leaves the intrinsic width alone,
+       so the table still forces the page wider. Without this a table with more
+       columns than the viewport can hold pushes the whole PAGE sideways: `pre`
+       has scrolled inside its own box since it was written, and `table` never
+       got the equivalent. Found by the kitchen-sink fixture at 320px.
+       This upholds the existing no-horizontal-scroll guarantee rather than
+       changing the frozen style — column widths on a desktop are unaffected,
+       because the constraint only ever binds when the table cannot otherwise
+       fit. */
+    overflow-wrap: anywhere;
+  }
+</style>

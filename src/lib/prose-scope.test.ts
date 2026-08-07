@@ -1,28 +1,20 @@
-import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { allCssSources, cssIn, selectorsIn } from './stylesheets';
 
 // Prose styling must not reach past the article. e2e/post-list-alignment.spec.ts
 // asserts the outcome a reader can see; this asserts the shape of the rule, so
-// that dropping the `article` prefix fails immediately rather than in whatever
-// listing page happens to be looked at next.
+// that dropping the scope fails immediately rather than in whatever listing
+// page happens to be looked at next.
 //
 // Element-level list rules are the specific hazard: they are the ones with low
 // enough specificity to look harmless and wide enough reach to hit every list
 // on the site, including ones that do not exist yet.
+//
+// Since #116 this scans EVERY stylesheet source, not one global block. A rule
+// that moves into a component must stay inside the guard — otherwise splitting
+// the CSS into layers would have been a way to escape it.
 
-const BASE_LAYOUT = 'src/layouts/Base.astro';
-
-/** Every selector in the global sheet, comments stripped. */
-function selectors(): string[] {
-  const match = /<style is:global>([\s\S]*)<\/style>/.exec(readFileSync(BASE_LAYOUT, 'utf8'));
-  if (!match) throw new Error(`no global style block in ${BASE_LAYOUT}`);
-  const css = match[1].replace(/\/\*[\s\S]*?\*\//g, '');
-
-  return [...css.matchAll(/(^|\})([^{}]+)\{/g)]
-    .flatMap(([, , group]) => group.split(','))
-    .map((selector) => selector.trim())
-    .filter((selector) => selector.length > 0 && !selector.startsWith('@'));
-}
+const PROSE_COMPONENT = 'src/components/Prose.astro';
 
 /**
  * A list rule that nothing scopes.
@@ -41,13 +33,36 @@ function isUnscopedListRule(selector: string): boolean {
 }
 
 describe('prose styling stays inside the article', () => {
-  it('scopes every list-element rule', () => {
-    const bare = selectors().filter(isUnscopedListRule);
+  it('scopes every list-element rule, in every stylesheet source', () => {
+    const bare = allCssSources().flatMap(([path, css]) =>
+      selectorsIn(css)
+        .filter(isUnscopedListRule)
+        .map((selector) => `${path}: ${selector}`),
+    );
     expect(bare, 'a list rule reaches outside the article').toEqual([]);
   });
 
   it('still styles lists that ARE prose', () => {
-    const scoped = selectors().filter((selector) => /^article\s+(ul|ol|li)\b/.test(selector));
+    const scoped = selectorsIn(cssIn(PROSE_COMPONENT)).filter((selector) =>
+      /^\.prose\b.*\b(?:ul|ol|li)\b/.test(selector),
+    );
     expect(scoped.length, 'prose lists lost their rules entirely').toBeGreaterThan(0);
+  });
+
+  // The guarantee #116 buys, stated as a test rather than as a comment. Astro
+  // compiles `.prose :global(ul)` to `.prose[data-astro-cid-…] ul`: the
+  // narrowing comes from a scope attribute the compiler generates, not from an
+  // `article ` prefix someone has to remember to type. `.post-list` is never
+  // inside that element, so a prose list rule cannot reach it at any
+  // specificity.
+  it('narrows prose list rules with the component class, not a hand-written prefix', () => {
+    const listRules = selectorsIn(cssIn(PROSE_COMPONENT)).filter((selector) =>
+      /\b(?:ul|ol|li)\b/.test(selector),
+    );
+    expect(listRules.length, 'no prose list rules found to check').toBeGreaterThan(0);
+    expect(
+      listRules.filter((selector) => !selector.startsWith('.prose')),
+      'a list rule in Prose.astro is not anchored on .prose, so Astro cannot scope it',
+    ).toEqual([]);
   });
 });

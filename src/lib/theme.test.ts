@@ -1,5 +1,5 @@
-import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { allCssSources, mediaBlocks, selectorsIn, withoutMediaBlocks } from './stylesheets';
 import { DEFAULT_THEME, THEME_STORAGE_KEY, THEMES, type Theme, themeAttribute } from './theme';
 
 describe('the three theme states', () => {
@@ -44,60 +44,49 @@ describe('themeAttribute', () => {
 // Asserted structurally, because the failure is silent and only shows on the
 // one combination nobody tests by hand.
 
-const BASE_LAYOUT = 'src/layouts/Base.astro';
-
-function globalStyleBlock(): string {
-  const match = /<style is:global>([\s\S]*)<\/style>/.exec(readFileSync(BASE_LAYOUT, 'utf8'));
-  if (!match) throw new Error(`no global style block in ${BASE_LAYOUT}`);
-  return match[1].replace(/\/\*[\s\S]*?\*\//g, '');
-}
+// Since #116 this scans EVERY stylesheet source rather than one global block.
+// The trap is silent by nature, so the guard must not have a layer it cannot
+// see: a component that adds its own prefers-color-scheme rule is covered the
+// day it is written.
+const DARK_SCHEME = /prefers-color-scheme:\s*dark/;
 
 /** The selectors declared inside each `prefers-color-scheme: dark` block. */
 function darkSchemeQueries(css: string): string[][] {
-  const blocks: string[][] = [];
-  const opener = /@media\s*\(prefers-color-scheme:\s*dark\)\s*\{/g;
-
-  for (let match = opener.exec(css); match !== null; match = opener.exec(css)) {
-    let depth = 1;
-    let index = match.index + match[0].length;
-    const start = index;
-    while (index < css.length && depth > 0) {
-      if (css[index] === '{') depth++;
-      else if (css[index] === '}') depth--;
-      index++;
-    }
-    const body = css.slice(start, index - 1);
-    blocks.push(
-      [...body.matchAll(/(^|\})([^{}]+)\{/g)].flatMap(([, , group]) =>
-        group.split(',').map((selector) => selector.trim()),
-      ),
-    );
-  }
-  return blocks;
+  return mediaBlocks(css, DARK_SCHEME).map(selectorsIn);
 }
 
 describe('every OS-preference query can see a forced theme', () => {
   it('guards each prefers-color-scheme selector against a forced light theme', () => {
-    const unguarded = darkSchemeQueries(globalStyleBlock())
-      .flat()
-      .filter((selector) => !selector.includes("[data-theme='light']"));
+    const unguarded = allCssSources().flatMap(([path, css]) =>
+      darkSchemeQueries(css)
+        .flat()
+        .filter((selector) => !selector.includes("[data-theme='light']"))
+        .map((selector) => `${path}: ${selector}`),
+    );
     expect(unguarded, 'these fire even when the reader has forced light').toEqual([]);
   });
 
   it('gives each of them a forced-dark companion outside the query', () => {
-    const css = globalStyleBlock();
-    const inQuery = darkSchemeQueries(css).flat();
-    expect(inQuery.length, 'expected at least one OS-preference rule to guard').toBeGreaterThan(0);
+    const sources = allCssSources();
+    const total = sources.flatMap(([, css]) => darkSchemeQueries(css).flat());
+    expect(total.length, 'expected at least one OS-preference rule to guard').toBeGreaterThan(0);
 
     // For every `:root:not([data-theme='light']) X` inside the query there must
     // be a `:root[data-theme='dark'] X` outside it, or forcing dark on a light
-    // OS does nothing.
-    const outside = css.replace(/@media\s*\(prefers-color-scheme:[\s\S]*?\n {2}\}/g, '');
-    for (const selector of inQuery) {
-      const target = selector.replace(":root:not([data-theme='light'])", '').trim();
-      expect(outside, `no forced-dark companion for "${target}"`).toContain(
-        `:root[data-theme='dark'] ${target}`,
-      );
+    // OS does nothing. The companion has to be in the SAME file: a rule and its
+    // counterpart living in different layers is how one of them gets deleted.
+    for (const [path, css] of sources) {
+      // Brace-matched removal. The previous version anchored on `\n  }`, the
+      // indentation of a rule inside `<style is:global>` — which stops matching
+      // the moment the rule moves into a .css file at column zero, silently
+      // leaving the whole query in `outside` and passing every assertion.
+      const outside = withoutMediaBlocks(css, DARK_SCHEME);
+      for (const selector of darkSchemeQueries(css).flat()) {
+        const target = selector.replace(":root:not([data-theme='light'])", '').trim();
+        expect(outside, `${path}: no forced-dark companion for "${target}"`).toContain(
+          `:root[data-theme='dark'] ${target}`,
+        );
+      }
     }
   });
 });

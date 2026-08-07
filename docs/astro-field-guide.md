@@ -598,3 +598,30 @@ how the project actually grew.
   an auto-layout table still forces the page wider than the viewport. This is
   why a wide table pushed the whole page sideways while `pre` — which has
   `overflow-x: auto` — never did.
+
+## Prose cannot be scoped, but it can be housed (2026-08-07, issue #116)
+
+- **Astro scopes a component's styles by adding `data-astro-cid-…` to the
+  markup it compiles — and slotted content is not markup it compiles.** Rendered
+  markdown arrives through a `<slot />` as finished HTML, so it never gets the
+  attribute and a plain scoped rule never matches it. This is why article prose
+  styling had lived in one global block since the site was built.
+  Docs: https://docs.astro.build/en/guides/styling/#scoped-styles
+- **`.prose :global(ul)` is the way out.** The `:global()` goes on the
+  DESCENDANT, never the whole selector: Astro still scopes `.prose` — which *is*
+  the component's own element — and leaves `ul` alone, compiling to
+  `.prose[data-astro-cid-…] ul`. The narrowing comes from an attribute the
+  compiler generates, not from an `article ` prefix someone has to remember.
+  Wrapping the whole selector in `:global()` opts out entirely and puts you back
+  where you started.
+- **The reset is not the prose.** `h1` appears on the home page, both error
+  pages, a Category page and a Post header — none of which render a Post body —
+  so the base type scale has to stay in the global sheet. Only what is specific
+  to article content moves into the component.
+- **A guard that reads one file stops guarding when the file splits.** The
+  palette mirror, the forced-theme companions and the prose-list scoping all
+  reached into `Base.astro`'s `<style is:global>` by regex; after the split they
+  would have kept passing while checking a block that no longer held the rules.
+  They ask `src/lib/stylesheets.ts` for every source now. Two of them were also
+  anchored on a two-space indent, which a `.css` file at column zero does not
+  have — brace-matching instead.
