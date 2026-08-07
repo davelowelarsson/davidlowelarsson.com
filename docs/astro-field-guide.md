@@ -481,3 +481,10 @@ how the project actually grew.
   resulting HTML to the existing sanitizer. The Container API is experimental,
   so this dependency stays isolated to the prerendered RSS endpoint and its
   production-build contract. Docs: https://docs.astro.build/en/reference/container-reference/
+
+## Preview-only prototype routes (2026-08-06, issue #11)
+
+- A dynamic `.astro` route returns three variant paths from `getStaticPaths()` when
+  `SHOW_DRAFTS=true`, and an empty array in Production. The prototype URLs therefore work
+  locally and on Preview Deployments without entering the production build or sitemap.
+  Docs: https://docs.astro.build/en/guides/routing/#static-ssg-mode
