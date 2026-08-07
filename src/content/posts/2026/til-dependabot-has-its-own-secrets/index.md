@@ -19,7 +19,25 @@ Cloudflare token and skips with a notice when it isn't set, which is exactly why
 perfectly healthy... a green check mark and a step that quietly decided there was nothing for it to
 do.
 
+GitHub treats a Dependabot PR like it came from a fork, with a read-only `GITHUB_TOKEN` and no
+access to the Actions secrets. That's a good default, because the code in a dependency update
+shouldn't automatically get my deployment credentials, but it also means a preview deployment
+needs its own narrowly scoped secret in both stores.
+
 ![Dependabot secrets store](image.png)
+
+The GitHub CLI can put a secret directly in the Dependabot store:
+
+```sh
+gh secret set DEPENDABOT_SECRET_NAME --app dependabot
+```
+
+I only want a preview token with the smallest permissions I can give it in that store. Copying a
+production token there would make the security boundary a lot less useful.
 
 **Takeaway:** a Dependabot PR's workflow reads secrets from the Dependabot store (something I did now but needed reminding about) rather than the
 Actions store, so anything guarded by a token check can pass by doing nothing at all.
+
+## Links
+
+- [Dependabot on Actions](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-on-actions/), where GitHub documents the separate secrets store and the fork-like permissions

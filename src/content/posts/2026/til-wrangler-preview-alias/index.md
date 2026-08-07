@@ -42,4 +42,4 @@ so the tab I keep open through a review never quietly goes stale.
 
 ## Links
 
-- [Preview URLs and aliases for Workers](https://developers.cloudflare.com/workers/configuration/previews/)
+- [Preview URLs and aliases for Workers](https://developers.cloudflare.com/workers/versions-and-deployments/preview-urls/), including the alias rules (lowercase, starts with a letter, 63 characters with the worker name, 1000 kept)
