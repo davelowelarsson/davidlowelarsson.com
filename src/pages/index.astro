@@ -63,8 +63,8 @@ const site = Astro.site?.href ?? 'https://davidlowelarsson.com';
   {
     recent.length > 0 && (
       <section aria-labelledby="recent-heading">
-        <h2 id="recent-heading" class="section-heading">
-          Recent
+        <h2 id="recent-heading" class="divider section-heading">
+          <span>Recent</span>
         </h2>
         <PostList posts={recent} />
         <p class="all-posts">
