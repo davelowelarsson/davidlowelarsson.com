@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { KITCHEN_SINK } from './fixtures';
 
 // The trap this file exists to prevent, which has already cost an hour once:
 // a bare `ul { padding-left: … }` for prose lists outranks `.post-list
@@ -49,7 +50,7 @@ for (const path of LISTING_PAGES) {
 
 // Prose lists still need their indent — scoping must not mean deleting it.
 test('prose lists inside an article keep their indent', async ({ page }) => {
-  await page.goto('/posts/experiment-home-lab-topology/');
+  await page.goto(KITCHEN_SINK);
   const list = page.locator('article ul').first();
   await expect(list).toBeVisible();
 

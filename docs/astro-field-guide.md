@@ -575,3 +575,26 @@ how the project actually grew.
   in a post body can no longer be silently ignored, because the page will not
   compile at all. The scanner does not need to be the safety net here.
   Docs: https://docs.astro.build/en/guides/integrations-guide/mdx/#using-components
+
+## A content collection can hold test fixtures (2026-08-07, issue #125)
+
+- **`draft: true` is a build-time filter, so a Post can exist only for tests.**
+  The e2e suite builds with `SHOW_DRAFTS=true` and production with `false`, so a
+  permanent draft is present exactly where it is wanted and structurally
+  incapable of leaking. Nothing extra was needed — no separate collection, no
+  test-only route, no `import.meta.env` branch in a template.
+  Docs: https://docs.astro.build/en/guides/content-collections/#filtering-collection-queries
+- **A `.md` post and an `.mdx` post do not render the same way.** They take
+  different processors, so one fixture cannot cover both — hence two. This is
+  the same reason `tldr.spec.ts` always ran twice.
+- **In MDX, do not wrap slot content in `<p>` when blank lines already will.**
+  Markdown inside a component's children still goes through the paragraph rule,
+  so explicit `<p>` tags come out as `<p><p>…</p></p>` and the browser splits
+  them — three paragraphs rendered as nine. Write the prose bare and let MDX
+  make the paragraphs.
+  Docs: https://docs.astro.build/en/guides/integrations-guide/mdx/#using-components
+- **Only `overflow-wrap: anywhere` shrinks a cell's min-content width.**
+  `break-word` wraps the rendered text but leaves the intrinsic width alone, so
+  an auto-layout table still forces the page wider than the viewport. This is
+  why a wide table pushed the whole page sideways while `pre` — which has
+  `overflow-x: auto` — never did.

@@ -112,6 +112,16 @@ describe('production build (SHOW_DRAFTS=false)', () => {
       'expected at least one draft to make this test meaningful',
     ).toBeGreaterThan(0);
 
+    // Belt and braces on top of the loop below. The e2e suite pins itself to
+    // these two fixtures and would happily go on passing if one of them
+    // silently became publishable — the loop only checks the drafts it finds,
+    // so a fixture that stopped being a draft would stop being checked. Naming
+    // them here is what makes "the fixtures are permanently unpublishable" a
+    // claim this test can fail on. See src/lib/e2e-fixtures.ts.
+    for (const fixture of ['kitchen-sink', 'kitchen-sink-markdown']) {
+      expect(drafts, `e2e fixture ${fixture} is no longer a draft`).toContain(fixture);
+    }
+
     const rss = readFileSync(join(outDir, 'rss.xml'), 'utf8');
     const sitemap = existsSync(join(outDir, 'sitemap-0.xml'))
       ? readFileSync(join(outDir, 'sitemap-0.xml'), 'utf8')

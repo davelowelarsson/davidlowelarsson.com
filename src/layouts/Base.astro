@@ -1080,6 +1080,19 @@ const THEME_ICONS: Record<string, string> = {
     text-align: left;
     padding: 0.5rem 0.75rem;
     border-bottom: 1px solid var(--hairline);
+    /* `anywhere`, not `break-word`. Only `anywhere` reduces a cell's MIN-CONTENT
+       width, which is what an auto-layout table uses to decide it cannot fit —
+       `break-word` wraps the rendered text but leaves the intrinsic width alone,
+       so the table still forces the page wider. Without this a table with more
+       columns than the viewport can hold pushes the whole PAGE sideways: `pre`
+       has scrolled inside its own box since it was written, and `table` never
+       got the equivalent. Found by the kitchen-sink fixture at 320px; no
+       published Post happened to carry a table wide enough to show it.
+       This upholds the existing no-horizontal-scroll guarantee rather than
+       changing the frozen style — column widths on a desktop are unaffected,
+       because the constraint only ever binds when the table cannot otherwise
+       fit. */
+    overflow-wrap: anywhere;
   }
 
   @media (prefers-reduced-motion: no-preference) {

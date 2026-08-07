@@ -1,15 +1,24 @@
 import { expect, test } from '@playwright/test';
+import { KITCHEN_SINK, KITCHEN_SINK_MARKDOWN } from './fixtures';
 
 // Guards issue #6: mermaid code blocks render as diagrams client-side, and
 // — the point of doing this client-side instead of via rehype-mermaid SSR —
-// pages with no mermaid block never pay for the mermaid chunk at all. The
-// proof-post (experiment-home-lab-topology) carries one or more `mermaid`
-// blocks specifically to exercise this; it's published (draft: false), so it's
-// built and served the same way in dev, preview, and this e2e run against the
-// production build. The test is count-agnostic — a post may grow more diagrams.
+// pages with no mermaid block never pay for the mermaid chunk at all.
+//
+// Both fixtures carry a diagram, because `.md` and `.mdx` do not go through the
+// same processor and "a fenced mermaid block renders" has to hold in both. The
+// fixtures' node labels are stable and asserted on: renaming one means changing
+// this spec in the same commit, which is the point — a published Post's labels
+// are writing and must never be load-bearing for a test about rendering.
 
-const MERMAID_POST_PATH = '/posts/experiment-home-lab-topology/';
-const AI_OWNERSHIP_POST_PATH = '/posts/essay-ai-code-ownership/';
+const MERMAID_POST_PATH = KITCHEN_SINK;
+const MERMAID_MARKDOWN_PATH = KITCHEN_SINK_MARKDOWN;
+
+function requireBox<T>(box: T | null): T {
+  expect(box).toBeTruthy();
+  if (!box) throw new Error('expected element bounding box');
+  return box;
+}
 
 test('a mermaid block in a post renders as an inline SVG diagram', async ({ page }) => {
   await page.goto(MERMAID_POST_PATH);
@@ -29,13 +38,25 @@ test('a mermaid block in a post renders as an inline SVG diagram', async ({ page
   await expect(diagrams.first().locator('g.node').first()).toBeVisible();
 });
 
-test('the AI code ownership risk map renders both responsibility paths', async ({ page }) => {
-  await page.goto(AI_OWNERSHIP_POST_PATH);
+test('a diagram renders the labels on both of its branches', async ({ page }) => {
+  await page.goto(MERMAID_POST_PATH);
 
   const diagram = page.locator('.mermaid-diagram svg');
   await expect(diagram).toBeVisible();
-  await expect(diagram).toContainText('Input / output box');
-  await expect(diagram).toContainText('Full execution chain');
+  await expect(diagram).toContainText('Component tier');
+  await expect(diagram).toContainText('Markdown tier');
+});
+
+test('a mermaid block renders in a plain .md post too, not only in .mdx', async ({ page }) => {
+  // The two formats take different processors. A diagram that renders in one and
+  // silently stays a code block in the other is exactly the regression a
+  // single-format fixture would miss.
+  await page.goto(MERMAID_MARKDOWN_PATH);
+
+  await expect(page.locator('pre > code.language-mermaid')).toHaveCount(0);
+  const diagram = page.locator('.mermaid-diagram svg');
+  await expect(diagram).toBeVisible();
+  await expect(diagram).toContainText('CSS framing, keyed on path');
 });
 
 test('a diagram breaks out wider than the prose column on desktop', async ({ page }) => {
@@ -49,13 +70,11 @@ test('a diagram breaks out wider than the prose column on desktop', async ({ pag
   await expect(diagram).toBeVisible();
   const paragraph = page.locator('article p').first();
 
-  const diagramBox = await diagram.boundingBox();
-  const paragraphBox = await paragraph.boundingBox();
-  expect(diagramBox, 'diagram should have a box').not.toBeNull();
-  expect(paragraphBox, 'paragraph should have a box').not.toBeNull();
+  const diagramBox = requireBox(await diagram.boundingBox());
+  const paragraphBox = requireBox(await paragraph.boundingBox());
 
   // Comfortably wider than the text measure (not merely a rounding difference).
-  expect(diagramBox!.width).toBeGreaterThan(paragraphBox!.width + 40);
+  expect(diagramBox.width).toBeGreaterThan(paragraphBox.width + 40);
 });
 
 for (const width of [390, 1280]) {
@@ -100,7 +119,7 @@ test('clicking a diagram opens it larger in the lightbox; Escape and backdrop cl
 
   const inline = page.locator('.mermaid-diagram svg').first();
   await expect(inline).toBeVisible();
-  const inlineBox = await inline.boundingBox();
+  const inlineBox = requireBox(await inline.boundingBox());
 
   const dialog = page.locator('#lightbox');
   await expect(dialog).toBeHidden();
@@ -110,9 +129,9 @@ test('clicking a diagram opens it larger in the lightbox; Escape and backdrop cl
 
   const modalSvg = dialog.locator('svg').first();
   await expect(modalSvg).toBeVisible();
-  const modalBox = await modalSvg.boundingBox();
-  expect(modalBox!.width, 'diagram in the modal is larger than inline').toBeGreaterThan(
-    inlineBox!.width,
+  const modalBox = requireBox(await modalSvg.boundingBox());
+  expect(modalBox.width, 'diagram in the modal is larger than inline').toBeGreaterThan(
+    inlineBox.width,
   );
 
   await page.keyboard.press('Escape');

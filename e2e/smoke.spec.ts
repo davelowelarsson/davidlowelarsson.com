@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { BYLINES } from '../src/lib/bylines';
+import { KITCHEN_SINK, KITCHEN_SINK_MARKDOWN } from './fixtures';
 
 test('landing page presents David and navigates to posts', async ({ page }) => {
   await page.goto('/');
@@ -62,6 +63,9 @@ test('categories are reachable from the posts filter rail and from a post page',
   await page.locator('.filter-rail').getByRole('link', { name: 'essay' }).click();
   await expect(page).toHaveURL(/\/category\/essay\/$/);
 
+  // content-pinned: the Category badge has to carry a real Category, and this
+  // asserts the published essay reaches /category/essay/ — Post metadata, not
+  // rendering.
   await page.goto('/posts/essay-dora-five-years-after-deploy-fear/');
   await page.locator('article').getByRole('link', { name: 'essay' }).click();
   await expect(page).toHaveURL(/\/category\/essay\/$/);
@@ -96,11 +100,13 @@ test('sitemap carries per-post lastmod and robots.txt points at it', async ({ re
   const sitemap = await (await request.get('/sitemap-0.xml')).text();
   expect(sitemap).toContain('<lastmod>');
   expect(sitemap).toContain(
+    // content-pinned: a real lastmod for a real Post is the thing being asserted.
     '<loc>https://davidlowelarsson.com/posts/experiment-spotify-slack-sync/</loc><lastmod>2026-07-10T00:00:00.000Z</lastmod>',
   );
-  expect(sitemap).not.toContain(
-    '<loc>https://davidlowelarsson.com/posts/embed-test-fixture/</loc>',
-  );
+  // The fixtures are permanent drafts: present in this build (SHOW_DRAFTS=true),
+  // absent from the sitemap either way.
+  expect(sitemap).not.toContain(`<loc>https://davidlowelarsson.com${KITCHEN_SINK}</loc>`);
+  expect(sitemap).not.toContain(`<loc>https://davidlowelarsson.com${KITCHEN_SINK_MARKDOWN}</loc>`);
 
   const robots = await (await request.get('/robots.txt')).text();
   expect(robots).toContain('Sitemap: https://davidlowelarsson.com/sitemap-index.xml');
@@ -118,6 +124,8 @@ test('pages carry OpenGraph metadata and structured data', async ({ page }) => {
   expect(profile['@type']).toBe('ProfilePage');
   expect(profile.mainEntity['@type']).toBe('Person');
 
+  // content-pinned: OpenGraph and JSON-LD are contracts over published content;
+  // a draft fixture is excluded from the surfaces this asserts against.
   await page.goto('/posts/essay-dora-five-years-after-deploy-fear/');
   await expect(page.locator('meta[property="og:type"]')).toHaveAttribute('content', 'article');
   await expect(page.locator('meta[property="article:published_time"]')).toHaveCount(1);
@@ -126,6 +134,7 @@ test('pages carry OpenGraph metadata and structured data', async ({ page }) => {
   );
   expect(posting['@type']).toBe('BlogPosting');
   expect(posting.url).toBe(
+    // content-pinned: the canonical URL of the post loaded just above.
     'https://davidlowelarsson.com/posts/essay-dora-five-years-after-deploy-fear/',
   );
   expect(posting.image['@type']).toBe('ImageObject');

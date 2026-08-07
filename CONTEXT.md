@@ -46,6 +46,18 @@ adjacent list as one summary band. It is not a blockquote — David is summarizi
 his own Post, not quoting another source. Its styling is part of the frozen
 non-media style (see Frozen Style below).
 
+## Fixture
+
+A Post that exists only to be tested against, kept `draft: true` forever. There
+are two — `kitchen-sink` (`.mdx`) and `kitchen-sink-markdown` (`.md`) — one per
+markdown processor, holding one of every block the site can render. A Fixture's
+prose is placeholder text describing the block below it: it never reaches a
+reader, so it is not voice-bearing and does not go through `/draft-post`. Its
+node labels, captions and asset names *are* load-bearing and change like code.
+Every e2e spec that is about rendering targets a Fixture; a spec that is
+genuinely about published content pins it with a `content-pinned:` reason
+(ADR 0011).
+
 ## Scheduled Post
 
 A non-draft Post with a future `liveFrom`. Merged and committed — it publishes

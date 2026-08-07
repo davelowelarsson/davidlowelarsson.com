@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 320" width="640" height="320" role="img" aria-label="Fixture sketch: two boxes joined by an arrow">
+  <!--
+    Not a real Excalidraw export — a hand-written stand-in with the same shape:
+    dark strokes on a transparent ground, named *.excalidraw.svg so the
+    sketch-inversion rule (keyed on the path, not the contents) applies to it.
+    Deliberately synthetic so the fixture owns its assets outright.
+  -->
+  <g fill="none" stroke="#1e1e1e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M42 78 L246 74 L250 176 L46 180 Z" />
+    <path d="M44 80 L248 76" opacity="0.5" />
+    <path d="M392 76 L598 80 L594 182 L390 178 Z" />
+    <path d="M394 78 L596 82" opacity="0.5" />
+    <path d="M252 128 L378 128" />
+    <path d="M362 116 L380 128 L361 140" />
+    <path d="M120 244 C 190 226, 300 262, 420 238" stroke-dasharray="7 9" opacity="0.75" />
+  </g>
+  <g font-family="Comic Sans MS, Segoe Print, cursive" font-size="20" fill="#1e1e1e">
+    <text x="80" y="136">source</text>
+    <text x="432" y="140">rendered</text>
+    <text x="150" y="286" font-size="16" opacity="0.8">…and back again</text>
+  </g>
+</svg>

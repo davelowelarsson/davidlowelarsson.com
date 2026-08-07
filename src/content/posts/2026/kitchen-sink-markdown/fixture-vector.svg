@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" width="640" height="360" role="img" aria-label="Fixture vector chart: four bars of increasing height with a baseline">
+  <!--
+    A plain .svg — the "drawn/vector" kind. No plate, no dark dimming, and no
+    sketch inversion (that rule is keyed on *.excalidraw.svg). It uses only
+    explicit colours, so it renders identically on either ground and any
+    theme-dependent treatment applied to it is a regression, not a feature.
+  -->
+  <rect x="0" y="0" width="640" height="360" fill="#f4f6f8" />
+  <g fill="#3c6e8f">
+    <rect x="80" y="240" width="72" height="64" />
+    <rect x="196" y="188" width="72" height="116" />
+    <rect x="312" y="140" width="72" height="164" />
+    <rect x="428" y="96" width="72" height="208" />
+  </g>
+  <path d="M56 304 H 560" stroke="#26343d" stroke-width="3" fill="none" />
+  <g font-family="system-ui, sans-serif" font-size="18" fill="#26343d" text-anchor="middle">
+    <text x="116" y="332">one</text>
+    <text x="232" y="332">two</text>
+    <text x="348" y="332">three</text>
+    <text x="464" y="332">four</text>
+    <text x="320" y="52" font-size="22">Fixture vector chart</text>
+  </g>
+</svg>

@@ -1,12 +1,19 @@
 import { expect, test } from '@playwright/test';
+import { KITCHEN_SINK } from './fixtures';
 
 // Centred header, in reading order: Category eyebrow, title, then date and
 // state. A reader should know what KIND of writing this is before they start.
+//
+// The header's SHAPE is rendering, so it is asserted on the fixture. Post STATE
+// — scheduled versus published — is metadata, and the one test that asserts it
+// stays on real Posts because state is the thing it is about.
 
-const PUBLISHED = '/posts/essay-ai-code-ownership/';
+const POST_PATH = KITCHEN_SINK;
+/** The fixture's Category. Changing its frontmatter means changing this. */
+const FIXTURE_CATEGORY = 'experiment';
 
 test('the header reads eyebrow, then title, then date', async ({ page }) => {
-  await page.goto(PUBLISHED);
+  await page.goto(POST_PATH);
 
   const eyebrow = page.locator('.post-header .eyebrow');
   const title = page.locator('.post-header h1');
@@ -46,11 +53,11 @@ test('the header reads eyebrow, then title, then date', async ({ page }) => {
 test('the Category eyebrow carries the word, tinted, and links to its Category', async ({
   page,
 }) => {
-  await page.goto(PUBLISHED);
+  await page.goto(POST_PATH);
 
   const badge = page.locator('.post-header .eyebrow a.badge');
-  await expect(badge).toHaveText('essay');
-  await expect(badge).toHaveAttribute('href', '/category/essay/');
+  await expect(badge).toHaveText(FIXTURE_CATEGORY);
+  await expect(badge).toHaveAttribute('href', `/category/${FIXTURE_CATEGORY}/`);
 
   // Tinted, not left on the body ink — and the word is there either way.
   const [colour, ink] = await Promise.all([
@@ -66,7 +73,7 @@ test('the Category eyebrow carries the word, tinted, and links to its Category',
 });
 
 test('the title is centred and the only h1', async ({ page }) => {
-  await page.goto(PUBLISHED);
+  await page.goto(POST_PATH);
 
   await expect(page.locator('h1')).toHaveCount(1);
 
@@ -82,7 +89,7 @@ test('the title is centred and the only h1', async ({ page }) => {
 });
 
 test('the date is machine-readable and set in tabular figures', async ({ page }) => {
-  await page.goto(PUBLISHED);
+  await page.goto(POST_PATH);
 
   const time = page.locator('.post-header time');
   const datetime = await time.getAttribute('datetime');
@@ -105,9 +112,13 @@ test('post-list rows stay left-aligned — the centring is scoped to the header'
 test('a scheduled Post is marked, a published one is not', async ({ page }) => {
   // The e2e build runs with SHOW_DRAFTS=true, which is what a Preview
   // Deployment does — so scheduled Posts render here the way David sees them.
-  await page.goto(PUBLISHED);
+  //
+  // content-pinned: this asserts Post STATE — both slugs below — and neither
+  // state exists on a permanent draft. A fixture could only show "draft" here.
+  await page.goto('/posts/essay-ai-code-ownership/');
   await expect(page.locator('.post-header .badge-scheduled')).toHaveCount(0);
 
+  // content-pinned: a really-scheduled Post, which is the case under test.
   await page.goto('/posts/til-dnsendpoint-cloudflare-comments/');
   const scheduled = page.locator('.post-header .badge-scheduled');
   await expect(scheduled).toBeVisible();
@@ -130,7 +141,7 @@ test('a scheduled Post is marked, a published one is not', async ({ page }) => {
 
 test('the header reads correctly at 320px', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 800 });
-  await page.goto(PUBLISHED);
+  await page.goto(POST_PATH);
 
   await expect(page.locator('.post-header .eyebrow')).toBeVisible();
   await expect(page.locator('.post-header h1')).toBeVisible();
