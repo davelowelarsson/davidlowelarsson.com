@@ -190,19 +190,19 @@ const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
     --font-prose: system-ui, -apple-system, 'Segoe UI', sans-serif;
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
-    --ink: light-dark(#1b1b1f, #e6e6e9);
-    --muted: light-dark(#5f665d, #9c9ca6);
-    --hairline: light-dark(rgb(0 0 0 / 12%), rgb(255 255 255 / 16%));
-    --chip: light-dark(rgb(0 0 0 / 5%), rgb(255 255 255 / 9%));
-    --bg: light-dark(#ffffff, #111113);
-    --warn: light-dark(#8a5800, #fbbf24);
-    --focus: light-dark(#2563eb, #93b4ff);
-    --status-up: light-dark(#15803d, #4ade80);
-    --status-down: light-dark(#b91c1c, #f87171);
-    --tint-essay: light-dark(#4338ca, #a5b4fc);
-    --tint-til: light-dark(#047857, #6ee7b7);
-    --tint-experiment: light-dark(#0e7490, #67e8f9);
-    --tint-project: light-dark(#be185d, #f9a8d4);
+    --bg: light-dark(#fafbfa, #111310);
+    --ink: light-dark(#1e211d, #e6eae3);
+    --muted: light-dark(#5f665d, #a3aa9f);
+    --hairline: light-dark(rgb(30 33 29 / 13%), rgb(230 234 227 / 14%));
+    --chip: light-dark(rgb(30 33 29 / 5%), rgb(230 234 227 / 7%));
+    --accent: light-dark(#0f6b74, #6fcdd9);
+    --warn: light-dark(#8a5800, #eebd5c);
+    --status-up: light-dark(#136c36, #4ade80);
+    --status-down: light-dark(#b01818, #f87171);
+    --tint-essay: light-dark(#4338ca, #b4bdfc);
+    --tint-til: light-dark(#0f766e, #5eead4);
+    --tint-experiment: light-dark(#155e75, #7dd3fc);
+    --tint-project: light-dark(#a21caf, #f0abfc);
   }
 
   * {
@@ -222,7 +222,7 @@ const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
   }
 
   :focus-visible {
-    outline: 2px solid var(--focus);
+    outline: 2px solid var(--accent);
     outline-offset: 2px;
     border-radius: 2px;
   }
@@ -256,7 +256,7 @@ const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
   article h2#tldr,
   article h2#tldr + ul {
     background: var(--chip);
-    border-left: 3px solid var(--focus);
+    border-left: 3px solid var(--accent);
   }
 
   article h2#tldr {
@@ -544,7 +544,7 @@ const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
   /* Preview-only: a non-draft post queued for a future liveFrom. Calm blue so
      it reads as "coming", distinct from the amber "draft". */
   .badge-scheduled {
-    color: var(--focus);
+    color: var(--accent);
   }
 
   /* Error-page illustrations keep their own gray plate — framed like a card

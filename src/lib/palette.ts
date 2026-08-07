@@ -21,20 +21,26 @@ export interface ColorPair {
 }
 
 export const PALETTE = {
-  ink: { light: '#1b1b1f', dark: '#e6e6e9' },
-  muted: { light: '#5f665d', dark: '#9c9ca6' },
-  hairline: { light: 'rgb(0 0 0 / 12%)', dark: 'rgb(255 255 255 / 16%)' },
-  chip: { light: 'rgb(0 0 0 / 5%)', dark: 'rgb(255 255 255 / 9%)' },
-  bg: { light: '#ffffff', dark: '#111113' },
-  warn: { light: '#8a5800', dark: '#fbbf24' },
-  focus: { light: '#2563eb', dark: '#93b4ff' },
-  'status-up': { light: '#15803d', dark: '#4ade80' },
-  'status-down': { light: '#b91c1c', dark: '#f87171' },
-  // Quiet Category tints — legible as monochrome, scannable as colour.
-  'tint-essay': { light: '#4338ca', dark: '#a5b4fc' },
-  'tint-til': { light: '#047857', dark: '#6ee7b7' },
-  'tint-experiment': { light: '#0e7490', dark: '#67e8f9' },
-  'tint-project': { light: '#be185d', dark: '#f9a8d4' },
+  // Green-biased neutrals: the greys carry a trace of the accent's hue, so they
+  // read as chosen rather than as leftover #888.
+  bg: { light: '#fafbfa', dark: '#111310' },
+  ink: { light: '#1e211d', dark: '#e6eae3' },
+  muted: { light: '#5f665d', dark: '#a3aa9f' },
+  hairline: { light: 'rgb(30 33 29 / 13%)', dark: 'rgb(230 234 227 / 14%)' },
+  chip: { light: 'rgb(30 33 29 / 5%)', dark: 'rgb(230 234 227 / 7%)' },
+  // The accent means STATE — link, focus, current, scheduled. Nothing else.
+  accent: { light: '#0f6b74', dark: '#6fcdd9' },
+  warn: { light: '#8a5800', dark: '#eebd5c' },
+  // Retuned to sit with the green-biased ground. The locked design has no
+  // equivalent for these two; the light values are what changed, because the
+  // old `#15803d` measured 4.84:1 against the new ground.
+  'status-up': { light: '#136c36', dark: '#4ade80' },
+  'status-down': { light: '#b01818', dark: '#f87171' },
+  // Category tints. These only ever colour the Category WORD — see ADR 0009.
+  'tint-essay': { light: '#4338ca', dark: '#b4bdfc' },
+  'tint-til': { light: '#0f766e', dark: '#5eead4' },
+  'tint-experiment': { light: '#155e75', dark: '#7dd3fc' },
+  'tint-project': { light: '#a21caf', dark: '#f0abfc' },
 } as const satisfies Record<string, ColorPair>;
 
 export type TokenName = keyof typeof PALETTE;
@@ -45,14 +51,15 @@ export interface TextToken {
   readonly ground: TokenName;
 }
 
-// Every token used as a text colour anywhere in the sheet. `focus` is here
-// because `.badge-scheduled` paints text with it, not only because it draws
-// the focus ring — the ring's own (non-text, 3:1) threshold is #107's job.
+// Every token used as a text colour anywhere in the sheet. `accent` is here
+// because `.badge-scheduled` and link hover paint text with it, not only
+// because it draws the focus ring — the ring's own (non-text, 3:1) threshold
+// is a separate, lower guarantee.
 export const TEXT_TOKENS = [
   { token: 'ink', ground: 'bg' },
   { token: 'muted', ground: 'bg' },
   { token: 'warn', ground: 'bg' },
-  { token: 'focus', ground: 'bg' },
+  { token: 'accent', ground: 'bg' },
   { token: 'status-up', ground: 'bg' },
   { token: 'status-down', ground: 'bg' },
   { token: 'tint-essay', ground: 'bg' },
@@ -78,18 +85,22 @@ export const AAA_FLOOR = 7;
 
 /**
  * Text tokens that do not yet clear CONTRAST_FLOOR. This is a countdown, not a
- * set of exemptions: #108 gives each of these its locked value and empties the
- * list. Everything here still clears AA_FLOOR, which has no exceptions.
+ * set of exemptions — everything here still clears AA_FLOOR, which has no
+ * exceptions at all.
  *
  * The test asserts this list is EXACTLY the set that falls short — a token
  * cannot quietly join it, and a token that gets fixed cannot quietly stay on
- * it. Deleting the last entry is how #108 knows it is finished.
+ * it.
+ *
+ * One entry left, and it is a contradiction inside the locked design rather
+ * than an unfinished job: the locked `--tint-til` is `#0f766e`, which measures
+ * 5.28:1 against the locked ground — the prototype's own §1b note records the
+ * tint range as "5.3–7.6" while setting the floor at 5.5. Changing the hex
+ * would be reopening a locked decision, so it is reported on #94 instead.
+ * `#0e7168` is the smallest same-hue darkening that clears the floor (5.65:1).
  */
 export const BELOW_FLOOR = [
-  'focus:light',
-  'status-up:light',
   'tint-til:light',
-  'tint-experiment:light',
 ] as const satisfies readonly `${TokenName}:${Scheme}`[];
 
 /** The three sRGB channels of an opaque hex colour, 0–255. */
