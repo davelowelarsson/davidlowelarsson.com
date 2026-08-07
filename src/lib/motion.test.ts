@@ -53,10 +53,16 @@ describe('motion is opt-in', () => {
       );
       const ranges = guardedRanges(source);
 
-      for (const match of source.matchAll(/\b(transition|animation)\s*:/g)) {
+      // Longhands too. `transition: …` was the only form matched at first,
+      // so `transition-property` + `transition-duration`, the `animation-*`
+      // longhands, and a `.animate()` call all animated for a reader who asked
+      // their OS not to.
+      for (const match of source.matchAll(
+        /\b(transition|animation)(?:-[a-z-]+)?\s*:|\.animate\s*\(/g,
+      )) {
         const at = match.index ?? 0;
         const inside = ranges.some(([start, end]) => at > start && at < end);
-        if (!inside) unguarded.push(`${path}: ${match[1]} at offset ${at}`);
+        if (!inside) unguarded.push(`${path}: ${match[0].trim()} at offset ${at}`);
       }
     }
 

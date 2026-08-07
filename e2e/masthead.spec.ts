@@ -272,10 +272,19 @@ for (const scheme of ['light', 'dark'] as const) {
       await control.focus();
       const outline = await control.evaluate((el) => {
         const computed = getComputedStyle(el);
-        return { style: computed.outlineStyle, width: Number.parseFloat(computed.outlineWidth) };
+        return {
+          style: computed.outlineStyle,
+          width: Number.parseFloat(computed.outlineWidth),
+          color: computed.outlineColor,
+        };
       });
       expect(outline.style, `control ${i} has no focus ring in ${scheme}`).not.toBe('none');
       expect(outline.width, `control ${i} has a zero-width ring in ${scheme}`).toBeGreaterThan(0);
+      // A 2px solid TRANSPARENT outline satisfies style and width and is
+      // invisible, so the colour has to be checked too.
+      expect(outline.color, `control ${i} has an invisible ring in ${scheme}`).not.toMatch(
+        /transparent|rgba?\([^)]*,\s*0\s*\)/,
+      );
     }
   });
 }

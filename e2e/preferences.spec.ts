@@ -67,10 +67,17 @@ for (const scheme of ['light', 'dark'] as const) {
       await control.focus();
       const ring = await control.evaluate((el) => {
         const computed = getComputedStyle(el);
-        return { style: computed.outlineStyle, width: Number.parseFloat(computed.outlineWidth) };
+        return {
+          style: computed.outlineStyle,
+          width: Number.parseFloat(computed.outlineWidth),
+          color: computed.outlineColor,
+        };
       });
       expect(ring.style, `control ${i} lost its ring in ${scheme}`).not.toBe('none');
       expect(ring.width, `control ${i} has a zero-width ring in ${scheme}`).toBeGreaterThan(0);
+      expect(ring.color, `control ${i} has an invisible ring in ${scheme}`).not.toMatch(
+        /transparent|rgba?\([^)]*,\s*0\s*\)/,
+      );
     }
   });
 }
