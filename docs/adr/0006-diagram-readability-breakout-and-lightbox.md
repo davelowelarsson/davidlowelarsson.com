@@ -7,7 +7,8 @@ Superseded in part by: [ADR 0012 — The legibility floor](0012-the-legibility-f
 > **Read this first.** §1's absolute ban on inline horizontal scroll no longer
 > holds for a diagram that cannot be fitted legibly; ADR 0012 replaces it with a
 > legibility floor. §2 (`.breakout` at 60rem) stands unchanged. §3's lightbox
-> survives with its purpose restated. §4's deferral of selective image breakout
+> survives with its purpose restated and its keyboard gap closed (#122, which
+> also closes #75). §4's deferral of selective image breakout
 > is discharged — with a refusal, not a mechanism. Each section below is marked.
 
 ## Context
@@ -56,10 +57,7 @@ this is a rendering/layout decision, not an authoring constraint.
    deliberately gentle first cap — a full-bleed visual language is a design
    decision deferred to the #11 typography pass, reachable by raising this one
    number.
-3. **A minimal, dependency-free lightbox is the escape hatch.** *(Amended by
-   #122: the floor removes its original justification for diagrams, but its real
-   constituency was always the 41 article images. Purpose restated, keyboard gap
-   closed.)* The existing
+3. **A minimal, dependency-free lightbox is the escape hatch.** The existing
    native-`<dialog>` image lightbox is generalised to also open a **clone of the
    inline diagram SVG at natural size** (the `useMaxWidth` cap stripped,
    intrinsic dimensions pinned from the `viewBox`), panned by scrolling the
@@ -67,6 +65,27 @@ this is a rendering/layout decision, not an authoring constraint.
    already gives Escape, focus trapping and the backdrop, and browser pinch-zoom
    still works on the dialog content. If real use proves this insufficient,
    pinch-to-zoom is the documented next step — not built now.
+
+   > **Amended by #122 — purpose restated, keyboard gap closed.** ADR 0012's
+   > legibility floor removes the justification written above: a diagram no
+   > longer needs an escape hatch to be readable. The lightbox survives anyway,
+   > because its real constituency was never diagrams — it is bound to every
+   > article image, and there are 41 of those against 3 diagrams. What it is
+   > FOR is: **examine any figure full-screen.**
+   >
+   > It was also pointer-only (#75), which is a capability that exists for
+   > mouse users and not for keyboard users — not something that can ship into
+   > a frozen accessibility floor. Each examinable figure now carries its own
+   > button, visually hidden until focused, in the same idiom as the skip link.
+   > A sibling button rather than a wrapper, for two reasons: an `<img>` given
+   > `role="button"` stops being announced as an image, and a diagram already
+   > contains the focusable scroll region ADR 0012 adds, so wrapping it would
+   > nest interactive content inside interactive content.
+   >
+   > The "no pan/zoom library, no custom gesture code" constraint above still
+   > stands and is unchanged. Panning from the keyboard needed no library: the
+   > dialog is the scroll container, so focusing it on open makes the arrow keys
+   > pan. Pinch-to-zoom remains the documented next step, still not built.
 4. **Compare-mode and selective image-breakout are explicitly deferred.**
    *(The image-breakout half is discharged by #119 — with a refusal rather than
    a mechanism: breakout is a component gesture, and a plain Markdown image does

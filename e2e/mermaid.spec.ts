@@ -225,12 +225,25 @@ test('clicking a diagram opens it larger in the lightbox; Escape and backdrop cl
   await inline.click();
   await expect(dialog).toBeVisible();
 
-  const modalSvg = dialog.locator('svg').first();
+  // `.lightbox-content`, not the dialog: the close button carries an inline
+  // <svg> icon, so a bare `svg` selector measures a 16px cross.
+  const modalSvg = dialog.locator('.lightbox-content svg').first();
   await expect(modalSvg).toBeVisible();
   const modalBox = requireBox(await modalSvg.boundingBox());
-  expect(modalBox.width, 'diagram in the modal is larger than inline').toBeGreaterThan(
-    inlineBox.width,
-  );
+  // At or above, not strictly above — and deliberately, at THIS width.
+  //
+  // On a phone the inline figure already breaks out to `100vw - 2rem`, and the
+  // enlarged plate is the full screen less its padding: the same number. There
+  // is no more width to give it, so parity is the geometry, not a regression.
+  // What the phone gains is the full height and no surrounding content.
+  //
+  // The claim that opening a figure makes it BIGGER is a desktop claim and is
+  // asserted as one, at 1280px, in e2e/lightbox.spec.ts. Asserting it here
+  // would only be satisfiable by making the inline figure worse.
+  expect(
+    modalBox.width,
+    'the enlarged diagram is smaller than the inline one',
+  ).toBeGreaterThanOrEqual(inlineBox.width);
 
   await page.keyboard.press('Escape');
   await expect(dialog).toBeHidden();

@@ -711,3 +711,26 @@ how the project actually grew.
   the theme fix and changed nothing once `themeVariables` were supplied — the
   rendered SVG was byte-identical either way. A knob that looks load-bearing and
   is not is worse than no knob.
+
+## Native `<dialog>` does more than it gets credit for (2026-08-07, issue #122)
+
+- **`showModal()` focuses the dialog element itself** when it contains nothing
+  focusable — no `tabindex="-1"` needed. That is what makes the arrow keys pan
+  an oversized figure: the dialog is the scroll container AND the focus holder,
+  so keyboard panning needed no code at all.
+- **Closing a dialog restores focus to whatever had it when the dialog opened.**
+  An `opener` variable and a `.focus()` on close are redundant. Both of these
+  were written, then removed after planting the regression and watching the
+  tests keep passing — which is the only way to tell a load-bearing line from
+  one that merely looks like it.
+  Docs: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog
+- **Add a sibling control, not a wrapper, when the media has its own
+  semantics.** An `<img>` given `role="button"` stops being announced as an
+  image, and a Mermaid diagram already contains the focusable scroll region the
+  legibility floor adds — wrapping it would nest interactive content. A sibling
+  `<button>`, visually hidden until focused (the same idiom as `.skip-link`),
+  gives keyboard users a real control without putting chrome under 41 images
+  for the readers who already have a pointer.
+- **A `MutationObserver` on `<article>` is the only reliable way to enhance
+  client-rendered media.** Mermaid swaps diagrams in after every script has run,
+  and again on every theme change; a one-shot `querySelectorAll` never sees one.

@@ -44,6 +44,19 @@ export interface RenderInput {
   baseLabelPx: number;
   /** The smallest label size that still counts as readable. */
   floorPx: number;
+  /**
+   * May the diagram be drawn LARGER than its natural size to fill the space?
+   *
+   * Inline: no. A small diagram stretched to fill a wide column looks enormous
+   * and slightly wrong, and nobody asked for it.
+   *
+   * In the lightbox: yes, and this is the whole point of the enlarged view. A
+   * reader who opens a figure is asking to see it bigger. A raster cannot
+   * honour that past its natural size — upscaling it just goes soft — but a
+   * diagram is a vector and scales losslessly, so pinning it to its viewBox
+   * was giving the reader a smaller diagram than the one they clicked.
+   */
+  fill?: boolean;
 }
 
 export interface RenderDecision {
@@ -63,6 +76,7 @@ export function decideRender({
   containerWidth,
   baseLabelPx,
   floorPx,
+  fill = false,
 }: RenderInput): RenderDecision {
   // Every input is read from the DOM, so "not measurable" is reachable: a
   // diagram that has not laid out yet, or a label element that is not there.
@@ -72,8 +86,9 @@ export function decideRender({
     return { mode: 'fit', renderWidth: Math.max(containerWidth, 0) || 0 };
   }
 
-  // Never stretch a diagram past its own size just because the column is wide.
-  const fittedWidth = Math.min(containerWidth, naturalWidth);
+  // Never stretch a diagram past its own size just because the column is wide —
+  // unless the caller is the enlarged view, where filling the space IS the ask.
+  const fittedWidth = fill ? containerWidth : Math.min(containerWidth, naturalWidth);
 
   // The floor is a floor, not a ceiling: a diagram drawn with 6px labels is
   // illegible even unshrunk, so this can be greater than 1 and grow it.
