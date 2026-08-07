@@ -1,5 +1,6 @@
 ---
 import { Image } from 'astro:assets';
+import { figureClass } from '../lib/figure';
 import { mediaUrl } from '../lib/media';
 
 // Self-hosted video from Cloudflare R2 (issue #10). Native <video> — no
@@ -36,7 +37,8 @@ const posterSrc = isProcessedImage ? (poster as ImageMetadata).src : poster;
 const aspectRatio = width && height ? `${width} / ${height}` : '16 / 9';
 ---
 
-<div class="video-embed" style={`aspect-ratio: ${aspectRatio};`}>
+<figure class={figureClass('video-embed')} data-media="embed">
+  <div class="media__body" style={`aspect-ratio: ${aspectRatio};`}>
   <!--
     The poster is rendered twice on purpose: once through <Image> so the
     optimized/responsive asset exists at all (Astro only emits it if
@@ -49,23 +51,25 @@ const aspectRatio = width && height ? `${width} / ${height}` : '16 / 9';
     <source src={mediaUrl(src)} type={type} />
     <slot />
   </video>
-</div>
+  </div>
+</figure>
 
 <style>
   .video-embed {
     width: 100%;
+    margin: 2rem 0;
   }
 
-  .video-embed video {
-    display: block;
-    width: 100%;
+  .video-embed .media__body video {
     height: 100%;
     /* Fill the reserved aspect-ratio box without distorting or cropping the
-       frame — letterboxes against the black background if the real video
-       ratio differs from the box. */
+       frame — letterboxes against the black ground if the real video ratio
+       differs from the box.
+
+       Black, not a token, and not palette debt after all: a letterbox is the
+       absence of picture, the same way the lightbox scrim is the absence of
+       page. A themed letterbox would tint the film. */
     object-fit: contain;
-    border-radius: 8px;
-    border: 1px solid var(--hairline);
     background: #000;
   }
 </style>

@@ -16,7 +16,7 @@ function requireBox<T>(box: T | null): T {
 test('a compact pair stays inside the article flow at its declared crop', async ({ page }) => {
   await page.goto(KITCHEN_SINK);
 
-  const pair = page.locator('[data-image-layout="compact-pair"]');
+  const pair = page.locator('figure.media[data-media="photo"].image-pair');
   await expect(pair).toBeVisible();
   await expect(pair.locator('img')).toHaveCount(2);
 
@@ -81,8 +81,11 @@ test('a figure declares its kind, and its content sits in a body element', async
   const figure = page.locator('figure.media[data-media="photo"]').first();
   await expect(figure).toBeVisible();
   await expect(figure.locator('.media__body img')).toBeVisible();
-  // The retired vocabulary is gone from this component.
-  await expect(page.locator('figure.media[data-image-layout]')).toHaveCount(0);
+  // The retired vocabularies are gone from the WHOLE page, not just this
+  // component: #118 finished the migration ArticleImage started.
+  await expect(page.locator('[data-image-layout]')).toHaveCount(0);
+  await expect(page.locator('[data-image-crop]')).toHaveCount(0);
+  await expect(page.locator('[data-media-side]')).toHaveCount(0);
 });
 
 test('a photo is framed, and dimmed on a dark ground but not on a light one', async ({ page }) => {
@@ -161,3 +164,50 @@ for (const width of [320, 390]) {
     ).toBeLessThanOrEqual(1);
   });
 }
+
+// ── The embed kind (#118) ──
+//
+// A third-party iframe's framing problem is genuinely different from a
+// photograph's: the page controls the box and never the interior. That is why
+// it is its own kind rather than `photo` with a shrug.
+
+test('self-hosted video and the third-party facade are both embeds', async ({ page }) => {
+  await page.goto(KITCHEN_SINK);
+
+  const video = page
+    .locator('figure.media[data-media="embed"]')
+    .filter({ has: page.locator('video') });
+  const facade = page
+    .locator('figure.media[data-media="embed"]')
+    .filter({ has: page.locator('.youtube-embed') });
+  await expect(video.first()).toBeVisible();
+  await expect(facade.first()).toBeVisible();
+  await expect(video.first().locator('.media__body')).toBeVisible();
+  await expect(facade.first().locator('.media__body')).toBeVisible();
+});
+
+test('an embed is framed as a box and never reached into', async ({ page }) => {
+  await page.goto(KITCHEN_SINK);
+  const body = page
+    .locator('figure.media[data-media="embed"] .media__body')
+    .filter({ has: page.locator('video') })
+    .first();
+
+  await page.emulateMedia({ colorScheme: 'light' });
+  const light = await body.evaluate((el) => {
+    const style = getComputedStyle(el);
+    return {
+      radius: style.borderTopLeftRadius,
+      border: style.borderTopWidth,
+      filter: style.filter,
+    };
+  });
+  expect(Number.parseFloat(light.radius), 'an embed is not framed').toBeGreaterThan(0);
+  expect(Number.parseFloat(light.border), 'an embed has no box').toBeGreaterThan(0);
+
+  // No dimming on either ground. A dimmed video is a worse video, and unlike a
+  // raster it is not sitting still to be glanced at.
+  expect(light.filter).toBe('none');
+  await page.emulateMedia({ colorScheme: 'dark' });
+  expect(await body.evaluate((el) => getComputedStyle(el).filter)).toBe('none');
+});

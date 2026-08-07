@@ -734,3 +734,20 @@ how the project actually grew.
 - **A `MutationObserver` on `<article>` is the only reliable way to enhance
   client-rendered media.** Mermaid swaps diagrams in after every script has run,
   and again on every theme change; a one-shot `querySelectorAll` never sees one.
+
+## Naming an axis is what stops it colliding with another (2026-08-07, issue #118)
+
+- **`data-media-side` became `data-placement`.** It was one character of
+  *meaning* away from `data-media`: one named a position, the other a kind, and
+  a reader had to already know which was which. They now sit on different
+  elements too — kind on the figure, placement and layout on the wrapper — so
+  the markup itself says which axis is which.
+- **`data-image-crop="4:3"` was documentation pretending to be data.** Nothing
+  read it; the crop was always the CSS `aspect-ratio` beside it. Retired into
+  the rule that actually implements it.
+- **A component that renders async needs its enhancement gated on content, not
+  on existence.** The lightbox attached an examine button as soon as a Mermaid
+  container appeared — but the container is filled a tick later, so pressing the
+  button in that window did nothing. Gating on `querySelector('svg')` fixes it,
+  and the MutationObserver fires again when the SVG lands. It showed up as a
+  test that passed alone and failed in a full run.

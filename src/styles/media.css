@@ -44,8 +44,16 @@
   font-size: 0.875rem;
   line-height: 1.5;
   color: var(--muted);
-  text-align: center;
   text-wrap: pretty;
+}
+
+/* Centred only when the figure broke out.
+   A caption follows its figure: under a 60rem figure a left-aligned line looks
+   orphaned against all that width, while under an inline aside centring would
+   pull a source credit away from the text it belongs to. Keyed on the LAYOUT
+   axis, which is the axis that decides it. */
+.media.breakout > .media__caption {
+  text-align: center;
 }
 
 /* ── photo ──
@@ -71,4 +79,34 @@
 
 :root[data-theme="dark"] [data-media="photo"] .media__body :is(img, picture) {
   filter: brightness(0.92);
+}
+
+/* ── chart ──
+   Drawn, not photographed: it is already ink on a ground of its own choosing,
+   so it is framed and otherwise left alone. No dimming — dimming a drawing is
+   treating it as a photograph, and a research visual's whole job is to be read
+   accurately. */
+
+[data-media="chart"] .media__body :is(img, picture, svg) {
+  border-radius: 8px;
+}
+
+/* ── embed ──
+   A third-party iframe's framing problem is genuinely different, which is why
+   this is its own kind rather than `photo` with a shrug: **the page controls
+   the box and never the interior.** So the treatment is entirely box — a
+   border and a radius that make it sit in the page like every other figure —
+   and deliberately nothing that reaches inside. No dark-ground dimming either:
+   a dimmed video is a worse video, and unlike a raster it is not sitting still
+   to be glanced at. */
+
+[data-media="embed"] .media__body {
+  border-radius: 8px;
+  border: 1px solid var(--hairline);
+  overflow: hidden;
+}
+
+[data-media="embed"] .media__body :is(video, iframe) {
+  display: block;
+  width: 100%;
 }

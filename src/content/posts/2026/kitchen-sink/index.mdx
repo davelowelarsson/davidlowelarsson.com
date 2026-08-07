@@ -154,17 +154,22 @@ at 60rem is unreadable and a caption is text.
 
 ### A compact pair
 
-<ImagePair images={[
-  { src: testCardPairA, alt: 'Test card A: a 4:3 maroon ground with a 100px grid and a centre cross' },
-  { src: testCardPairB, alt: 'Test card B: a 4:3 green ground with a 100px grid and a centre cross' },
-]} />
+<ImagePair
+  kind="photo"
+  images={[
+    { src: testCardPairA, alt: 'Test card A: a 4:3 maroon ground with a 100px grid and a centre cross' },
+    { src: testCardPairB, alt: 'Test card B: a 4:3 green ground with a 100px grid and a centre cross' },
+  ]}
+  caption="A pair is one figure with one caption, not two figures side by side."
+/>
 
 ### An aside that breaks out, with its media beside the text
 
 <MediaAside
   src={testCardTall}
   alt="Test card: a tall violet ground with a 100px grid, corner markers and a centre cross"
-  side="right"
+  kind="photo"
+  placement="right"
   caption="A caption stays at a readable width even though the figure above it breaks out."
   sourceHref="https://docs.astro.build/en/guides/images/"
   sourceLabel="Data: Astro"

@@ -102,4 +102,23 @@ describe('Video', () => {
     expect(html).toContain('kind="captions"');
     expect(html).toContain('src="/captions/clip.en.vtt"');
   });
+
+  // #118. Both video components emit the figure contract under the `embed` kind.
+  // A third-party iframe's framing problem is genuinely different from a
+  // photograph's — the page controls the box and never the interior — so it is
+  // its own kind rather than `photo` with a shrug, and self-hosted video shares
+  // it because the box problem is identical even when the interior is ours.
+  it('emits the figure contract under the embed kind', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(Video, {
+      props: { src: '2026/my-post/clip.mp4' },
+    });
+
+    expect(html).toMatch(/<figure[^>]*class="[^"]*\bmedia\b/);
+    expect(html).toContain('data-media="embed"');
+    expect(html).toContain('media__body');
+    // The reserved aspect-ratio box moved onto the body with the migration; it
+    // is what keeps the page from shifting before the video loads.
+    expect(html).toMatch(/media__body[^"]*"[^>]*aspect-ratio/);
+  });
 });

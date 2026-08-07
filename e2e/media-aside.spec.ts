@@ -11,7 +11,8 @@ test('aside media sits right on desktop and below its text on mobile', async ({ 
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto(POST_PATH);
 
-  const aside = page.locator('[data-media-side="right"]');
+  // Placement lives on the wrapper, kind on the figure inside it (#118).
+  const aside = page.locator('[data-placement="right"]');
   const content = aside.locator('.media-aside__content');
   const figure = aside.locator('figure');
   await expect(figure).toBeVisible();

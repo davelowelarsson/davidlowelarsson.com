@@ -1,26 +1,55 @@
 ---
 import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
+import { figureClass, type MediaKind } from '../lib/figure';
 
+/**
+ * Media beside its own explanation: figure on one side, text on the other,
+ * stacked on a phone. Migrated to the figure contract in #118.
+ *
+ * The three axes are visible in the markup here, which is the point of naming
+ * them separately:
+ *
+ *   Layout    `.breakout`      on the WRAPPER — the whole aside breaks out
+ *   Placement `data-placement` on the WRAPPER — which side the figure sits
+ *   Kind      `data-media`     on the FIGURE  — what the media IS
+ *
+ * `data-media-side` was renamed to `data-placement` because it was one
+ * character of meaning away from `data-media`: one named a position, the other
+ * a kind, and a reader had to know which was which. The figure is the inner
+ * element, not the wrapper, so a figure never contains a figure.
+ */
 interface Props {
   src: ImageMetadata;
   alt: string;
-  side?: 'left' | 'right';
+  /** What the media IS. See MEDIA_KINDS in src/lib/figure.ts. */
+  kind: MediaKind;
+  /** Which side the figure sits on. Placement, not kind. */
+  placement?: 'left' | 'right';
   caption?: string;
   sourceHref?: string;
   sourceLabel?: string;
 }
 
-const { src, alt, side = 'right', caption, sourceHref, sourceLabel = 'Source' } = Astro.props;
+const {
+  src,
+  alt,
+  kind,
+  placement = 'right',
+  caption,
+  sourceHref,
+  sourceLabel = 'Source',
+} = Astro.props;
 const rasterSizes =
   '(min-width: 62rem) 28.75rem, (min-width: 52rem) calc((100vw - 4.5rem) / 2), calc(100vw - 2rem)';
 ---
 
-<div class={`media-aside media-aside--${side} breakout`} data-media-side={side}>
+<div class={`media-aside media-aside--${placement} breakout`} data-placement={placement}>
   <div class="media-aside__content">
     <slot />
   </div>
-  <figure class="media-aside__figure">
+  <figure class={figureClass('media-aside__figure')} data-media={kind}>
+    <div class="media__body">
     {
       src.format === 'svg' ? (
         <img
@@ -35,9 +64,10 @@ const rasterSizes =
         <Image src={src} alt={alt} widths={[360, 580, 900]} sizes={rasterSizes} />
       )
     }
+    </div>
     {
       (caption || sourceHref) && (
-        <figcaption>
+        <figcaption class="media__caption">
           {caption && <span>{caption}</span>}
           {sourceHref && <a href={sourceHref}>{sourceLabel}</a>}
         </figcaption>
@@ -62,21 +92,20 @@ const rasterSizes =
     margin: 0;
   }
 
-  .media-aside__figure :global(img) {
+  .media-aside__figure .media__body :global(img) {
     display: block;
     width: 100%;
     height: auto;
-    border-radius: 6px;
   }
 
-  figcaption {
+  /* The contract owns the caption's measure, type and colour. What is specific
+     here is that this caption is a credit line — a label and a source link side
+     by side — so it lays out as a row rather than as running text. */
+  .media-aside__figure .media__caption {
     display: flex;
     flex-wrap: wrap;
     gap: 0.15rem 0.5rem;
     margin-top: 0.65rem;
-    color: var(--muted);
-    font-size: 0.8125rem;
-    line-height: 1.5;
   }
 
   @media (min-width: 52rem) {
