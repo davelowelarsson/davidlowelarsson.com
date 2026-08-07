@@ -315,3 +315,34 @@ test('the Markdown tier gets framing but not the plate — the two-tier limit', 
   await expect(image).toBeVisible();
   await expect(page.locator('article figure.media[data-media="screenshot"]')).toHaveCount(0);
 });
+
+// ── chart ──
+//
+// The kind a Research Visual arrives as, and the one #124 asked for and did
+// not get: it was styled in the contract and declared in MEDIA_KINDS, but its
+// only use anywhere was inside a published Post — which ADR 0011 forbids e2e
+// from pinning. So the kind shipped with nothing allowed to test it.
+for (const scheme of ['light', 'dark'] as const) {
+  test(`a chart is framed but never dimmed — ${scheme} ground`, async ({ page }) => {
+    await page.emulateMedia({ colorScheme: scheme });
+    await page.goto(KITCHEN_SINK);
+
+    const chart = page.locator('figure.media[data-media="chart"]');
+    await expect(chart).toHaveCount(1);
+
+    const drawing = chart.locator('.media__body :is(img, picture, svg)').first();
+    await expect(drawing).toBeVisible();
+
+    // A chart is already ink on a ground of its own choosing. Dimming it is
+    // treating a drawing as a photograph, and a research visual's whole job is
+    // to be read accurately — so the treatment is a frame and nothing tonal.
+    expect(
+      await drawing.evaluate((el) => getComputedStyle(el).filter),
+      'a chart is being tonally altered',
+    ).toBe('none');
+    expect(
+      Number.parseFloat(await drawing.evaluate((el) => getComputedStyle(el).borderTopLeftRadius)),
+      'a chart is unframed',
+    ).toBeGreaterThan(0);
+  });
+}

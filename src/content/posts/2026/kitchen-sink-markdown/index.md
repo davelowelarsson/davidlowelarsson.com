@@ -98,6 +98,17 @@ sides.
 
 ## Images, as plain Markdown
 
+Each example below is followed by the source that produces it. There is only one
+syntax here — the whole tier is `![alt](path)` — so what the snippets actually
+document is the **path convention**, which is the only thing that decides how an
+image is framed.
+
+Colocate the file next to `index.md` and reference it relatively:
+
+```md
+![What the image shows](./my-image.png)
+```
+
 A raster. It gets a multi-width `srcset` and lazy loading from the global image
 config, and it opens in the lightbox — but it is an `<img>` in a paragraph, not a
 figure:
@@ -112,6 +123,15 @@ screenshot kind's plate, an author reaches for the component.
 
 ![Screenshot of an application with light chrome: a title bar, a sidebar, and rows of content](./screenshot-light-chrome.png)
 
+```md
+![Screenshot of the settings pane, with the sync toggle on](./settings.png)
+```
+
+Identical syntax, identical framing. There is no way to say "screenshot" here.
+Renaming the file changes nothing — that inference was considered and refused as
+too fragile. Wanting the plate is the signal to move the Post to `.mdx` and use
+the component; the kitchen-sink Fixture next door shows the one-line difference.
+
 A hand-drawn sketch, exported as SVG and named so the inversion rule finds it.
 The rule is keyed on the path, which is the only hook a plain Markdown image
 offers:
@@ -121,6 +141,16 @@ offers:
 A plain vector SVG, which is drawn rather than sketched and must not be inverted:
 
 ![Fixture vector chart: four bars of increasing height above a baseline](./fixture-vector.svg)
+
+```md
+![A sketch, inverted on a dark ground](./my-drawing.excalidraw.svg)
+
+![A drawn vector, left exactly as it is](./my-chart.svg)
+```
+
+The `.excalidraw.svg` suffix is load-bearing, not decorative: it is what tells
+the sheet to invert one and leave the other alone. Export from Excalidraw with
+the default name and it is already right.
 
 ## A diagram
 
