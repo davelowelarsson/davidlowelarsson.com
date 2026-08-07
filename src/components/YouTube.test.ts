@@ -71,4 +71,24 @@ describe('YouTube', () => {
     expect(html).toContain('aria-label="Open &quot;A test video&quot; on YouTube"');
     expect(html).toContain('Open on YouTube');
   });
+
+  // #118. Both video components emit the figure contract under the `embed` kind.
+  // A third-party iframe's framing problem is genuinely different from a
+  // photograph's — the page controls the box and never the interior — so it is
+  // its own kind rather than `photo` with a shrug, and self-hosted video shares
+  // it because the box problem is identical even when the interior is ours.
+  it('emits the figure contract under the embed kind', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(YouTube, {
+      props: { id: 'abc123', title: 'A talk', poster: '/og-default.png' },
+    });
+
+    expect(html).toMatch(/<figure[^>]*class="[^"]*\bmedia\b/);
+    expect(html).toContain('data-media="embed"');
+    expect(html).toContain('media__body');
+    // The fallback link is the figure's caption now rather than a loose
+    // paragraph after it — it describes the figure, which is what a caption is.
+    expect(html).toContain('<figcaption');
+    expect(html).toContain('Open on YouTube');
+  });
 });

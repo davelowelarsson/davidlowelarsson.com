@@ -1,6 +1,17 @@
 ---
 import { Image } from 'astro:assets';
+import { figureClass, type MediaKind } from '../lib/figure';
 
+/**
+ * Two images that belong together, side by side on a desktop and stacked on a
+ * phone. Migrated to the figure contract in #118.
+ *
+ * The retired vocabulary: this used to carry `data-image-layout="compact-pair"`
+ * and `data-image-crop="4:3"`. The first said what the LAYOUT was, which the
+ * contract now expresses as kind + the breakout primitive; the second described
+ * a CSS decision in markup, where nothing could act on it. Both are gone; the
+ * assertions that named them moved to `data-media` rather than being deleted.
+ */
 interface PairImage {
   src: ImageMetadata;
   alt: string;
@@ -8,36 +19,48 @@ interface PairImage {
 
 interface Props {
   images: [PairImage, PairImage];
+  /** What these are. See MEDIA_KINDS in src/lib/figure.ts. */
+  kind: MediaKind;
+  /** Optional caption for the pair as a whole, not for either image. */
+  caption?: string;
 }
 
-const { images } = Astro.props;
+const { images, kind, caption } = Astro.props;
 ---
 
-<figure class="image-pair" data-image-layout="compact-pair" data-image-crop="4:3">
-  {images.map((image) => <Image src={image.src} alt={image.alt} widths={[320, 560, 720]} sizes="(min-width: 44rem) 17rem, calc(100vw - 2.5rem)" />)}
+<figure class={figureClass('image-pair')} data-media={kind}>
+  <div class="media__body">
+    {images.map((image) => <Image src={image.src} alt={image.alt} widths={[320, 560, 720]} sizes="(min-width: 44rem) 17rem, calc(100vw - 2.5rem)" />)}
+  </div>
+  {caption && <figcaption class="media__caption">{caption}</figcaption>}
 </figure>
 
 <style>
   .image-pair {
-    display: grid;
-    gap: 0.75rem;
     max-width: min(36rem, 100%);
     margin: 2rem auto;
   }
 
+  .image-pair .media__body {
+    display: grid;
+    gap: 0.75rem;
+  }
+
   @media (min-width: 44rem) {
-    .image-pair {
+    .image-pair .media__body {
       grid-template-columns: 1fr 1fr;
       align-items: start;
     }
   }
 
-  .image-pair :global(img) {
+  /* The 4:3 crop that used to be announced in `data-image-crop`. It was never
+     read by anything — a CSS decision written into markup as documentation. It
+     is documentation here instead, where it is also the implementation. */
+  .image-pair .media__body :global(img) {
     display: block;
     width: 100%;
     aspect-ratio: 4 / 3;
     height: 100%;
     object-fit: cover;
-    border-radius: 8px;
   }
 </style>

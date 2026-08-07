@@ -1,5 +1,6 @@
 ---
 import { Image } from 'astro:assets';
+import { figureClass } from '../lib/figure';
 
 // Click-to-load YouTube facade (issue #37): renders a static poster, play
 // button, and direct fallback link. Page load makes zero requests to
@@ -31,8 +32,8 @@ const { id, title, poster, start } = Astro.props;
 const isProcessedImage = typeof poster !== 'string';
 ---
 
-<div class="youtube-player">
-  <div class="youtube-embed" data-youtube-id={id} data-youtube-title={title} data-youtube-start={start}>
+<figure class={figureClass('youtube-player')} data-media="embed">
+  <div class="media__body youtube-embed" data-youtube-id={id} data-youtube-title={title} data-youtube-start={start}>
     <button type="button" class="youtube-embed__play" aria-label={`Play video: ${title}`}>
       {
         isProcessedImage ? (
@@ -50,15 +51,15 @@ const isProcessedImage = typeof poster !== 'string';
       <span class="youtube-embed__play-icon" aria-hidden="true"></span>
     </button>
   </div>
-  <p class="youtube-player__fallback">
+  <figcaption class="youtube-player__fallback">
     <a
       href={`https://www.youtube.com/watch?v=${id}`}
       target="_blank"
       rel="noreferrer"
       aria-label={`Open "${title}" on YouTube`}>Open on YouTube</a
     >
-  </p>
-</div>
+  </figcaption>
+</figure>
 
 <style>
   .youtube-player__fallback {

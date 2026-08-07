@@ -237,16 +237,19 @@ const NON_COLOUR_TOKENS = [
  *     contract by #114.
  *   Lightbox — a black scrim at 75%. The backdrop deliberately does not follow
  *     the theme: it is the absence of the page, not a surface on it.
+ *   Video, YouTube — RECLASSIFIED in #118, which migrated both to the `embed`
+ *     kind and made the question concrete. A letterbox is black because video
+ *     is black; the facade's scrim and play triangle are the same idea. All of
+ *     it is the absence of picture, exactly like the lightbox scrim above —
+ *     not a surface the theme has an opinion about. The `embed` framing that
+ *     IS the page's opinion (border, radius) lives in src/styles/media.css and
+ *     uses tokens.
  *
  * Debt, and named as such:
- *   ArticleLinks — a surface pair that could be tokens and is not.
- *   Video, YouTube — a black letterbox and a white play triangle. Arguably not
- *     debt at all: a video's box is black because video is black, not because
- *     the theme said so. Either way the call belongs to the ticket that
- *     migrates them.
- *
- * The debt is left alone here because #116 is a prefactor — nothing a reader
- * sees may change — and #118 migrates those components anyway.
+ *   ArticleLinks — a surface pair (`light-dark(#ffffff, #151518)`) that could
+ *     be tokens and is not. The last real one. It is NOT a media component, so
+ *     #118 does not reach it and inventing a token for it here would be a
+ *     visual change smuggled into a migration. It needs its own decision.
  */
 const COLOUR_EXCEPTIONS = new Set([
   'src/components/ArticleLinks.astro',
