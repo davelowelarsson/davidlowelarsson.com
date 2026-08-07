@@ -1,13 +1,11 @@
 import { expect, test } from '@playwright/test';
 import { MASTHEAD_NAV } from '../src/lib/nav';
+import { KITCHEN_SINK } from './fixtures';
 
-const CORE_PAGES = [
-  '/',
-  '/posts/',
-  '/category/essay/',
-  '/category/til/',
-  '/posts/hello-world-again/',
-];
+// A Post page is one of the page kinds the masthead has to be identical on. It
+// does not matter WHICH Post — so it is the fixture, not whichever published
+// Post happened to be first in the folder when this was written.
+const CORE_PAGES = ['/', '/posts/', '/category/essay/', '/category/til/', KITCHEN_SINK];
 
 test('every Core Site page carries the same masthead over a hairline', async ({ page }) => {
   for (const path of CORE_PAGES) {
@@ -195,7 +193,7 @@ test('the control is icons at every width, and stays a quiet side thing', async 
 });
 
 test('landmarks are correct: one banner, one main', async ({ page }) => {
-  await page.goto('/posts/hello-world-again/');
+  await page.goto(KITCHEN_SINK);
 
   await expect(page.getByRole('banner')).toHaveCount(1);
   await expect(page.getByRole('main')).toHaveCount(1);
@@ -205,7 +203,7 @@ test('landmarks are correct: one banner, one main', async ({ page }) => {
 
 test.describe('the skip link', () => {
   test('is the first focusable element, hidden until focused', async ({ page }) => {
-    await page.goto('/posts/hello-world-again/');
+    await page.goto(KITCHEN_SINK);
 
     const skip = page.locator('.skip-link');
     const offscreen = await skip.boundingBox();
@@ -219,7 +217,7 @@ test.describe('the skip link', () => {
   });
 
   test('moves focus to the main content when activated', async ({ page }) => {
-    await page.goto('/posts/hello-world-again/');
+    await page.goto(KITCHEN_SINK);
 
     await page.keyboard.press('Tab');
     await page.keyboard.press('Enter');
@@ -241,7 +239,7 @@ test('the current page is marked, and not by colour alone', async ({ page }) => 
   expect(decoration, 'current page is signalled by colour alone').toContain('underline');
 
   // A post page is INSIDE /posts/ but is not it; nothing should claim the page.
-  await page.goto('/posts/hello-world-again/');
+  await page.goto(KITCHEN_SINK);
   await expect(page.locator('.site-nav a[aria-current]')).toHaveCount(0);
 });
 

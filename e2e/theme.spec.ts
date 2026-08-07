@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { THEME_ATTRIBUTE, THEME_STORAGE_KEY } from '../src/lib/theme';
+import { KITCHEN_SINK_MARKDOWN } from './fixtures';
 
 // Three states: light, dark, and auto — where auto is the ABSENCE of
 // `data-theme`, so the OS preference applies with no rule of its own.
@@ -108,7 +109,7 @@ test('no-flash contract: the theme script is inline, classic, and pre-stylesheet
 
 test('forcing dark on a light OS still inverts the Excalidraw sketch', async ({ page }) => {
   await page.emulateMedia({ colorScheme: 'light' });
-  await page.goto('/posts/experiment-obsidian-pipeline/');
+  await page.goto(KITCHEN_SINK_MARKDOWN);
 
   const sketch = page.locator("img[src*='excalidraw']").first();
   await expect(sketch).toBeVisible();
@@ -123,7 +124,7 @@ test('forcing dark on a light OS still inverts the Excalidraw sketch', async ({ 
 
 test('an OS-dark reader who forces light gets the sketch un-inverted', async ({ page }) => {
   await page.emulateMedia({ colorScheme: 'dark' });
-  await page.goto('/posts/experiment-obsidian-pipeline/');
+  await page.goto(KITCHEN_SINK_MARKDOWN);
 
   const sketch = page.locator("img[src*='excalidraw']").first();
   expect(await sketch.evaluate((el) => getComputedStyle(el).filter)).toContain('invert');

@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { KITCHEN_SINK, KITCHEN_SINK_MARKDOWN } from './fixtures';
 
 // Widening the measure (42rem → 43rem in #105) is exactly the kind of change
 // that pushes a page into horizontal scroll at a narrow width without anyone
@@ -13,9 +14,15 @@ const PAGES = [
   '/',
   '/posts/',
   '/category/essay/',
-  '/posts/experiment-home-lab-topology/', // diagram
-  '/posts/til-astro-ships-its-own-zod/', // table + code
-  '/posts/experiment-spotify-slack-sync/', // wide cards
+  // The fixtures carry a diagram, a wide table, a long code line and every kind
+  // of figure between them — all the blocks that push a page sideways, on one
+  // page each, in both processors.
+  KITCHEN_SINK,
+  KITCHEN_SINK_MARKDOWN,
+  // content-pinned: ProcessStepCard is ruled outside the figure contract and
+  // renders this Post's own data, so the wide-card case cannot move to a
+  // fixture without copying that data across. See process-step-card.spec.ts.
+  '/posts/experiment-spotify-slack-sync/',
 ];
 
 for (const width of WIDTHS) {

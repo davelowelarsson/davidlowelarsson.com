@@ -57,6 +57,9 @@ test('rss item for a diagram post resolves its in-body image to a served hashed 
 
   const items = xml.split('<item>').slice(1);
   const diagramItem = items.find((item) =>
+    // content-pinned: the feed is a contract over PUBLISHED content, and a
+    // draft fixture is absent from it by construction — there is nothing else
+    // this test could point at.
     item.includes('<link>https://davidlowelarsson.com/posts/experiment-draft-preview-pipeline/'),
   );
 
@@ -74,6 +77,8 @@ test('rss renders MDX posts without leaking imports or component source', async 
     .split('<item>')
     .slice(1)
     .find((item) =>
+      // content-pinned: same reason — the feed only carries published Posts, so
+      // "an MDX post in the feed" cannot be demonstrated on a draft fixture.
       item.includes('<link>https://davidlowelarsson.com/posts/experiment-spotify-slack-sync/'),
     );
 

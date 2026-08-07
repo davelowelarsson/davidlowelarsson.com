@@ -1,12 +1,15 @@
 import { expect, test } from '@playwright/test';
+import { KITCHEN_SINK_MARKDOWN } from './fixtures';
 
 // Guards issue #9: global image.layout/responsiveStyles config actually
-// produces responsive markup for a raster image dropped into a post, and
-// the dependency-free lightbox opens/closes it. The Raspberry Pi cluster post
-// provides a stable, published raster-image fixture.
+// produces responsive markup for a raster image dropped into a post, and the
+// dependency-free lightbox opens/closes it. The Markdown-tier fixture carries a
+// synthetic 1600x900 test card for exactly this — wide enough that the width
+// candidates are real, and owned by the fixture bundle, so no published post's
+// photographs can be edited out from under the test.
 
-const POST_PATH = '/posts/raspberry-pi-cluster/';
-const IMAGE_SELECTOR = 'article img[src*="raw-rpi-home-cluster"]';
+const POST_PATH = KITCHEN_SINK_MARKDOWN;
+const IMAGE_SELECTOR = 'article img[src*="test-card-wide"]';
 
 test('a raster image in a post gets a multi-width srcset and lazy loading', async ({ page }) => {
   await page.goto(POST_PATH);

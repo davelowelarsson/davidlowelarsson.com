@@ -1,5 +1,11 @@
 import { expect, test } from '@playwright/test';
 
+// content-pinned: deliberately. ProcessStepCard and WrappedSnapshot are ruled
+// OUTSIDE the figure contract (#114): they are composed prose structures, not
+// framed media, they are used in this one Post, and they render that Post's own
+// data. Moving them to a fixture would mean copying that data into the fixture —
+// more coupling, not less. Most of what this spec asserts is published content
+// anyway: the credit, the theme wording, the obfuscation, the source repo.
 const POST_PATH = '/posts/experiment-spotify-slack-sync/';
 const REPO_URL = 'https://github.com/davelowelarsson/spotify-slack-sync-fredagslistan';
 

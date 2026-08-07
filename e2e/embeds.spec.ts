@@ -1,12 +1,13 @@
 import { expect, test } from '@playwright/test';
+import { KITCHEN_SINK } from './fixtures';
 
 // Guards issue #37: a <YouTube /> facade never talks to Google/YouTube until
 // the reader clicks play, and never shifts layout while its poster loads.
-// The fixture post (embed-test-fixture, draft: true, .mdx) is built in this
-// e2e run because playwright.config.ts sets SHOW_DRAFTS=true — it's excluded
-// from the production build instead (src/lib/production-build.test.ts).
+// The kitchen-sink fixture (draft: true, .mdx) is built in this e2e run because
+// playwright.config.ts sets SHOW_DRAFTS=true — it's excluded from the
+// production build instead (src/lib/production-build.test.ts).
 
-const EMBED_FIXTURE_PATH = '/posts/embed-test-fixture/';
+const EMBED_FIXTURE_PATH = KITCHEN_SINK;
 
 test('the facade loads nothing from Google/YouTube until the reader clicks play', async ({
   page,
@@ -23,7 +24,7 @@ test('the facade loads nothing from Google/YouTube until the reader clicks play'
 
   const facade = page.locator('.youtube-embed');
   await expect(facade).toBeVisible();
-  const button = facade.getByRole('button', { name: /Play video: Test/ });
+  const button = facade.getByRole('button', { name: /Play video: Fixture clip/ });
   await expect(button).toBeVisible();
   await expect(facade.locator('iframe')).toHaveCount(0);
 
@@ -48,14 +49,17 @@ test('the facade poster causes no layout shift once it finishes loading', async 
   const facade = page.locator('.youtube-embed');
 
   const boxAtLoad = await facade.boundingBox();
-  await page
-    .locator('.youtube-embed__poster')
-    .first()
-    .evaluate((img: HTMLImageElement) =>
-      img.complete
-        ? Promise.resolve()
-        : new Promise((resolve) => img.addEventListener('load', resolve)),
-    );
+  const poster = page.locator('.youtube-embed__poster').first();
+  // The poster is lazy. On a page with one block it happens to be in the initial
+  // viewport; on the kitchen-sink fixture it is a long way down, so waiting for
+  // `load` without scrolling to it waits forever. Scroll first, then wait — the
+  // reserved box is measured before and after either way, which is the claim.
+  await poster.scrollIntoViewIfNeeded();
+  await poster.evaluate((img: HTMLImageElement) =>
+    img.complete
+      ? Promise.resolve()
+      : new Promise((resolve) => img.addEventListener('load', resolve)),
+  );
   const boxAfterPosterLoad = await facade.boundingBox();
 
   expect(boxAfterPosterLoad?.height).toBe(boxAtLoad?.height);
@@ -75,7 +79,13 @@ test('clicking the poster plays the video without opening the image lightbox', a
   await expect(dialog).toBeHidden();
 });
 
+// The specs below are content-pinned on purpose. They are not about how an
+// embed renders — that is covered above, on the fixture. They assert that the
+// 2013 archive migration PRESERVED the specific videos those posts were
+// written around, which is a claim about published content and cannot be made
+// anywhere else.
 test('the Maya exporter post embeds both original videos with fallbacks', async ({ page }) => {
+  // content-pinned: archive migration preserved this post's embeds.
   await page.goto('/posts/maya-scene-python-to-xml/');
 
   const players = page.locator('.youtube-player');
@@ -86,6 +96,7 @@ test('the Maya exporter post embeds both original videos with fallbacks', async 
 });
 
 test('the CGFX post embeds both original videos with fallbacks', async ({ page }) => {
+  // content-pinned: archive migration preserved this post's embeds.
   await page.goto('/posts/cgfx-and-glsl/');
 
   const players = page.locator('.youtube-player');
@@ -110,6 +121,7 @@ for (const post of [
   },
 ]) {
   test(`${post.slug} embeds its original videos with fallbacks`, async ({ page }) => {
+    // content-pinned: `post.slug` names published archive posts, listed above.
     await page.goto(`/posts/${post.slug}/`);
 
     const players = page.locator('.youtube-player');

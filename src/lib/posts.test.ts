@@ -129,7 +129,7 @@ describe('postIdFromEntry', () => {
   });
 
   it('accepts .mdx bundles too', () => {
-    expect(postIdFromEntry('2026/embed-test-fixture/index.mdx')).toBe('embed-test-fixture');
+    expect(postIdFromEntry('2026/kitchen-sink/index.mdx')).toBe('kitchen-sink');
   });
 
   it('ignores intermediate folders — organization never changes URLs', () => {

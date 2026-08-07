@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { THEME_ATTRIBUTE } from '../src/lib/theme';
+import { KITCHEN_SINK } from './fixtures';
 
 // What a reader has already told their operating system, honoured here without
 // asking them to configure anything.
@@ -103,7 +104,7 @@ test('prefers-reduced-motion removes the transitions that exist', async ({ page 
 // 1280px viewport reduces to. e2e/no-horizontal-scroll.spec.ts sweeps the
 // wider range; this pins the four page kinds the ticket names, under the
 // preferences that change layout metrics.
-const PAGE_KINDS = ['/', '/posts/', '/category/essay/', '/posts/essay-ai-code-ownership/'];
+const PAGE_KINDS = ['/', '/posts/', '/category/essay/', KITCHEN_SINK];
 
 test('no horizontal scroll at 320px, including under more-contrast', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 800 });

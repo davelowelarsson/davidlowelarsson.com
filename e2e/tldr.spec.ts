@@ -1,8 +1,10 @@
 import { expect, test } from '@playwright/test';
+import { KITCHEN_SINK, KITCHEN_SINK_MARKDOWN } from './fixtures';
 
+// One entry per processor, because that is the only reason this runs twice.
 const POSTS = [
-  { format: 'MDX', path: '/posts/essay-ai-code-ownership/', bullets: 4 },
-  { format: 'Markdown', path: '/posts/experiment-home-lab-topology/', bullets: 5 },
+  { format: 'MDX', path: KITCHEN_SINK, bullets: 5 },
+  { format: 'Markdown', path: KITCHEN_SINK_MARKDOWN, bullets: 4 },
 ] as const;
 
 for (const post of POSTS) {
