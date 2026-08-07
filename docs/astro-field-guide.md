@@ -527,3 +527,23 @@ how the project actually grew.
   of the layout and fails if a list rule loses its `article` prefix (what a
   reviewer would miss). The second catches the regression before a page is
   even built.
+
+## An inline pre-paint script in `<head>` (2026-08-07, issue #106)
+
+- **`define:vars` implies `is:inline`.** Astro bundles `<script>` by default —
+  which makes it a deferred module, so it runs *after* first paint and the
+  no-flash guarantee is gone. `define:vars` opts out automatically; writing
+  `is:inline` as well is redundant to the compiler but not to the next reader,
+  and `astro check` hints for the bare form.
+  Docs: https://docs.astro.build/en/guides/client-side-scripts/#opting-out-of-processing
+- **`define:vars` is how an inline script gets build-time values.** An inline
+  script cannot `import`, so constants that must stay single-sourced
+  (`src/lib/theme.ts`) are passed in as variables instead. The DOM code is
+  duplicated; the *names* are not.
+- **Astro hoists `<style>` into a `<link>` in `<head>`.** So "before first
+  paint" means "above that link" — a script placed in `<head>` before the
+  stylesheet is parser-blocking and runs first. The e2e test asserts the
+  document order with `compareDocumentPosition` rather than trusting it.
+- **Two scripts, deliberately.** The pre-paint one must be in `<head>`; the one
+  that syncs `aria-pressed` and wires clicks must be next to the control in
+  `<body>`. Splitting them is what keeps the first one where it has to be.
