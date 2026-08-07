@@ -332,6 +332,21 @@ const THEME_ICONS: Record<string, string> = {
     --tint-project: light-dark(#a21caf, #f0abfc);
   }
 
+  /* A reader who has asked their OS for more contrast gets firmer hairlines
+     and stronger secondary text — cheap, and it moves the page toward AAA.
+     Mirrored from HIGH_CONTRAST in src/lib/palette.ts, which is where the test
+     proves these are genuinely stronger rather than merely different.
+
+     No [data-theme] companion is needed, unlike the prefers-color-scheme
+     rules: these are light-dark() pairs resolved by color-scheme, which a
+     forced theme sets — so the override follows a forced theme for free. */
+  @media (prefers-contrast: more) {
+    :root {
+      --muted: light-dark(#3f453d, #cdd3c8);
+      --hairline: light-dark(rgb(30 33 29 / 34%), rgb(230 234 227 / 34%));
+    }
+  }
+
   /* Three states, and auto is the ABSENCE of the attribute. Because every token
      is a light-dark() pair, one property flips the whole page. See ADR 0010. */
   :root[data-theme='light'] {

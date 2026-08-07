@@ -8,6 +8,7 @@ import {
   CONTRAST_FLOOR,
   type ColorPair,
   contrastRatio,
+  HIGH_CONTRAST,
   NON_TEXT_FLOOR,
   PALETTE,
   relativeLuminance,
@@ -95,6 +96,31 @@ describe('the palette as data', () => {
     }
   });
 
+  // An override that does not measurably improve contrast is decoration. So
+  // the high-contrast values have to beat their own base AND clear a higher
+  // floor than the base palette is held to.
+  it('makes the high-contrast overrides genuinely stronger, in both schemes', () => {
+    for (const scheme of SCHEMES) {
+      const base = contrastRatio(PALETTE.muted[scheme], PALETTE.bg[scheme]);
+      const strengthened = contrastRatio(HIGH_CONTRAST.muted[scheme], PALETTE.bg[scheme]);
+
+      expect(strengthened, `muted (${scheme}) is not stronger`).toBeGreaterThan(base);
+      expect(strengthened, `muted (${scheme}) does not reach AAA`).toBeGreaterThanOrEqual(
+        AAA_FLOOR,
+      );
+    }
+  });
+
+  it('firms the hairlines rather than merely recolouring them', () => {
+    const alpha = (value: string) => Number.parseFloat(/\/\s*([\d.]+)%/.exec(value)?.[1] ?? '0');
+    for (const scheme of SCHEMES) {
+      expect(
+        alpha(HIGH_CONTRAST.hairline[scheme]),
+        `hairline (${scheme}) is no firmer`,
+      ).toBeGreaterThan(alpha(PALETTE.hairline[scheme]));
+    }
+  });
+
   // The focus ring is non-text UI, so WCAG asks 3:1 of it rather than 4.5:1 —
   // a separate guarantee from the same token's use as `.badge-scheduled` text.
   it(`keeps the focus ring above the ${NON_TEXT_FLOOR}:1 non-text threshold`, () => {
@@ -176,9 +202,20 @@ describe('the stylesheet mirrors the palette', () => {
     expect(offenders).toEqual([]);
   });
 
+  it('mirrors the high-contrast overrides too', () => {
+    const css = globalStyleBlock();
+    const block = /@media\s*\(prefers-contrast:\s*more\)\s*\{([\s\S]*?\n {2}\})/.exec(css);
+    expect(block, 'no prefers-contrast block to mirror').not.toBeNull();
+    expect(declaredTokens(block?.[1] ?? '')).toEqual(HIGH_CONTRAST);
+  });
+
   it('writes no colour outside :root', () => {
     const css = globalStyleBlock();
-    const outside = css.replace(rootBlock(css), '');
+    // The high-contrast block is a second, deliberate home for two tokens —
+    // and the test above proves it mirrors HIGH_CONTRAST exactly.
+    const outside = css
+      .replace(/@media\s*\(prefers-contrast:\s*more\)\s*\{[\s\S]*?\n {2}\}/, '')
+      .replace(rootBlock(css), '');
     const literals = [
       ...(outside.match(/#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{4}|[0-9a-fA-F]{3})\b/g) ??
         []),

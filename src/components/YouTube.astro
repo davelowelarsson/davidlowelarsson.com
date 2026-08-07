@@ -108,7 +108,16 @@ const isProcessedImage = typeof poster !== 'string';
     height: 4rem;
     border-radius: 50%;
     background: rgb(0 0 0 / 65%);
-    transition: background 120ms ease;
+  }
+
+  /* Opt-in, not opt-out: no transition unless the reader has said motion is
+     fine. `no-preference` is the only value that means "they were asked and
+     did not object" — a `reduce` query would still animate for anyone whose
+     OS reports nothing. src/lib/motion.test.ts asserts this shape holds. */
+  @media (prefers-reduced-motion: no-preference) {
+    .youtube-embed__play-icon {
+      transition: background 120ms ease;
+    }
   }
 
   .youtube-embed__play:hover .youtube-embed__play-icon,
