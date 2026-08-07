@@ -65,8 +65,24 @@ const sizes = breakout ? 'min(60rem, calc(100vw - 2rem))' : 'min(34rem, calc(100
   .article-image .media__body :global(img) {
     display: block;
     width: 100%;
-    max-height: min(32rem, 72vh);
     height: auto;
+  }
+
+  /* A tall image is cropped to a tidy height rather than dominating the column
+     — EXCEPT a screenshot, which loses the thing being shown.
+     
+     Two decisions live here on purpose, and they belong to different axes. How
+     tall a figure may be in THIS component's layout is the component's; "never
+     crop a screenshot" is the kind's. The component defers to the kind rather
+     than the contract trying to out-specify it: an Astro scope attribute
+     outranks a global rule, so a `[data-media]` selector in media.css could
+     never have overridden this from outside.
+     
+     Briefly tried the other way round in #124, and the aside's tall research
+     card started being cropped — because "photo" is a kind shared by several
+     components, and only ONE of them wanted a height cap. */
+  .article-image:not([data-media='screenshot']) .media__body :global(img) {
+    max-height: min(32rem, 72vh);
     object-fit: cover;
   }
 

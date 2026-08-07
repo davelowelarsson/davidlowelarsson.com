@@ -110,3 +110,51 @@
   display: block;
   width: 100%;
 }
+
+/* ── screenshot ──
+   A picture of an interface, and the kind whose framing answers EVERY question
+   the opposite way from `photo`. That inversion is the justification for it
+   being a kind at all, rather than a photograph with a different caption.
+
+   1. NEVER CROPPED. A photograph loses nothing from a trimmed edge; a
+      screenshot loses the thing being shown.
+
+   2. NEVER DIMMED. `photo` is dimmed on a dark ground so a bright raster does
+      not glare — but a screenshot usually contains TEXT, and dimming lowers the
+      contrast of type the reader is meant to read. The dark-UI case is worse
+      still: dimming pushes it further into the ground it is already
+      disappearing into.
+
+   3. GIVEN AN EDGE BY THE PAGE — the one a photograph never needs. A
+      screenshot's outer pixels are flat fields of near-white or near-black,
+      which are the page's OWN grounds, so without a boundary it reads as a hole
+      in the page rather than a picture of another surface.
+
+   Behind all three: a screenshot is captured in ONE theme and the reader may be
+   in the other. Unlike a sketch it cannot be inverted to match — inverting a UI
+   destroys its brand colour, its syntax highlighting, and any photograph inside
+   it. So it is framed as a picture of a different surface rather than made to
+   pretend it belongs to this one.
+
+   The plate is `--chip`, and no new token was needed. ADR 0009 deferred the
+   locked palette's `--plate` (#eef0ed light) for want of a text-free consumer,
+   and this is that consumer — but `--chip` over the light ground resolves to
+   #eff0ef, the same colour to within (1, 0, 2) of 255. The locked plate was
+   already in the palette under another name, and unlike `--plate` it has a dark
+   value and is already validated as a ground. */
+
+[data-media="screenshot"] .media__body {
+  padding: 0.5rem;
+  border-radius: 10px;
+  border: 1px solid var(--hairline);
+  background: var(--chip);
+}
+
+[data-media="screenshot"] .media__body :is(img, picture) {
+  border-radius: 6px;
+}
+
+[data-media="screenshot"] .media__body img {
+  max-height: none;
+  object-fit: contain;
+}

@@ -1,5 +1,5 @@
-import { expect, test } from '@playwright/test';
-import { KITCHEN_SINK } from './fixtures';
+import { expect, type Locator, type Page, test } from '@playwright/test';
+import { KITCHEN_SINK, KITCHEN_SINK_MARKDOWN } from './fixtures';
 
 // The component tier of the figure contract: a constrained single image, a
 // compact pair, the lightbox they open into, and self-hosted video with and
@@ -210,4 +210,108 @@ test('an embed is framed as a box and never reached into', async ({ page }) => {
   expect(light.filter).toBe('none');
   await page.emulateMedia({ colorScheme: 'dark' });
   expect(await body.evaluate((el) => getComputedStyle(el).filter)).toBe('none');
+});
+
+// ── The screenshot kind (#124) ──
+//
+// The kind whose framing answers every question the OPPOSITE way from `photo`,
+// which is the justification for it being a kind rather than a photograph with
+// a different caption. The fixture carries a light-chrome and a dark-chrome
+// capture whose outer pixels are exactly the page's own grounds — the case the
+// kind exists for, in both directions, whichever theme the reader is in.
+
+function screenshots(page: Page): Locator {
+  return page.locator('figure.media[data-media="screenshot"]');
+}
+
+test('a screenshot is never cropped, however tall it is', async ({ page }) => {
+  await page.goto(KITCHEN_SINK);
+  const image = screenshots(page).first().locator('img');
+  await expect(image).toBeVisible();
+
+  const fit = await image.evaluate((el) => {
+    const img = el as HTMLImageElement;
+    const box = img.getBoundingClientRect();
+    return {
+      objectFit: getComputedStyle(img).objectFit,
+      rendered: box.width / box.height,
+      // The DECLARED dimensions, not `naturalWidth`. The image is lazy and far
+      // down the page, so it has not loaded when this runs and `naturalWidth`
+      // is 0 — which made the comparison NaN and the assertion meaningless in
+      // exactly the direction that hides a crop.
+      declared: Number(img.getAttribute('width')) / Number(img.getAttribute('height')),
+    };
+  });
+  // A photograph loses nothing from a trimmed edge; a screenshot loses the
+  // thing being shown.
+  expect(fit.declared, 'no declared dimensions to compare against').not.toBeNaN();
+  expect(fit.objectFit, 'a screenshot is cropped').not.toBe('cover');
+  expect(fit.rendered, 'a screenshot is not at its own proportions').toBeCloseTo(fit.declared, 2);
+});
+
+test('a photo IS still cropped — the kinds differ, they are not one rule', async ({ page }) => {
+  await page.goto(KITCHEN_SINK);
+  const photo = page
+    .locator('figure.media[data-media="photo"].article-image:not(.breakout)')
+    .first()
+    .locator('img');
+  await expect(photo).toBeVisible();
+  expect(await photo.evaluate((el) => getComputedStyle(el).objectFit)).toBe('cover');
+});
+
+for (const scheme of ['light', 'dark'] as const) {
+  test(`a screenshot is never dimmed — ${scheme} ground`, async ({ page }) => {
+    await page.emulateMedia({ colorScheme: scheme });
+    await page.goto(KITCHEN_SINK);
+    const image = screenshots(page).first().locator('img');
+    await expect(image).toBeVisible();
+
+    // `photo` is dimmed on a dark ground so a bright raster does not glare. A
+    // screenshot usually contains TEXT, and dimming lowers the contrast of type
+    // the reader is meant to read — and a dark UI dimmed on a dark page sinks
+    // further into the ground it is already disappearing into.
+    expect(
+      await image.evaluate((el) => getComputedStyle(el).filter),
+      'a screenshot is being tonally altered',
+    ).toBe('none');
+  });
+
+  test(`a screenshot gets an edge from the page — ${scheme} ground`, async ({ page }) => {
+    await page.emulateMedia({ colorScheme: scheme });
+    await page.goto(KITCHEN_SINK);
+    const body = screenshots(page).first().locator('.media__body');
+    await expect(body).toBeVisible();
+
+    const plate = await body.evaluate((el) => {
+      const style = getComputedStyle(el);
+      return {
+        border: Number.parseFloat(style.borderTopWidth),
+        padding: Number.parseFloat(style.paddingTop),
+        background: style.backgroundColor,
+      };
+    });
+    // Without a boundary a screenshot's flat near-white or near-black field
+    // reads as a hole in the page rather than a picture of another surface.
+    expect(plate.border, 'a screenshot has no edge').toBeGreaterThan(0);
+    expect(plate.padding, 'a screenshot sits on no plate').toBeGreaterThan(0);
+    expect(plate.background, 'the plate is see-through').not.toBe('rgba(0, 0, 0, 0)');
+  });
+}
+
+test('both chromes are present, so theme mismatch is covered either way', async ({ page }) => {
+  // A screenshot is captured in ONE theme and the reader may be in the other,
+  // and unlike a sketch it cannot be inverted to match. One capture would only
+  // ever test the matching case.
+  await page.goto(KITCHEN_SINK);
+  await expect(screenshots(page)).toHaveCount(2);
+});
+
+test('the Markdown tier gets framing but not the plate — the two-tier limit', async ({ page }) => {
+  // `photo` versus `screenshot` is deliberately not inferred from a filename,
+  // so a screenshot arriving as a plain Markdown image gets the raster
+  // treatment. Reaching the kind means reaching for a component.
+  await page.goto(KITCHEN_SINK_MARKDOWN);
+  const image = page.locator("article img[src*='screenshot-light-chrome']").first();
+  await expect(image).toBeVisible();
+  await expect(page.locator('article figure.media[data-media="screenshot"]')).toHaveCount(0);
 });
