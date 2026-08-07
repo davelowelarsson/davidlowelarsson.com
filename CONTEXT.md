@@ -139,6 +139,58 @@ So "one contract for all media" is true for components and **approximately** tru
 for Markdown. Say "the component tier" or "the Markdown tier" when the difference
 matters — most of the surprises in this system live exactly on that line.
 
+## Breakout
+
+A Figure that runs wider than the reading measure. It is the Layout axis, and
+the only width decision a Post can make — there is no half-step and no
+full-bleed. Breaking out is a deliberate authorial act, which is why it is a
+component gesture and a plain Markdown image is never offered one (ADR 0013).
+_Avoid_: "wide media", "full-bleed" — the first names a mechanism that does not
+exist, the second a width deliberately not offered.
+
+## Legibility floor
+
+The smallest a diagram's label text is allowed to become. A diagram shrinks to
+fit its container until its labels would fall below the floor; at that point it
+stops shrinking and scrolls inside its own container instead, while the page
+around it never scrolls sideways (ADR 0012).
+
+The floor is why an author keeps the freedom to draw whatever explains best: a
+diagram that scrolls is telling its author it has grown too complex, visibly and
+on every phone. It governs diagrams only — a screenshot of text cannot be
+measured this way, and the answer there is not to ship one.
+
+## Examine
+
+Opening any Figure full-screen to look at it closely — by pointer or by
+keyboard. Deliberately *not* "the diagram escape hatch", which is what it was
+before #122 restated its purpose: its real constituency is the site's images,
+not its handful of diagrams. The surface it opens into is the **Lightbox**.
+
+## Authoring snippet
+
+The copyable source shown beside an example in a Fixture, tagged with the tier
+it belongs to so it says *which kind of file it goes in*. Fixtures are therefore
+the authoring reference as well as the test target, and a guard keeps a snippet
+from drifting away from the example it documents.
+
+## Cousin Post
+
+An archive piece published as a companion to a current one — the tactic that
+lets old writing re-enter the feed without pretending to be new. A Cousin Post
+is an ordinary Post; the word describes *why it is scheduled when it is*, not a
+property of the writing. See `docs/publishing-routine.md`.
+
+## Cycle
+
+The unit of publishing cadence: roughly two weeks, tracked by exactly one open
+issue whose last checkbox opens the next Cycle — so the routine renews itself
+rather than needing to be restarted. A Cycle is a *container for a cadence*, not
+a deadline for a Post: one Post a month is the floor, not a failure.
+
+A Post counts as published when it is verified against the production feed.
+Merging is not publishing — see Scheduled Post.
+
 ## Production
 
 The build of the `main` branch served at davidlowelarsson.com, with drafts
