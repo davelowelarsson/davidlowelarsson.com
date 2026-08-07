@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import { SHOW_DRAFTS } from 'astro:env/server';
+import Prose from '../../components/Prose.astro';
 import Teaser from '../../components/Teaser.astro';
 import Base from '../../layouts/Base.astro';
 import { formatScheduleDate, isScheduled, isVisible } from '../../lib/posts';
@@ -79,8 +80,54 @@ if (!teaser) {
             )}
           </p>
         </header>
-        {Content && <Content />}
+        {
+          /*
+            The rendered Post body goes through Prose, which owns every rule
+            that styles article content. Markdown has no component of its own,
+            so this wrapper is the only thing prose CSS can be attached to.
+          */
+          Content && (
+            <Prose>
+              <Content />
+            </Prose>
+          )
+        }
       </article>
     )
   }
 </Base>
+
+<style>
+  /* Layer 3: the centred Post header. Scoped here, which is the only page that
+     renders one. The centring is deliberately NOT inherited by `.post-meta`
+     itself — that class is shared with every post-list row, which stays
+     left-aligned, so the override is written against `.post-header`. */
+  .post-header {
+    margin-bottom: 3.25rem;
+    text-align: center;
+  }
+
+  .eyebrow {
+    margin: 0 0 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  /* inline-flex + min-height so the Category link clears the WCAG 2.2 24px
+     target minimum; the text alone is about 12px tall. */
+  .eyebrow a.badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+  }
+
+  .post-header .post-meta {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.4rem 1rem;
+    margin: 0;
+  }
+</style>

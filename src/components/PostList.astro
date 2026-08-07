@@ -62,3 +62,73 @@ const formatDate = (date: Date) =>
     ))
   }
 </ul>
+
+<style>
+  /* Layer 3: the archive row. Scoped to this component, which is the only
+     place a post-list row is built.
+
+     `.post-list`'s `list-style: none; padding: 0` used to be the only thing
+     standing between prose list styling and the archive — a class outranks a
+     bare `ul`, so it happened to survive. It no longer has to: prose list
+     rules live inside Prose.astro and carry that component's scope attribute,
+     which nothing here is inside. */
+  .post-list {
+    list-style: none;
+    padding: 0;
+    margin: 1.5rem 0 0;
+  }
+
+  .post-list li + li {
+    margin-top: 0.25rem;
+  }
+
+  .post-link {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: 0.875rem 0.75rem;
+    margin: 0 -0.75rem;
+    border-radius: 10px;
+    text-decoration: none;
+  }
+
+  .post-link:hover {
+    background: var(--chip);
+  }
+
+  .post-cover {
+    flex: 0 0 auto;
+    width: 5.5rem;
+    height: auto;
+    border-radius: 6px;
+    border: 1px solid var(--hairline);
+  }
+
+  .post-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+  }
+
+  .post-title {
+    font-weight: 550;
+    line-height: 1.4;
+  }
+
+  .post-description {
+    font-size: 0.9375rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .post-list .post-meta {
+    margin-top: 0.15rem;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .post-link {
+      transition: background 120ms ease;
+    }
+  }
+</style>

@@ -16,6 +16,7 @@ import {
   TEXT_TOKENS,
   tokenContrast,
 } from './palette';
+import { allCssSources, cssIn, GLOBAL_STYLESHEET, mediaBlocks, stripComments } from './stylesheets';
 
 describe('relativeLuminance', () => {
   it('anchors at the ends of the sRGB range', () => {
@@ -170,8 +171,6 @@ describe('the palette as data', () => {
 // `:root` declares must equal PALETTE exactly, in both directions, and no
 // colour may be written anywhere else in the global sheet.
 
-const BASE_LAYOUT = 'src/layouts/Base.astro';
-
 /** Split `a, b` on the top-level comma only — values may nest parens. */
 function splitPair(value: string): [string, string] {
   let depth = 0;
@@ -188,14 +187,12 @@ function splitPair(value: string): [string, string] {
 
 /** The global sheet with comments removed — prose about colours is not a colour. */
 function globalStyleBlock(): string {
-  const match = /<style is:global>([\s\S]*)<\/style>/.exec(readFileSync(BASE_LAYOUT, 'utf8'));
-  if (!match) throw new Error(`no global style block in ${BASE_LAYOUT}`);
-  return match[1].replace(/\/\*[\s\S]*?\*\//g, '');
+  return stripComments(cssIn(GLOBAL_STYLESHEET));
 }
 
 function rootBlock(css: string): string {
   const match = /:root\s*\{([\s\S]*?)\n\s*\}/.exec(css);
-  if (!match) throw new Error(`no :root block in ${BASE_LAYOUT}`);
+  if (!match) throw new Error(`no :root block in ${GLOBAL_STYLESHEET}`);
   return match[1];
 }
 
@@ -222,6 +219,42 @@ const NON_COLOUR_TOKENS = [
   'divider-reach',
   'divider-gap',
 ];
+
+/**
+ * Components that define colours of their own, and why.
+ *
+ * Widening this scan from one global block to every layer (#116) found five —
+ * all of them predating the guard, none of them previously visible to it. They
+ * are listed rather than quietly excluded, so the exceptions are finite and
+ * each one has to justify itself.
+ *
+ * Genuinely outside the palette:
+ *   ProcessStepCard, WrappedSnapshot — brand marks. Spotify green and Slack's
+ *     four hues ARE those products' colours; putting them in src/lib/palette.ts
+ *     would claim they are this site's, and a theme change must not repaint
+ *     someone else's logo. Both components are ruled outside the figure
+ *     contract by #114.
+ *   Lightbox — a black scrim at 75%. The backdrop deliberately does not follow
+ *     the theme: it is the absence of the page, not a surface on it.
+ *
+ * Debt, and named as such:
+ *   ArticleLinks — a surface pair that could be tokens and is not.
+ *   Video, YouTube — a black letterbox and a white play triangle. Arguably not
+ *     debt at all: a video's box is black because video is black, not because
+ *     the theme said so. Either way the call belongs to the ticket that
+ *     migrates them.
+ *
+ * The debt is left alone here because #116 is a prefactor — nothing a reader
+ * sees may change — and #118 migrates those components anyway.
+ */
+const COLOUR_EXCEPTIONS = new Set([
+  'src/components/ArticleLinks.astro',
+  'src/components/Lightbox.astro',
+  'src/components/ProcessStepCard.astro',
+  'src/components/Video.astro',
+  'src/components/YouTube.astro',
+  'src/components/WrappedSnapshot.astro',
+]);
 
 /** Every rule whose selector starts with `:root`, wherever it appears. */
 function withoutRootRules(css: string): string {
@@ -262,10 +295,13 @@ describe('the stylesheet mirrors the palette', () => {
   });
 
   it('mirrors the high-contrast overrides too', () => {
-    const css = globalStyleBlock();
-    const block = /@media\s*\(prefers-contrast:\s*more\)\s*\{([\s\S]*?\n {2}\})/.exec(css);
-    expect(block, 'no prefers-contrast block to mirror').not.toBeNull();
-    expect(declaredTokens(block?.[1] ?? '')).toEqual(HIGH_CONTRAST);
+    // Brace-matched rather than anchored on a two-space indent: the same rule
+    // is indented differently in a .css file and in an .astro <style> block,
+    // and an indentation-anchored regex silently stops matching when a rule
+    // moves between layers.
+    const [block] = mediaBlocks(cssIn(GLOBAL_STYLESHEET), /prefers-contrast:\s*more/);
+    expect(block, 'no prefers-contrast block to mirror').toBeDefined();
+    expect(declaredTokens(block ?? '')).toEqual(HIGH_CONTRAST);
   });
 
   it('writes no colour outside :root', () => {
@@ -274,7 +310,13 @@ describe('the stylesheet mirrors the palette', () => {
     // which also excused any ordinary rule inside it: a
     // `@media (prefers-contrast: more) { .post-description { color: #fff } }`
     // passed both tests while making secondary text nearly invisible.
-    const outside = withoutRootRules(globalStyleBlock());
+    // Every layer, not just the global sheet. Before #116 there was only one
+    // block to scan, so moving a rule into a component would have been a way
+    // out of this guard; now it is not.
+    const outside = allCssSources()
+      .filter(([path]) => !COLOUR_EXCEPTIONS.has(path))
+      .map(([path, css]) => `/* ${path} */\n${withoutRootRules(stripComments(css))}`)
+      .join('\n');
 
     // Every colour syntax CSS has, not just the three this project happens to
     // use. `oklch()`, `hsl()`, a named colour or an uppercase `RGB()` are all

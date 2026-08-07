@@ -1,0 +1,387 @@
+/*
+ * Layer 1 of three: tokens, reset, and the shared chrome that has no component
+ * to belong to. Imported once, by src/layouts/Base.astro.
+ *
+ * The other two layers:
+ *   2. src/components/Prose.astro — everything inside a rendered Post body.
+ *   3. Every other component's own `<style>` block, scoped by Astro.
+ *
+ * What earns a place in THIS file is narrow:
+ *   - design tokens and the theme states that flip them;
+ *   - the reset, and the element typography that must hold on every page
+ *     (`h1` appears on the home page, 404, a Category page and a Post header,
+ *     so it cannot live inside Prose);
+ *   - chrome whose markup appears in more than one page and has no owning
+ *     component (`.divider`, `.post-meta`, `.badge*`, `.all-posts`), plus the
+ *     saltast stat nodes, which are built by script and therefore never carry
+ *     a scope attribute;
+ *   - `.breakout`, the layout primitive governed by ADR 0006.
+ *
+ * Anything with exactly one home belongs in that home's scoped block.
+ */
+
+/* Colours are defined in src/lib/palette.ts and mirrored here. This block is
+   the ONLY place the sheet may name a colour; src/lib/palette.test.ts asserts
+   both halves of that — that :root matches PALETTE exactly, and that nothing
+   in any stylesheet or component writes a hex, an rgb() or a light-dark() of
+   its own. Change a colour in the data; the failing test names the line to
+   follow up. */
+:root {
+  color-scheme: light dark;
+
+  --font-prose: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Rhythm. Defined once here so the measure, the type size and the leading
+     cannot drift apart — they are one decision about how dense the page is. */
+  --measure: 43rem;
+  --step-0: 1.0625rem;
+  --leading: 1.74;
+  --space-section: 4.5rem; /* air above a section break */
+  --space-figure: 3rem; /* air around any piece of media */
+
+  /* How far a divider's rule reaches from its label toward the margin.
+     THIS IS THE KNOB: 0 removes the rules entirely and leaves the label;
+     100% brings full-width rules back. Nothing else needs to change. */
+  --divider-reach: 4.5rem;
+  --divider-gap: 1.25rem;
+
+  --bg: light-dark(#fafbfa, #111310);
+  --ink: light-dark(#1e211d, #e6eae3);
+  --muted: light-dark(#5a6158, #a3aa9f);
+  --hairline: light-dark(rgb(30 33 29 / 13%), rgb(230 234 227 / 14%));
+  --chip: light-dark(rgb(30 33 29 / 5%), rgb(230 234 227 / 7%));
+  --accent: light-dark(#0e646c, #6fcdd9);
+  --warn: light-dark(#835300, #eebd5c);
+  --status-up: light-dark(#136c36, #4ade80);
+  --status-down: light-dark(#b01818, #f87171);
+  --tint-essay: light-dark(#4338ca, #b4bdfc);
+  --tint-til: light-dark(#0c665e, #5eead4);
+  --tint-experiment: light-dark(#155e75, #7dd3fc);
+  --tint-project: light-dark(#a21caf, #f0abfc);
+}
+
+/* A reader who has asked their OS for more contrast gets firmer hairlines
+   and stronger secondary text — cheap, and it moves the page toward AAA.
+   Mirrored from HIGH_CONTRAST in src/lib/palette.ts, which is where the test
+   proves these are genuinely stronger rather than merely different.
+
+   No [data-theme] companion is needed, unlike the prefers-color-scheme
+   rules: these are light-dark() pairs resolved by color-scheme, which a
+   forced theme sets — so the override follows a forced theme for free. */
+@media (prefers-contrast: more) {
+  :root {
+    --muted: light-dark(#3f453d, #cdd3c8);
+    --hairline: light-dark(rgb(30 33 29 / 34%), rgb(230 234 227 / 34%));
+  }
+}
+
+/* Three states, and auto is the ABSENCE of the attribute. Because every token
+   is a light-dark() pair, one property flips the whole page. See ADR 0010. */
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+/* ── Reset ── */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+  max-width: var(--measure);
+  font-family: var(--font-prose);
+  font-size: var(--step-0);
+  line-height: var(--leading);
+  color: var(--ink);
+  background: var(--bg);
+  text-rendering: optimizeLegibility;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ── Element typography that holds on every page ──
+   These are not "prose" in the Prose-component sense. A heading, a paragraph
+   and a link appear on the home page, the posts index, a Category page, both
+   error pages and a Teaser, none of which render a Post body. Moving them
+   into Prose would leave those pages unstyled — so the base scale lives here
+   and Prose adds only what is specific to article content. */
+
+h1 {
+  font-size: 1.625rem;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+  margin: 0 0 0.5rem;
+}
+
+h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 2.25em 0 0.5em;
+}
+
+h3 {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  margin: 1.75em 0 0.5em;
+}
+
+p {
+  margin: 0 0 1.3em;
+}
+
+a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--muted);
+  text-underline-offset: 0.15em;
+}
+
+a:hover {
+  text-decoration-color: currentColor;
+}
+
+main img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Excalidraw exports dark strokes on a transparent background — legible on
+   a white page, invisible on a dark one. Invert lightness and spin the hue
+   back so black-on-transparent reads as light-on-transparent in dark mode,
+   without touching the exported SVG file itself.
+
+   THE TRAP: `prefers-color-scheme` asks the OPERATING SYSTEM and cannot see
+   a theme the reader forced here. On a light OS with dark forced, the page
+   goes dark via color-scheme and this rule never fires — dark strokes on a
+   dark ground, invisible. So the query is narrowed to "OS dark AND not
+   forced light", and a forced-dark companion sits outside it. Every
+   prefers-color-scheme query in the codebase needs both halves;
+   src/lib/theme.test.ts asserts that structurally.
+
+   Here rather than in Prose.astro on purpose: it matches a sketch ANYWHERE on
+   the page, not only inside a Post body, and #116 is a prefactor — narrowing
+   it to `.prose` would be a behaviour change smuggled in as a move. #121 owns
+   sketch and diagram theming as its own decision. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) img[src*="excalidraw"] {
+    filter: invert(0.92) hue-rotate(180deg);
+  }
+}
+
+:root[data-theme="dark"] img[src*="excalidraw"] {
+  filter: invert(0.92) hue-rotate(180deg);
+}
+
+/* ── Layout primitive ──
+   Break a figure out wider than the prose measure, centred on the viewport,
+   without restructuring the single-column <body> (which also holds the
+   header/footer). The `left: 50%` + `translateX(-50%)` pair re-centres a child
+   that's wider than its parent; `min(60rem, 100vw - 2rem)` is the cap —
+   clearly wider than the text on desktop, full-width (minus a small gutter) on
+   mobile, and never wide enough to push the page into horizontal scroll. See
+   ADR 0006. Used by Mermaid.astro and MediaAside.astro, which is why it is
+   here rather than inside either of them. */
+.breakout {
+  width: min(60rem, 100vw - 2rem);
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* ── Section dividers ──
+   A centred label with rules reaching --divider-reach toward each margin and
+   stopping. The span that used to be rule is now breathing room.
+
+   ONE KNOB: --divider-reach at 0 removes the rules and leaves the label;
+   at 100% full-width rules come back. Nothing else changes. Asserted in
+   e2e/dividers.spec.ts, because a knob nobody turns is just a constant.
+
+   Accessibility: the elements are <h2> headings and STAY headings — they
+   carry the document outline (and .section-heading names a <section> via
+   aria-labelledby). The rules are ::before/::after pseudo-elements, which
+   never enter the accessibility tree, so the decoration is decorative and
+   the structure is structural. Both, correctly, on purpose.
+
+   .year-heading and .section-heading survive as markup hooks only — a
+   locator for the archive test and the aria-labelledby target. All the
+   styling is here. Global rather than scoped because the same divider appears
+   on the home page, the posts index and every Category page, none of which
+   share a component. */
+.divider {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: var(--divider-gap);
+  margin: var(--space-section) 0 1.25rem;
+  padding: 0;
+  border: 0;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  width: 100%;
+  max-width: var(--divider-reach);
+  border-top: 1px solid var(--hairline);
+}
+
+.divider::before {
+  justify-self: end;
+}
+
+.divider::after {
+  justify-self: start;
+}
+
+/* ── Shared chrome ──
+   Each of these appears in several pages or components with no single owner:
+   .post-meta in a Post header, every post-list row, both error pages and a
+   Teaser; .badge alongside it in all of the same places; .all-posts on five
+   pages. */
+
+.post-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  /* Dates stack in columns on every listing page; tabular figures make a
+     column of them read as a column rather than as a ragged series. */
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+}
+
+.badge {
+  letter-spacing: 0.05em;
+}
+
+a.badge {
+  text-decoration: none;
+}
+
+a.badge:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+/* Quiet category tints — legible as monochrome, scannable as color */
+.badge-essay {
+  color: var(--tint-essay);
+}
+
+.badge-til {
+  color: var(--tint-til);
+}
+
+.badge-experiment {
+  color: var(--tint-experiment);
+}
+
+.badge-project {
+  color: var(--tint-project);
+}
+
+.badge-warning {
+  color: var(--warn);
+}
+
+/* Preview-only: a non-draft post queued for a future liveFrom. Calm blue so
+   it reads as "coming", distinct from the amber "draft". */
+.badge-scheduled {
+  color: var(--accent);
+}
+
+/* Error-page illustrations keep their own gray plate — framed like a card
+   so the fixed background reads as intentional in both themes. */
+.error-illustration {
+  display: block;
+  margin: 2.5rem auto;
+  border-radius: 12px;
+  border: 1px solid var(--hairline);
+  max-width: 100%;
+  height: auto;
+}
+
+.all-posts {
+  margin-top: 1rem;
+}
+
+.all-posts a {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.all-posts a:hover {
+  color: var(--ink);
+}
+
+/* Colored status breakdown — shared by the footer tally and the experiments
+   callout on a Category page. These nodes are created by script, so they never
+   carry a scope attribute and cannot live in either owner's scoped block. */
+.saltast-stats {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.15rem 0.7rem;
+}
+
+.saltast-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--stat-color, var(--muted));
+}
+
+.saltast-stat--up {
+  --stat-color: var(--status-up);
+}
+
+.saltast-stat--down {
+  --stat-color: var(--status-down);
+}
+
+.saltast-stat--unknown {
+  --stat-color: var(--warn);
+}
+
+.saltast-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.saltast-total {
+  color: var(--muted);
+}
+
+/* On a phone there is no room for a 4.5rem reach either side of a label and
+   any air worth the name — so the knob turns down rather than the treatment
+   changing shape. */
+@media (max-width: 30rem) {
+  :root {
+    --divider-reach: 2rem;
+    --space-section: 3.25rem;
+  }
+}

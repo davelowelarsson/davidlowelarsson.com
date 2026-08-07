@@ -12,12 +12,19 @@ import { describe, expect, it } from 'vitest';
 // object" — writing `@media (prefers-reduced-motion: reduce) { … none }`
 // instead would still animate for anyone whose OS reports nothing at all.
 
-/** Every .astro file under src/. */
-function astroFiles(): string[] {
+/**
+ * Every file that can contribute CSS — `.astro` AND `.css`.
+ *
+ * This scanned only `.astro` until #116 moved the tokens and reset into
+ * src/styles/global.css. A `transition:` added there would have been invisible
+ * to this guard: not a hypothetical, since the rule this test was written for
+ * (`.post-link`'s background transition) sat in exactly the block that moved.
+ */
+function styleFiles(): string[] {
   const files: string[] = [];
   for (const entry of readdirSync('src', { recursive: true }) as string[]) {
     const path = join('src', entry.toString());
-    if (path.endsWith('.astro') && !statSync(path).isDirectory()) files.push(path);
+    if (/\.(astro|css)$/.test(path) && !statSync(path).isDirectory()) files.push(path);
   }
   return files;
 }
@@ -47,7 +54,7 @@ describe('motion is opt-in', () => {
   it('guards every transition and animation behind prefers-reduced-motion', () => {
     const unguarded: string[] = [];
 
-    for (const path of astroFiles()) {
+    for (const path of styleFiles()) {
       const source = readFileSync(path, 'utf8').replace(/\/\*[\s\S]*?\*\//g, (comment) =>
         ' '.repeat(comment.length),
       );
