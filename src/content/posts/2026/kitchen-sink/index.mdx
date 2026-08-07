@@ -128,7 +128,29 @@ both sides.
 
 ### A constrained single image
 
-<ArticleImage src={testCardWide} alt="Test card: a wide slate ground with a 100px grid, corner markers and a centre cross" />
+The figure contract: a `figure.media` carrying a `data-media` kind, its content
+in a body element, and an optional caption. Nothing here says how wide it is —
+that is the layout axis, and it is off by default.
+
+<ArticleImage
+  src={testCardWide}
+  alt="Test card: a wide slate ground with a 100px grid, corner markers and a centre cross"
+  kind="photo"
+/>
+
+### The same figure, captioned and broken out
+
+Same contract, two axes turned on. The figure runs to the 60rem breakout; the
+caption below it stays at the reading measure, because a line of small grey text
+at 60rem is unreadable and a caption is text.
+
+<ArticleImage
+  src={testCardWide}
+  alt="Test card: a wide slate ground with a 100px grid, corner markers and a centre cross"
+  kind="photo"
+  breakout
+  caption="A caption stays at the reading measure however wide the figure above it runs. This one is deliberately long enough to wrap, because a caption that fits on one line proves nothing about its measure."
+/>
 
 ### A compact pair
 

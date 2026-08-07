@@ -86,9 +86,36 @@ export function normalizeQuotes(css: string): string {
  */
 export function selectorsIn(css: string): string[] {
   return [...stripComments(css).matchAll(/(?<=^|[{}])([^{}]+)\{/g)]
-    .flatMap(([, group]) => (group as string).split(','))
+    .flatMap(([, group]) => splitSelectorGroup(group as string))
     .map((selector) => selector.trim())
     .filter((selector) => selector.length > 0 && !selector.startsWith('@'));
+}
+
+/**
+ * Split `a, b` on TOP-LEVEL commas only.
+ *
+ * A functional pseudo-class carries its own commas — `:is(img, picture)`,
+ * `:where(ul, ol)`, `:not(a, button)`. Splitting on every comma tears those in
+ * half and hands the guards fragments like `picture)`, which match nothing they
+ * are looking for and are reported as violations that do not exist. Found the
+ * moment the figure contract used `:is()`.
+ */
+function splitSelectorGroup(group: string): string[] {
+  const parts: string[] = [];
+  let depth = 0;
+  let start = 0;
+
+  for (let i = 0; i < group.length; i++) {
+    const char = group[i];
+    if (char === '(') depth++;
+    else if (char === ')') depth--;
+    else if (char === ',' && depth === 0) {
+      parts.push(group.slice(start, i));
+      start = i + 1;
+    }
+  }
+  parts.push(group.slice(start));
+  return parts;
 }
 
 /**
