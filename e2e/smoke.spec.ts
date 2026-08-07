@@ -37,10 +37,10 @@ test('category pages list only their category and explain the term', async ({ pa
   await page.goto('/category/til/');
   await expect(page.getByRole('heading', { level: 1 })).toContainText('til');
   await expect(page.getByText('Today I Learned')).toBeVisible();
-  await expect(page.getByText('DORA metrics are a flashlight')).toHaveCount(0);
+  await expect(page.getByText('DORA, five years after the deploy fear')).toHaveCount(0);
 
   await page.goto('/category/essay/');
-  await expect(page.getByText('DORA metrics are a flashlight')).toBeVisible();
+  await expect(page.getByText('DORA, five years after the deploy fear')).toBeVisible();
 });
 
 test('the posts archive divides entries by year, newest first', async ({ page }) => {
@@ -60,7 +60,7 @@ test('categories are reachable from the posts filter rail and from a post page',
   await page.locator('.filter-rail').getByRole('link', { name: 'essay' }).click();
   await expect(page).toHaveURL(/\/category\/essay\/$/);
 
-  await page.goto('/posts/essay-dora-metrics-flashlight/');
+  await page.goto('/posts/essay-dora-five-years-after-deploy-fear/');
   await page.locator('article').getByRole('link', { name: 'essay' }).click();
   await expect(page).toHaveURL(/\/category\/essay\/$/);
 });
@@ -83,7 +83,7 @@ test('rss feed serves rich items', async ({ request }) => {
   expect(response.status()).toBe(200);
 
   const xml = await response.text();
-  expect(xml).toContain('DORA metrics are a flashlight');
+  expect(xml).toContain('DORA, five years after the deploy fear');
   expect(xml).toContain('<content:encoded>');
   expect(xml).toContain('<category>');
 });
@@ -116,14 +116,16 @@ test('pages carry OpenGraph metadata and structured data', async ({ page }) => {
   expect(profile['@type']).toBe('ProfilePage');
   expect(profile.mainEntity['@type']).toBe('Person');
 
-  await page.goto('/posts/essay-dora-metrics-flashlight/');
+  await page.goto('/posts/essay-dora-five-years-after-deploy-fear/');
   await expect(page.locator('meta[property="og:type"]')).toHaveAttribute('content', 'article');
   await expect(page.locator('meta[property="article:published_time"]')).toHaveCount(1);
   const posting = JSON.parse(
     (await page.locator('script[type="application/ld+json"]').textContent()) ?? '{}',
   );
   expect(posting['@type']).toBe('BlogPosting');
-  expect(posting.url).toBe('https://davidlowelarsson.com/posts/essay-dora-metrics-flashlight/');
+  expect(posting.url).toBe(
+    'https://davidlowelarsson.com/posts/essay-dora-five-years-after-deploy-fear/',
+  );
   expect(posting.image['@type']).toBe('ImageObject');
   expect(posting.publisher['@type']).toBe('Organization');
 
@@ -148,7 +150,7 @@ test('llms.txt lists published posts for AI crawlers', async ({ request }) => {
 
   const text = await response.text();
   expect(text).toContain('# David Lowe Larsson');
-  expect(text).toContain('DORA metrics are a flashlight');
+  expect(text).toContain('DORA, five years after the deploy fear');
 });
 
 test('every page declares its canonical URL on the apex domain', async ({ page }) => {

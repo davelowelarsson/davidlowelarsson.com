@@ -1,72 +1,69 @@
 ---
 title: "In praise of boring tools"
-description: "Choosing the tool with the fewest surprises is not a failure of ambition — it's usually the ambitious choice, once you count the cost of surprises."
+description: "The containers we started with at UR were early software, and they were still boring, and that turned out to be the difference that mattered."
 pubDate: 2026-06-19
 category: essay
 draft: true
-tags: ["tooling", "platform-engineering", "leadership"]
+tags: ["tooling", "platform-engineering", "kubernetes", "leadership"]
 ---
 
-The most reliable systems I've run were never built on the newest tool in the room. They were
-built on the tool with the smallest surface area for surprise — usually a few years old, usually
-a little unfashionable, always well understood by whoever was on call.
+A couple of years ago (must be something like 15 years ago) I was still working in a codebase relying heavily on mootools. Nobody had used
+mootools for years. But someone sat down years before I got there, weighed mootools against jquery,
+and picked the one that lost, and then I was the one living with it.
 
 ![Abstract composition of a single solid grounded shape surrounded by faded, drifting shapes](./essay-boring-tools.svg)
 
-## Boring is a property of the operator, not the tool
+<!-- Maybe use this image here - https://imgs.xkcd.com/comics/dependency.png -->
 
-"Boring" doesn't mean simple, old, or feature-poor. It means the people running it have already
-found its edges. A tool is boring once its failure modes are documented in someone's memory
-instead of waiting to be discovered in an incident.
+So that's what I'm actually thinking about whenever we discuss at work whether something is too
+new to run in production. Not the feature list. Who is going to be living inside this decision in
+2033, and will they understand why it was made 🤔
 
-### The cost nobody puts on the slide
+## Docker in 2016
 
-New tools get evaluated on features. They rarely get evaluated on the cost of the first year of
-finding out how they fail — the outages that teach you what the vendor's docs didn't mention, the
-support tickets that become tribal knowledge, the on-call shifts spent reading source code
-instead of runbooks.
+We started jumping on docker maybe 2016 or 2017. The software was early but it was stable, and we
+took it in small steps. We experimented with docker and docker swarm, then started a very small
+cluster on Rancher's own Cattle, and by the time we were ready to actually scale, Rancher had
+moved to RKE, so that became the next step rather than a rewrite. Today it's kubernetes, and I
+still like the opinionated way Rancher sets things up, enough that I [built a k3s cluster out of
+raspberry pis at home](/posts/raspberry-pi-cluster/) to keep learning it.
 
-> Every tool has a "getting to know you" tax. The question is whether you pay it before or during
-> an incident.
+Every one of those steps was early. None of them was new. Other people had already run the thing
+we were about to run, it was already a big part of the CNCF landscape, and the failure modes were
+written down somewhere by someone who had hit them first. That's the whole trick, and it has
+nothing to do with how old the software is.
 
-## What I actually look for
+## The part that took longest was not the software
 
-- Predictable failure modes, ideally ones other teams have already hit and written up
-- A boring, mechanical upgrade path — no "rewrite your config format" between minor versions
-- Enough adoption that Stack Overflow, GitHub issues, and coworkers have already hit your bug
-- A rollback path that doesn't require the tool's own healthy operation to execute
+Trust and workflows around containers were very limited in the beginning, and people had a really
+hard time seeing the benefit. The abstraction levels are the hard part... taking the leap from
+"frontend, application, backend" all the way down to infrastructure is a long journey, and a lot
+of coworkers and others I've worked with have not completed it yet. Neither had I, for years.
 
-None of that shows up in a feature comparison table, which is exactly why feature comparison
-tables are a bad way to choose infrastructure.
+That's the cost I never see in anyone's evaluation of a tool. The tool arrives more or less on the
+day we install it. The understanding arrives whenever it arrives, and until it does, the tool is
+something most of the team has to trust rather than reason about.
 
-## A comparison, stated plainly
+## The rule, and the things we kept too long
 
-| Property                 | Exciting new tool          | Boring established tool         |
-| -------------------------- | ---------------------------- | ---------------------------------- |
-| Failure modes              | Discovered live, by you      | Documented, by someone else already |
-| On-call familiarity        | Low, growing slowly          | High, from day one                  |
-| Migration risk if it stalls | High — small community      | Low — many exits, many alternatives |
-| Feature velocity            | High                         | Low, but predictable                |
+We have continuous discussions about tools and newness, and the rule we land on is boring in
+itself: anything that isn't 1.0 or GA we evaluate, try out, play with, but don't put in
+production. We do bend that for some kubernetes tooling, which I notice and am not entirely
+comfortable with. Beyond that it's tried and true, preferably open source, because that gives me
+much more confidence about what happens when the vendor loses interest. And never build it
+yourself. Not-invented-here is a dangerous and very maintenance heavy road to walk through a
+career.
 
-## Where "exciting" is still the right call
+Jenkins is the one we should have let go earlier than we did. We built a very competent shared
+workflow, and also a complicated one that was genuinely hard to make sense of at some points, and
+I've written about [where that started creating its own
+friction](/posts/essay-3d-art-to-platform-engineering/) already. And ur.se on Ruby on Rails is
+probably something we never should have moved to. It was never easy to edit or make changes in,
+and it gave us issues more than once. Moving that over to Next.js and TypeScript has taken six or
+seven years and is only mainly done now.
 
-This isn't an argument for never adopting anything new. Some problems genuinely need a tool that
-doesn't exist yet in boring form. The distinction I try to hold onto: adopt exciting tools for
-capabilities you can't get any other way, not for capabilities you already have, slightly nicer.
-
-```bash
-# a boring health check, run from a boring cron job,
-# writing to a boring log file — and still catching the outage
-curl -sf https://example.com/health || echo "$(date -u) health check failed" >> /var/log/health.log
-```
-
-That one-liner has caught more real incidents for me than any observability platform I've
-adopted for the excitement of it. It's not sophisticated. It's just been running, unattended,
-for years, and I know exactly how it fails.
-
-## The actual ambition
-
-Choosing boring tools is not the safe, unambitious choice it looks like from the outside. It's a
-bet that your team's attention is the scarcest resource in the system, and that spending it on
-novel failure modes is a worse trade than spending it on the actual problem you're trying to
-solve. That's still ambition — just pointed at the right target.
+The tools that never seem to be in the way are ssh, bash, grep, find and vim/neovim. Kubernetes
+and docker are not boring, they're incredible, so maybe boring is the wrong word for what I look
+for... what I look for is a tool somebody else has already found the edges of. Six or seven years
+for one migration is a good reminder of how long these decisions keep being someone's daily work
+after the meeting where they were made. We'll see what I'm still living inside in 2033 🤷
