@@ -9,7 +9,9 @@ Superseded in part by: [ADR 0012 — The legibility floor](0012-the-legibility-f
 > legibility floor. §2 (`.breakout` at 60rem) stands unchanged. §3's lightbox
 > survives with its purpose restated and its keyboard gap closed (#122, which
 > also closes #75). §4's deferral of selective image breakout
-> is discharged — with a refusal, not a mechanism. Each section below is marked.
+> is discharged — with a refusal, not a mechanism — as is §4's compare-mode
+> deferral (#123, prototyped and answered without shipping the feature). Each
+> section below is marked.
 
 ## Context
 
@@ -87,15 +89,42 @@ this is a rendering/layout decision, not an authoring constraint.
    > dialog is the scroll container, so focusing it on open makes the arrow keys
    > pan. Pinch-to-zoom remains the documented next step, still not built.
 4. **Compare-mode and selective image-breakout are explicitly deferred.**
-   *(The image-breakout half is discharged by #119 — with a refusal rather than
-   a mechanism: breakout is a component gesture, and a plain Markdown image does
-   not get one. Compare-mode is still deferred; #123 prototypes it.)*
    Before/after is a recurring shape in the author's writing, so a side-by-side
    "compare mode" is plausible future work — but building a general pairing
    feature for a single post is gold-plating. Likewise, plain Markdown
    `![](…)` can't opt one image into breakout without an authoring convention
    (an MDX `<Figure>`, a marker, or a blanket rule). Both are captured on
    issue #11; the `.breakout` foundation is already in place for them to adopt.
+
+   > **Both deferrals discharged.**
+   >
+   > *Selective image breakout* (#119) — with a REFUSAL rather than a mechanism.
+   > Breakout is a component gesture; a plain Markdown image does not get one.
+   > No authoring convention was invented, which is the outcome this section was
+   > worried about.
+   >
+   > *Compare-mode* (#123) — prototyped and answered, without shipping the
+   > feature. The figure shape holds unchanged: a `figure.media` with a
+   > `data-media` kind, a `.media__body` and a caption accommodates two pieces
+   > of media in a relationship, because the body already held one child or
+   > several. Two findings came out of it and both are worth having before the
+   > freeze:
+   >
+   > 1. **Compare is not a kind.** The media being compared are screenshots;
+   >    `data-media` says what a thing IS, and comparison is how two of them are
+   >    PRESENTED. A `data-media="compare"` would be a position wearing a kind's
+   >    name — the same collision that turned `data-media-side` into
+   >    `data-placement`. The pairing belongs on the layout axis, beside
+   >    `.breakout`.
+   > 2. **A figure may contain an operable control**, which the contract did not
+   >    anticipate. A wipe needs a slider and a toggle needs buttons, and neither
+   >    the body nor the caption is the right home — the control sits as a
+   >    sibling. It costs nothing today, but a figure holding a control is no
+   >    longer purely presentational, and that is now written down.
+   >
+   > The feature itself stays deferred on #55, which is still open. Building a
+   > general pairing mechanism for zero current Posts is the gold-plating that
+   > deleted the audio component.
 
 ## Consequences
 
