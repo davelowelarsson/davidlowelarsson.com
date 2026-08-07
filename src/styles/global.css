@@ -164,33 +164,6 @@ main img {
   height: auto;
 }
 
-/* Excalidraw exports dark strokes on a transparent background — legible on
-   a white page, invisible on a dark one. Invert lightness and spin the hue
-   back so black-on-transparent reads as light-on-transparent in dark mode,
-   without touching the exported SVG file itself.
-
-   THE TRAP: `prefers-color-scheme` asks the OPERATING SYSTEM and cannot see
-   a theme the reader forced here. On a light OS with dark forced, the page
-   goes dark via color-scheme and this rule never fires — dark strokes on a
-   dark ground, invisible. So the query is narrowed to "OS dark AND not
-   forced light", and a forced-dark companion sits outside it. Every
-   prefers-color-scheme query in the codebase needs both halves;
-   src/lib/theme.test.ts asserts that structurally.
-
-   Here rather than in Prose.astro on purpose: it matches a sketch ANYWHERE on
-   the page, not only inside a Post body, and #116 is a prefactor — narrowing
-   it to `.prose` would be a behaviour change smuggled in as a move. #121 owns
-   sketch and diagram theming as its own decision. */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) img[src*="excalidraw"] {
-    filter: invert(0.92) hue-rotate(180deg);
-  }
-}
-
-:root[data-theme="dark"] img[src*="excalidraw"] {
-  filter: invert(0.92) hue-rotate(180deg);
-}
-
 /* ── Layout primitive ──
    Break a figure out wider than the prose measure, centred on the viewport,
    without restructuring the single-column <body> (which also holds the

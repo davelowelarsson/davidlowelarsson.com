@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { allCssSources, mediaBlocks, selectorsIn, withoutMediaBlocks } from './stylesheets';
+import {
+  allCssSources,
+  collapseWhitespace,
+  mediaBlocks,
+  selectorsIn,
+  withoutMediaBlocks,
+} from './stylesheets';
 import { DEFAULT_THEME, THEME_STORAGE_KEY, THEMES, type Theme, themeAttribute } from './theme';
 
 describe('the three theme states', () => {
@@ -80,9 +86,14 @@ describe('every OS-preference query can see a forced theme', () => {
       // indentation of a rule inside `<style is:global>` — which stops matching
       // the moment the rule moves into a .css file at column zero, silently
       // leaving the whole query in `outside` and passing every assertion.
-      const outside = withoutMediaBlocks(css, DARK_SCHEME);
+      // Whitespace-flattened on both sides: a formatter wraps a long selector
+      // wherever it likes, and this comparison is about the selector, not about
+      // where biome chose to break the line.
+      const outside = collapseWhitespace(withoutMediaBlocks(css, DARK_SCHEME));
       for (const selector of darkSchemeQueries(css).flat()) {
-        const target = selector.replace(":root:not([data-theme='light'])", '').trim();
+        const target = collapseWhitespace(
+          selector.replace(":root:not([data-theme='light'])", ''),
+        ).trim();
         expect(outside, `${path}: no forced-dark companion for "${target}"`).toContain(
           `:root[data-theme='dark'] ${target}`,
         );

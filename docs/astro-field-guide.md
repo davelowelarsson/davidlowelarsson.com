@@ -643,3 +643,25 @@ how the project actually grew.
   that reads CSS as text — including the guards in `src/lib/stylesheets.ts` —
   has to track paren depth, or it reports violations that do not exist and
   misses ones that do.
+
+## Path-keyed CSS is the only hook a Markdown image gives you (2026-08-07, issue #119)
+
+- **Astro's native Markdown processor has no remark/rehype plugin hooks**, so
+  "just add a rehype plugin" is not a small change — it migrates the whole
+  pipeline onto unified. Refused for the third time here. The element itself is
+  the only place left to attach behaviour, which makes the rendered `src` the
+  hook.
+- **The rendered `src` keeps the original basename**, so it is reliable to key
+  on: a processed raster becomes `/_astro/<name>.<hash>.webp` and an SVG stays
+  `/_astro/<name>.<hash>.svg`. That is what makes `[src*='excalidraw']` and
+  `[src$='.svg']` work — and why `[src$='.png']` would NOT, since the extension
+  is rewritten.
+  Docs: https://docs.astro.build/en/guides/images/#images-in-markdown-files
+- **Source order is the override.** The sketch rule sits after the raster rule
+  so an inverted sketch is not also dimmed. Both are single-class specificity,
+  so the later one wins — worth stating, because reordering the file silently
+  changes the rendering.
+- **A guard that reads `.astro` CSS must strip `:global()` first.** `.prose
+  :global(ul)` and `.prose ul` are the same compiled rule, but only one of them
+  is what the file says. `src/lib/stylesheets.ts` unwraps it centrally, so no
+  individual guard has to know the syntax exists.

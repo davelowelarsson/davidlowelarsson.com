@@ -40,8 +40,12 @@ export function styleSourceFiles(root = 'src'): string[] {
 export function cssIn(path: string): string {
   const source = readFileSync(path, 'utf8');
   if (path.endsWith('.css')) return normalizeQuotes(source);
-  return normalizeQuotes(
-    [...source.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)].map((match) => match[1]).join('\n'),
+  return unwrapGlobal(
+    normalizeQuotes(
+      [...source.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)]
+        .map((match) => match[1])
+        .join('\n'),
+    ),
   );
 }
 
@@ -50,6 +54,17 @@ export function allCssSources(root = 'src'): [string, string][] {
   return styleSourceFiles(root)
     .map((path): [string, string] => [path, cssIn(path)])
     .filter(([, css]) => css.trim().length > 0);
+}
+
+/**
+ * Runs of whitespace collapsed to single spaces.
+ *
+ * A formatter wraps a long selector across lines wherever it likes, so any
+ * guard comparing selector text literally has to flatten it first — otherwise
+ * the check passes or fails on where biome chose to break the line.
+ */
+export function collapseWhitespace(text: string): string {
+  return text.replace(/\s+/g, ' ');
 }
 
 /** Comments removed — prose about a colour is not a colour. */
@@ -69,6 +84,39 @@ export function stripComments(css: string): string {
  */
 export function normalizeQuotes(css: string): string {
   return css.replace(/"/g, "'");
+}
+
+/**
+ * `:global(…)` wrappers removed, leaving what Astro will actually compile —
+ * minus the scope attribute it adds.
+ *
+ * A guard that matches selector TEXT must see the selector the browser sees.
+ * `.prose :global(ul)` and `.prose ul` are the same rule; so are
+ * `:global(:root[data-theme='dark']) .prose` and
+ * `:root[data-theme='dark'] .prose`. Reading the source form means every guard
+ * has to know about a syntax that exists only inside `.astro` files — and the
+ * theme guard did not, so it looked for a forced-dark companion that was
+ * present and reported it missing.
+ */
+export function unwrapGlobal(css: string): string {
+  let out = '';
+  for (let i = 0; i < css.length; ) {
+    if (!css.startsWith(':global(', i)) {
+      out += css[i];
+      i += 1;
+      continue;
+    }
+    // Copy the wrapped selector, dropping the wrapper's own parentheses.
+    let depth = 1;
+    let j = i + ':global('.length;
+    for (; j < css.length && depth > 0; j++) {
+      if (css[j] === '(') depth++;
+      else if (css[j] === ')') depth--;
+      if (depth > 0) out += css[j];
+    }
+    i = j;
+  }
+  return out;
 }
 
 /**

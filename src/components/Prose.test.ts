@@ -11,6 +11,20 @@ import Prose from './Prose.astro';
 
 const PROSE_COMPONENT = 'src/components/Prose.astro';
 
+/**
+ * A selector with its `:global()` wrappers removed and its whitespace collapsed
+ * — i.e. what Astro will actually compile it into, minus the scope attribute.
+ * Reading the source form instead means matching against `:global(` noise and
+ * against wherever the formatter chose to wrap a long selector across lines.
+ */
+function normalize(selector: string): string {
+  return selector
+    .replace(/:global\(/g, '')
+    .replace(/\)(?=\s|$)/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 async function render(html: string): Promise<string> {
   const container = await AstroContainer.create();
   return container.renderToString(Prose, { slots: { default: html } });
@@ -47,13 +61,60 @@ describe('Prose', () => {
     expect(await render('<p>x</p>')).toMatch(/data-astro-cid-[\w-]+/);
   });
 
-  it('anchors every one of its rules on .prose', () => {
+  // ── The Markdown tier (#119) ──
+  it('addresses each of the three path conventions', () => {
+    const css = cssIn(PROSE_COMPONENT);
+    // A sketch, a drawn vector and a raster are told apart by PATH, because the
+    // element is the only hook a plain Markdown image offers.
+    expect(css, 'no sketch rule').toContain("img[src*='excalidraw']");
+    expect(css, 'raster rule does not exclude vectors').toContain("img:not([src$='.svg'])");
+  });
+
+  it('frames only images that arrived as Markdown, never a component figure', () => {
+    // A component emits `figure.media > .media__body > img`, which is neither a
+    // direct child of the wrapper nor inside a paragraph. The Markdown rules
+    // must stay shaped so they cannot reach it — otherwise the two tiers fight
+    // over the same element and the component tier loses to source order.
+    const framing = selectorsIn(cssIn(PROSE_COMPONENT))
+      .map(normalize)
+      .filter((selector) => /img(?:\[|:not)/.test(selector));
+
+    expect(framing.length, 'no Markdown image rules found to check').toBeGreaterThan(0);
+    expect(
+      framing.filter((selector) => !/\.prose > img|\.prose p > img|\.prose img\[/.test(selector)),
+      'a Markdown image rule is not anchored on a direct child or a paragraph child',
+    ).toEqual([]);
+    expect(
+      framing.filter((selector) => selector.includes('media__body')),
+      'a Markdown image rule reaches into a component figure',
+    ).toEqual([]);
+  });
+
+  it('introduces no authoring syntax — the rules key on the path alone', () => {
+    const css = cssIn(PROSE_COMPONENT);
+    // A marker class or data attribute would mean editing 35 published Posts.
+    expect(css).not.toMatch(/img\[(?:class|data-)/);
+  });
+
+  it('keeps every one of its rules inside .prose', () => {
     // A rule written as bare `:global(table)` would compile to `table` and
-    // reach every page on the site. The component is only a boundary while all
-    // of its selectors start at the wrapper.
-    const loose = selectorsIn(cssIn(PROSE_COMPONENT)).filter(
-      (selector) => !selector.startsWith('.prose'),
-    );
+    // reach every page on the site. The component is only a boundary while
+    // every selector passes through the wrapper.
+    //
+    // A theme-dependent rule is allowed to be PREFIXED by `:root[data-theme=…]`
+    // — that is a state of the document, not an escape from the component — so
+    // the requirement is that `.prose` appears, not that it comes first.
+    const loose = selectorsIn(cssIn(PROSE_COMPONENT))
+      .map(normalize)
+      .filter((selector) => !/(^|\s):root\b/.test(selector) && !selector.startsWith('.prose'));
     expect(loose, 'a rule in Prose.astro escapes the component').toEqual([]);
+
+    const themed = selectorsIn(cssIn(PROSE_COMPONENT))
+      .map(normalize)
+      .filter((selector) => /(^|\s):root\b/.test(selector));
+    expect(
+      themed.filter((selector) => !selector.includes('.prose')),
+      'a theme-prefixed rule leaves the component entirely',
+    ).toEqual([]);
   });
 });
