@@ -242,6 +242,159 @@ test('clicking a diagram opens it larger in the lightbox; Escape and backdrop cl
   await expect(dialog).toBeHidden();
 });
 
+// ── Diagram theming from the design tokens (#121) ──
+//
+// Two problems, one bug and one aesthetic. The bug: the library's theme was
+// picked from `matchMedia('(prefers-color-scheme: dark)')`, so a reader on a
+// light machine who forced dark got a dark page with a light diagram — the
+// same failure the CSS rules guard against, in JavaScript where no CSS guard
+// can see it. The aesthetic: the diagram arrived in the library's own palette,
+// a visitor on the page rather than part of the writing.
+
+/** The page's own tokens, resolved to the rgb the reader is actually seeing. */
+async function tokens(page: Page): Promise<Record<string, string>> {
+  return page.evaluate(() => {
+    const probe = document.createElement('span');
+    probe.style.position = 'absolute';
+    probe.style.visibility = 'hidden';
+    document.body.append(probe);
+    const read = (name: string) => {
+      probe.style.color = `var(${name})`;
+      return getComputedStyle(probe).color;
+    };
+    const values = {
+      bg: read('--bg'),
+      ink: read('--ink'),
+      muted: read('--muted'),
+      chip: read('--chip'),
+    };
+    probe.remove();
+    return values;
+  });
+}
+
+/** What the first diagram is actually drawn in. */
+async function diagramColours(page: Page): Promise<Record<string, string>> {
+  return page.evaluate(() => {
+    const svg = document.querySelector('.mermaid-diagram svg');
+    // Every branch returns the same keys. An early `return {}` widens the type
+    // to a union with all-optional members, which `Record<string, string>`
+    // rejects — and `astro check` catches it while `playwright test` does not.
+    if (!svg) return { label: '', nodeFill: '', nodeStroke: '', edgeStroke: '' };
+    const label = svg.querySelector('.nodeLabel');
+    const node = svg.querySelector('.node rect, .node polygon, .basic rect');
+    const edge = svg.querySelector('.edgePath path, path.flowchart-link');
+    return {
+      label: label ? getComputedStyle(label).color : '',
+      nodeFill: node ? getComputedStyle(node).fill : '',
+      nodeStroke: node ? getComputedStyle(node).stroke : '',
+      edgeStroke: edge ? getComputedStyle(edge).stroke : '',
+    };
+  });
+}
+
+async function expectDrawnInPageColours(page: Page) {
+  const token = await tokens(page);
+  const drawn = await diagramColours(page);
+  expect(drawn.label, 'diagram text is not the page ink').toBe(token.ink);
+  expect(drawn.nodeFill, 'node fill is not the page surface').toBe(token.chip);
+  expect(drawn.nodeStroke, 'node border is not the page line colour').toBe(token.muted);
+  expect(drawn.edgeStroke, 'edge is not the page line colour').toBe(token.muted);
+}
+
+test('a diagram is drawn in the page tokens, on either ground', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'light' });
+  await page.goto(MERMAID_POST_PATH);
+  await expect(page.locator('.mermaid-diagram svg').first()).toBeVisible();
+  await expectDrawnInPageColours(page);
+
+  await page.emulateMedia({ colorScheme: 'dark' });
+  // One variant per ground: the same tokens, resolved against the other one.
+  await expect.poll(async () => (await diagramColours(page)).label).toBe((await tokens(page)).ink);
+  await expectDrawnInPageColours(page);
+});
+
+test('a diagram follows the CHOSEN theme, not the OS preference', async ({ page }) => {
+  // The bug, in the direction that used to fail silently: light machine, dark
+  // forced. Before #121 the page went dark and the diagram stayed light.
+  await page.emulateMedia({ colorScheme: 'light' });
+  await page.goto(MERMAID_POST_PATH);
+  await expect(page.locator('.mermaid-diagram svg').first()).toBeVisible();
+  const lightInk = (await diagramColours(page)).label;
+
+  await page.locator('[data-theme-set="dark"]').click();
+  await expect
+    .poll(async () => (await diagramColours(page)).label, {
+      message: 'dark forced on a light OS left the diagram in light colours',
+    })
+    .not.toBe(lightInk);
+  await expectDrawnInPageColours(page);
+});
+
+test('an OS-dark reader who forces light gets a light diagram', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await page.goto(MERMAID_POST_PATH);
+  await expect(page.locator('.mermaid-diagram svg').first()).toBeVisible();
+  const darkInk = (await diagramColours(page)).label;
+
+  await page.locator('[data-theme-set="light"]').click();
+  await expect
+    .poll(async () => (await diagramColours(page)).label, {
+      message: 'light forced on a dark OS left the diagram in dark colours',
+    })
+    .not.toBe(darkInk);
+  await expectDrawnInPageColours(page);
+});
+
+test('the theme control re-themes the diagram without a reload', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'light' });
+  await page.goto(MERMAID_POST_PATH);
+  await expect(page.locator('.mermaid-diagram svg').first()).toBeVisible();
+
+  // A marker that only survives if the document is never replaced. The control
+  // APPEARS to act immediately, so it has to actually do so — re-theming via a
+  // navigation would pass a colour assertion and still be the wrong behaviour.
+  await page.evaluate(() => {
+    (window as unknown as { __sameDocument: boolean }).__sameDocument = true;
+  });
+
+  const before = (await diagramColours(page)).label;
+  await page.locator('[data-theme-set="dark"]').click();
+  await expect.poll(async () => (await diagramColours(page)).label).not.toBe(before);
+
+  expect(
+    await page.evaluate(() => (window as unknown as { __sameDocument?: boolean }).__sameDocument),
+    'the page reloaded instead of re-theming in place',
+  ).toBe(true);
+});
+
+test('the legibility floor still holds after a re-theme', async ({ page }) => {
+  // Re-theming re-renders, which throws away the sizing the floor applied. If
+  // the floor were not re-applied, a diagram would silently revert to
+  // fit-to-container — illegible, and only on the second render.
+  await page.setViewportSize({ width: 390, height: 900 });
+  await page.emulateMedia({ colorScheme: 'light' });
+  await page.goto(MERMAID_POST_PATH);
+
+  const complex = page.locator('.mermaid-diagram').filter({ hasText: COMPLEX_LABEL });
+  await expect(complex.locator('svg')).toBeVisible();
+  const scroll = complex.locator('.mermaid-diagram__scroll');
+  expect(await scrollsSideways(scroll)).toBe(true);
+
+  await page.locator('[data-theme-set="dark"]').click();
+  await expect
+    .poll(() => scrollsSideways(scroll), {
+      message: 'the diagram lost its floor sizing when the theme changed',
+    })
+    .toBe(true);
+  await expect
+    .poll(() => smallestLabelPx(complex), {
+      message: 'labels fell below the floor after a re-theme',
+    })
+    .toBeGreaterThanOrEqual(FLOOR_PX - 0.5);
+  await expect(scroll).toHaveAttribute('tabindex', '0');
+});
+
 test('a page without a mermaid block never fetches the mermaid chunk', async ({ page }) => {
   // The Mermaid.astro wrapper script itself ships on every page (same as
   // Lightbox) — it's the tiny, dependency-free querySelector check. What

@@ -15,16 +15,92 @@
 // bundles it into a local chunk under `/_astro/` at build time — the CSP
 // (`script-src 'self'`) is satisfied without a CDN allowance, and pages
 // with no mermaid block never fetch that chunk at all (the early return
-// below happens before the import is ever reached).
+// below happens before the import is ever reached). #121 must not weaken
+// that: every listener it adds is registered only after a block is found.
 //
 // #120 adds the legibility floor. The DECISION is arithmetic and lives in
 // src/lib/legibility.ts, where its boundaries are unit-tested; this file only
 // measures the DOM, applies the answer, and re-applies it when the container
 // changes width.
+//
+// #121 makes the diagram part of the page rather than a visitor on it: its
+// colours come from the design tokens, and it follows the theme the reader
+// CHOSE rather than the one their operating system prefers.
 ---
 
 <script>
   import { decideRender, LEGIBILITY_FLOOR_PX } from '../lib/legibility';
+  import { THEME_ATTRIBUTE } from '../lib/theme';
+
+  /** A rendered diagram, kept so it can be re-drawn when the theme changes. */
+  interface Diagram {
+    figure: HTMLElement;
+    scroll: HTMLElement;
+    source: string;
+  }
+
+  const diagrams: Diagram[] = [];
+  let mermaid: typeof import('mermaid').default | null = null;
+  let nextId = 0;
+
+  /**
+   * A design token resolved to a real colour.
+   *
+   * `getPropertyValue('--ink')` returns the token as WRITTEN — `light-dark(…)`,
+   * unsubstituted — because custom properties are resolved lazily. Painting it
+   * onto a throwaway element and reading the computed colour back is what turns
+   * it into the rgb the reader is actually looking at, on whichever ground is
+   * currently in force. Same trick the palette e2e uses.
+   */
+  function resolveToken(probe: HTMLElement, token: string): string {
+    probe.style.color = `var(${token})`;
+    return getComputedStyle(probe).color;
+  }
+
+  /**
+   * Mermaid theme variables derived from the design tokens.
+   *
+   * Neutrals only, deliberately. ADR 0009 reserves the accent for STATE and the
+   * Category tints for Category words — a diagram that borrowed either would be
+   * saying something it does not mean. What a diagram needs is a surface, ink,
+   * and a line, and the palette already has all three.
+   */
+  function themeVariables(): Record<string, string> {
+    const probe = document.createElement('span');
+    probe.style.position = 'absolute';
+    probe.style.visibility = 'hidden';
+    document.body.append(probe);
+
+    const bg = resolveToken(probe, '--bg');
+    const ink = resolveToken(probe, '--ink');
+    const muted = resolveToken(probe, '--muted');
+    const chip = resolveToken(probe, '--chip');
+    const hairline = resolveToken(probe, '--hairline');
+    probe.remove();
+
+    return {
+      background: bg,
+      // Node fills sit on --chip, which the contrast model already knows as a
+      // ground that carries text (see GROUNDS in src/lib/palette.ts).
+      primaryColor: chip,
+      secondaryColor: chip,
+      tertiaryColor: bg,
+      mainBkg: chip,
+      clusterBkg: bg,
+      clusterBorder: hairline,
+      primaryTextColor: ink,
+      textColor: ink,
+      titleColor: ink,
+      primaryBorderColor: muted,
+      nodeBorder: muted,
+      lineColor: muted,
+      edgeLabelBackground: bg,
+      fontFamily: getComputedStyle(document.body).fontFamily,
+      // Pinned rather than inherited: this is the number the legibility floor
+      // is expressed against, so it must not drift with the prose type scale.
+      fontSize: '16px',
+    };
+  }
 
   /** The label size a diagram is drawn with, in its own units. */
   function baseLabelPx(svg: SVGSVGElement): number {
@@ -73,19 +149,51 @@
     }
   }
 
+  /** Draw (or re-draw) one diagram on the current ground. */
+  async function draw({ figure, scroll, source }: Diagram) {
+    if (!mermaid) return;
+    const { svg, bindFunctions } = await mermaid.render(`mermaid-${nextId++}`, source);
+    scroll.innerHTML = svg;
+    bindFunctions?.(scroll);
+    // The floor is measured from the RENDERED diagram, so it has to be applied
+    // again after every re-theme: a different theme can change label metrics,
+    // and a stale decision would leave the diagram sized for a drawing that no
+    // longer exists.
+    applyFloor(figure, scroll);
+  }
+
+  /** Re-initialise on the current ground and re-draw everything. */
+  async function retheme() {
+    if (!mermaid || diagrams.length === 0) return;
+    mermaid.initialize({
+      startOnLoad: false,
+      // `base` is the theme intended to be driven by themeVariables; `dark` and
+      // `neutral` bring their own palettes and would fight the tokens.
+      //
+      // There is deliberately no OS-preference read here, and no `darkMode`
+      // flag. The old code picked the library's palette from
+      // `matchMedia('(prefers-color-scheme: dark)')`, which is why a forced
+      // theme was ignored. Rather than feed that switch a better signal, the
+      // switch is gone: the tokens below are resolved from the live document,
+      // so they already carry whatever ground is in force — chosen or
+      // inherited — and there is nothing left to get wrong. `darkMode` was
+      // measured to change nothing once themeVariables are supplied, so
+      // keeping it would have been a knob that looked load-bearing and was not.
+      theme: 'base',
+      themeVariables: themeVariables(),
+    });
+    for (const diagram of diagrams) await draw(diagram);
+  }
+
   async function renderMermaid() {
     const blocks = document.querySelectorAll<HTMLElement>('pre > code.language-mermaid');
     if (blocks.length === 0) return;
 
-    const { default: mermaid } = await import('mermaid');
-    const theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'neutral';
-    mermaid.initialize({ startOnLoad: false, theme });
+    mermaid = (await import('mermaid')).default;
 
-    let i = 0;
     for (const block of blocks) {
       const pre = block.parentElement;
       if (!pre) continue;
-      const { svg, bindFunctions } = await mermaid.render(`mermaid-${i++}`, block.textContent ?? '');
 
       // `breakout` lets the diagram render wider than the prose column so it
       // stays legible without shrinking to the paragraph measure (see the
@@ -96,20 +204,33 @@
       figure.className = 'mermaid-diagram breakout';
       const scroll = document.createElement('div');
       scroll.className = 'mermaid-diagram__scroll';
-      scroll.innerHTML = svg;
       figure.append(scroll);
       pre.replaceWith(figure);
-      bindFunctions?.(scroll);
 
-      applyFloor(figure, scroll);
+      // The SOURCE is kept, not just the rendered SVG. Re-theming means
+      // re-rendering, and the markup it came from is gone from the page by now.
+      diagrams.push({ figure, scroll, source: block.textContent ?? '' });
 
       // A phone that rotates, a window that resizes, or a font that loads late
-      // all change the answer. Without this the decision is made once against a
-      // width that may no longer exist.
+      // all change the floor's answer. Without this the decision is made once
+      // against a width that may no longer exist.
       if (typeof ResizeObserver !== 'undefined') {
         new ResizeObserver(() => applyFloor(figure, scroll)).observe(figure);
       }
     }
+
+    await retheme();
+
+    // Both signals, because either can change the ground:
+    //   - the reader uses the theme control  -> data-theme is set or removed
+    //   - the reader is on `system` and the OS flips -> the media query changes
+    // Registered here, after a block was found, so a page without a diagram
+    // still adds nothing and still never reaches the import above.
+    new MutationObserver(retheme).observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: [THEME_ATTRIBUTE],
+    });
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change', retheme);
   }
 
   renderMermaid();
