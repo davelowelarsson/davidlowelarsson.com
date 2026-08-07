@@ -216,6 +216,23 @@ flowchart TD
   framing --> rendered
 ```
 
+### A complex diagram, wider than a phone
+
+The one above is the common case and never scrolls. This one cannot be drawn
+legibly at 390px — shrinking it to fit would put its labels near 4px — so it
+stops shrinking at the legibility floor and scrolls inside its own container.
+The page around it does not move. Both cases have to exist here: a fixture with
+only simple diagrams would leave the floor's whole reason for existing untested.
+
+```mermaid
+flowchart LR
+  author[Author writes a fenced block] --> collection[Astro reads the content collection]
+  collection --> processor[Sätteri renders the Markdown body]
+  processor --> finder[Mermaid finds the language-mermaid block]
+  finder --> floor[The legibility floor decides fit or scroll]
+  floor --> reader[The reader gets a diagram they can actually read]
+```
+
 ## Plain Markdown images inside .mdx
 
 A raster, referenced with plain Markdown syntax rather than a component:

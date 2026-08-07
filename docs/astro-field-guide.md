@@ -665,3 +665,27 @@ how the project actually grew.
   :global(ul)` and `.prose ul` are the same compiled rule, but only one of them
   is what the file says. `src/lib/stylesheets.ts` unwraps it centrally, so no
   individual guard has to know the syntax exists.
+
+## A component `<script>` can import from src/lib; an inline one cannot (2026-08-07, issue #120)
+
+- **`<script>` in an Astro component is bundled by Vite**, so it can
+  `import { decideRender } from '../lib/legibility'` and share code with the
+  unit-tested logic layer. The theme control cannot do this only because its
+  script is `is:inline` (it has to run before first paint), which is why that
+  one duplicates its constants instead. Two scripts, two different rules — the
+  distinction is `is:inline`, not "script in a component".
+  Docs: https://docs.astro.build/en/guides/client-side-scripts/#script-processing
+- **SVG font-size is in user units, and the viewBox scale is applied at paint.**
+  So `getComputedStyle(label).fontSize` gives the size the diagram was DRAWN at,
+  not the size on screen — the rendered size is that number times
+  `renderedWidth / viewBoxWidth`. That ratio is also the font-metric-free way to
+  assert legibility in a browser test: no measuring of text boxes, so no
+  macOS-versus-CI divergence.
+- **`useMaxWidth` has to be overridden, not configured away.** Mermaid pins
+  `max-width` at the diagram's natural size, which vetoes any decision to draw
+  it *wider* — so the floor sets `maxWidth: 'none'` per diagram rather than
+  trying to turn the option off globally.
+- **A scroll container should only be focusable while it scrolls.** `tabindex`
+  and `role="region"` are attached and removed with the behaviour: a tab stop
+  that goes nowhere and an announced region with nothing to reach are both worse
+  than leaving it alone.

@@ -1,4 +1,5 @@
-import { expect, test } from '@playwright/test';
+import { expect, type Locator, type Page, test } from '@playwright/test';
+import { LEGIBILITY_FLOOR_PX as FLOOR_PX } from '../src/lib/legibility';
 import { KITCHEN_SINK, KITCHEN_SINK_MARKDOWN } from './fixtures';
 
 // Guards issue #6: mermaid code blocks render as diagrams client-side, and
@@ -41,7 +42,9 @@ test('a mermaid block in a post renders as an inline SVG diagram', async ({ page
 test('a diagram renders the labels on both of its branches', async ({ page }) => {
   await page.goto(MERMAID_POST_PATH);
 
-  const diagram = page.locator('.mermaid-diagram svg');
+  // `.first()`: the fixture now carries a simple diagram AND a complex one, so
+  // the floor has both cases to exercise. This test is about the simple one.
+  const diagram = page.locator('.mermaid-diagram svg').first();
   await expect(diagram).toBeVisible();
   await expect(diagram).toContainText('Component tier');
   await expect(diagram).toContainText('Markdown tier');
@@ -77,34 +80,129 @@ test('a diagram breaks out wider than the prose column on desktop', async ({ pag
   expect(diagramBox.width).toBeGreaterThan(paragraphBox.width + 40);
 });
 
-for (const width of [390, 1280]) {
-  test(`a diagram never overflows horizontally at ${width}px`, async ({ page }) => {
-    // The inline middle path must always fit its container — no horizontal
-    // scroll, on phone or desktop — and breaking out wider must not push the
-    // page itself into horizontal scroll.
+// ── The legibility floor (#120) ──
+//
+// The guarantee this replaces was "a diagram never scrolls". That was a PROXY
+// for legibility, and it bought the proxy by making complex diagrams into
+// thumbnails: at 390px a 12px label lands near 4px. The new guarantee is
+// stronger, because it asserts the thing itself — "a diagram never scrolls
+// unless the legibility floor would be breached, and the page never scrolls
+// either way."
+//
+// The fixture carries one of each case on purpose. A suite with only simple
+// diagrams would leave the floor's entire reason for existing unexercised.
+
+const SIMPLE_LABEL = 'Which processor?';
+const COMPLEX_LABEL = 'The legibility floor decides fit or scroll';
+
+/** The smallest rendered label size in a diagram, in CSS pixels. */
+async function smallestLabelPx(diagram: Locator): Promise<number> {
+  return diagram.evaluate((el) => {
+    const svg = el.querySelector('svg');
+    if (!svg) return Number.NaN;
+    // The viewBox-to-CSS scale: labels are set in user units and painted at
+    // this ratio, so the rendered size is the product. Reading the ratio rather
+    // than a bounding box keeps this independent of the font stack, which is
+    // what made three earlier assertions differ between macOS and CI's Linux.
+    const natural = svg.viewBox?.baseVal?.width ?? 0;
+    const rendered = svg.getBoundingClientRect().width;
+    if (!natural || !rendered) return Number.NaN;
+    const scale = rendered / natural;
+
+    const labels = [...svg.querySelectorAll('.nodeLabel, .edgeLabel, text')];
+    if (labels.length === 0) return Number.NaN;
+    return Math.min(
+      ...labels.map((label) => Number.parseFloat(getComputedStyle(label).fontSize) * scale),
+    );
+  });
+}
+
+/** Whether an element's own box scrolls sideways. */
+async function scrollsSideways(locator: Locator): Promise<boolean> {
+  return locator.evaluate((el) => el.scrollWidth > el.clientWidth + 1);
+}
+
+function diagramContaining(page: Page, label: string): Locator {
+  return page.locator('.mermaid-diagram').filter({ hasText: label });
+}
+
+test('a simple diagram fits without scrolling on a phone', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 900 });
+  await page.goto(MERMAID_POST_PATH);
+
+  const diagram = diagramContaining(page, SIMPLE_LABEL);
+  await expect(diagram.locator('svg')).toBeVisible();
+  const scroll = diagram.locator('.mermaid-diagram__scroll');
+
+  expect(await scrollsSideways(scroll), 'the common case was made to scroll').toBe(false);
+  // Not scrolling is only the right answer if it is also legible.
+  expect(await smallestLabelPx(diagram)).toBeGreaterThanOrEqual(FLOOR_PX - 0.5);
+
+  // A container that does not scroll must not be a tab stop or an announced
+  // region — there would be nothing to reach.
+  await expect(scroll).not.toHaveAttribute('tabindex', '0');
+  await expect(scroll).not.toHaveAttribute('role', 'region');
+});
+
+test('a complex diagram stops shrinking at the floor and scrolls inside itself', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 900 });
+  await page.goto(MERMAID_POST_PATH);
+
+  const diagram = diagramContaining(page, COMPLEX_LABEL);
+  await expect(diagram.locator('svg')).toBeVisible();
+  const scroll = diagram.locator('.mermaid-diagram__scroll');
+
+  expect(await scrollsSideways(scroll), 'a diagram that cannot fit legibly did not scroll').toBe(
+    true,
+  );
+  // The whole point: it scrolls BECAUSE it stayed legible, not despite it.
+  expect(
+    await smallestLabelPx(diagram),
+    'the diagram scrolled and is still below the floor',
+  ).toBeGreaterThanOrEqual(FLOOR_PX - 0.5);
+});
+
+test('a scrollable diagram is reachable and announced from the keyboard', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 900 });
+  await page.goto(MERMAID_POST_PATH);
+
+  const scroll = diagramContaining(page, COMPLEX_LABEL).locator('.mermaid-diagram__scroll');
+  await expect(scroll).toBeVisible();
+
+  // Landing in a scroll region should say what it is, not drop the reader into
+  // an unnamed box.
+  await expect(scroll).toHaveAttribute('tabindex', '0');
+  await expect(scroll).toHaveAttribute('role', 'region');
+  await expect(scroll).toHaveAccessibleName(/diagram/i);
+
+  // Focusable in fact, and operable once focused.
+  await scroll.focus();
+  await expect(scroll).toBeFocused();
+  const before = await scroll.evaluate((el) => el.scrollLeft);
+  await page.keyboard.press('ArrowRight');
+  await expect
+    .poll(() => scroll.evaluate((el) => el.scrollLeft), {
+      message: 'the focused scroll region did not respond to the keyboard',
+    })
+    .toBeGreaterThan(before);
+});
+
+for (const width of [320, 390, 1280]) {
+  test(`the page never scrolls sideways at ${width}px, whatever a diagram is doing`, async ({
+    page,
+  }) => {
     await page.setViewportSize({ width, height: 900 });
     await page.goto(MERMAID_POST_PATH);
+    await expect(page.locator('.mermaid-diagram svg').first()).toBeVisible();
 
-    const diagrams = page.locator('.mermaid-diagram');
-    // Wait for the async mermaid render to swap in the diagrams before measuring.
-    await expect(diagrams.first()).toBeVisible();
-    const count = await diagrams.count();
-    expect(count).toBeGreaterThan(0);
-
-    for (let i = 0; i < count; i++) {
-      const overflow = await diagrams.nth(i).evaluate((el) => ({
-        scrollWidth: el.scrollWidth,
-        clientWidth: el.clientWidth,
-      }));
-      expect(overflow.scrollWidth, `diagram ${i} must not scroll sideways`).toBeLessThanOrEqual(
-        overflow.clientWidth + 1,
-      );
-    }
-
-    const pageOverflows = await page.evaluate(
-      () => document.documentElement.scrollWidth > window.innerWidth + 1,
-    );
-    expect(pageOverflows, 'the page must not scroll sideways').toBe(false);
+    // The exemption WCAG 1.4.10 grants two-dimensional content covers the
+    // diagram, not the page around it.
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth),
+      'the page scrolls sideways',
+    ).toBeLessThanOrEqual(1);
   });
 }
 

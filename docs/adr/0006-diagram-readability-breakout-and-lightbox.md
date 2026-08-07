@@ -1,7 +1,14 @@
 # 0006 — Diagrams: break out inline, examine in the lightbox
 
 Date: 2026-07-08
-Status: accepted
+Status: accepted, amended — §1 superseded in part by ADR 0012
+Superseded in part by: [ADR 0012 — The legibility floor](0012-the-legibility-floor.md) (§1)
+
+> **Read this first.** §1's absolute ban on inline horizontal scroll no longer
+> holds for a diagram that cannot be fitted legibly; ADR 0012 replaces it with a
+> legibility floor. §2 (`.breakout` at 60rem) stands unchanged. §3's lightbox
+> survives with its purpose restated. §4's deferral of selective image breakout
+> is discharged — with a refusal, not a mechanism. Each section below is marked.
 
 ## Context
 
@@ -30,7 +37,16 @@ this is a rendering/layout decision, not an authoring constraint.
    stays `true`; the SVG always fits its box. We do *not* switch to
    natural-size-with-scroll inline, because a horizontal scrollbar mid-prose is
    exactly the swiping we want to avoid.
-2. **Diagrams break out wider than the prose column.** A reusable `.breakout`
+
+   > **Superseded in part by [ADR 0012](0012-the-legibility-floor.md).** This
+   > holds for every diagram that *can* be fitted legibly — most of them, and
+   > the reasoning above is still why. It no longer holds when fitting would put
+   > label text below the 9px legibility floor: such a diagram stops shrinking
+   > and scrolls inside its own container. The page still never scrolls, and
+   > `useMaxWidth` is now overridden per diagram rather than trusted.
+2. **Diagrams break out wider than the prose column.** *(Stands unchanged —
+   the legibility floor operates inside whatever width this gives it.)*
+   A reusable `.breakout`
    class (`width: min(60rem, 100vw - 2rem)`, re-centred on the viewport with
    `left: 50%` + `translateX(-50%)`) lets a figure exceed the 42rem measure
    without restructuring the single-column `<body>` (which also holds the
@@ -40,7 +56,10 @@ this is a rendering/layout decision, not an authoring constraint.
    deliberately gentle first cap — a full-bleed visual language is a design
    decision deferred to the #11 typography pass, reachable by raising this one
    number.
-3. **A minimal, dependency-free lightbox is the escape hatch.** The existing
+3. **A minimal, dependency-free lightbox is the escape hatch.** *(Amended by
+   #122: the floor removes its original justification for diagrams, but its real
+   constituency was always the 41 article images. Purpose restated, keyboard gap
+   closed.)* The existing
    native-`<dialog>` image lightbox is generalised to also open a **clone of the
    inline diagram SVG at natural size** (the `useMaxWidth` cap stripped,
    intrinsic dimensions pinned from the `viewBox`), panned by scrolling the
@@ -49,6 +68,9 @@ this is a rendering/layout decision, not an authoring constraint.
    still works on the dialog content. If real use proves this insufficient,
    pinch-to-zoom is the documented next step — not built now.
 4. **Compare-mode and selective image-breakout are explicitly deferred.**
+   *(The image-breakout half is discharged by #119 — with a refusal rather than
+   a mechanism: breakout is a component gesture, and a plain Markdown image does
+   not get one. Compare-mode is still deferred; #123 prototypes it.)*
    Before/after is a recurring shape in the author's writing, so a side-by-side
    "compare mode" is plausible future work — but building a general pairing
    feature for a single post is gold-plating. Likewise, plain Markdown
@@ -58,10 +80,15 @@ this is a rendering/layout decision, not an authoring constraint.
 
 ## Consequences
 
-- Diagrams are legible inline on desktop and "good enough, tap to examine" on
+- ~~Diagrams are legible inline on desktop and "good enough, tap to examine" on
   mobile, with zero horizontal scroll — the guarantee is locked by e2e specs
   (`scrollWidth <= clientWidth` for every `.mermaid-diagram`, plus a
-  page-level no-overflow assertion, at 390px and 1280px).
+  page-level no-overflow assertion, at 390px and 1280px).~~
+  **Amended by ADR 0012.** "Good enough, tap to examine" assumed an escape hatch
+  that was never keyboard-operable, and the e2e guarantee was a proxy: it watched
+  for scroll and inferred legibility. Both are replaced — the diagram stays
+  legible inline at any width, and the suite measures rendered label size against
+  the floor directly.
 - The lightbox is now media-type-agnostic via one delegated click listener on
   `<article>` — which also fixes a latent ordering bug: Mermaid swaps its
   diagrams in *after* the Lightbox script runs, so the old one-shot
