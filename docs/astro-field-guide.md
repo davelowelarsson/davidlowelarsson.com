@@ -488,3 +488,23 @@ how the project actually grew.
   `SHOW_DRAFTS=true`, and an empty array in Production. The prototype URLs therefore work
   locally and on Preview Deployments without entering the production build or sitemap.
   Docs: https://docs.astro.build/en/guides/routing/#static-ssg-mode
+## The palette as data, the stylesheet as its mirror (2026-08-07, issue #104)
+
+- **A `<style is:global>` block is still a build artefact.** Astro minifies it,
+  and the minifier *renormalises colour syntax* — `rgb(0 0 0 / 12%)` ships as
+  `#0000001f`. Any test comparing authored CSS to shipped CSS must compare
+  resolved colours (let the browser parse both sides), never strings.
+  Docs: https://docs.astro.build/en/guides/styling/#global-styles
+- **Custom properties compute to their *specified* value.**
+  `getComputedStyle(root).getPropertyValue('--ink')` hands back the whole
+  `light-dark(…, …)` pair, unresolved — the pick happens where the token is
+  *used*. To read what a reader actually sees, set `color: var(--ink)` on a
+  probe element and read that back instead.
+- **One definition site, enforced rather than generated.** `src/lib/palette.ts`
+  holds every colour; `:root` mirrors it. Two Vitest assertions do the work of a
+  build step: `:root` must equal `PALETTE` exactly, and the rest of the sheet
+  must contain no hex, `rgb()` or `light-dark()` at all. Cheaper than codegen,
+  and the tokens stay portable for the three-layer CSS split in #116.
+- **Same shape as `bylines.ts`:** exported `src/lib` data imported by both a
+  Vitest unit test and a Playwright spec, so the source of truth and the
+  rendered page are checked against one object.
