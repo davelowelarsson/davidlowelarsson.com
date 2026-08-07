@@ -831,8 +831,44 @@ const THEME_ICONS: Record<string, string> = {
     gap: 0.75rem;
     font-family: var(--font-mono);
     font-size: 0.75rem;
+    /* Dates stack in columns on every listing page; tabular figures make a
+       column of them read as a column rather than as a ragged series. */
+    font-variant-numeric: tabular-nums;
     letter-spacing: 0.02em;
     color: var(--muted);
+  }
+
+  /* ── Centred Post header ──
+     Category eyebrow, title, then date and state. The centring is scoped to
+     the header: `.post-meta` is shared with every post-list row, which stays
+     left-aligned. */
+  .post-header {
+    margin-bottom: 3.25rem;
+    text-align: center;
+  }
+
+  .eyebrow {
+    margin: 0 0 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  /* inline-flex + min-height so the Category link clears the WCAG 2.2 24px
+     target minimum; the text alone is about 12px tall. */
+  .eyebrow a.badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+  }
+
+  .post-header .post-meta {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.4rem 1rem;
+    margin: 0;
   }
 
   .badge {

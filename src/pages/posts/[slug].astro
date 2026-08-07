@@ -55,19 +55,30 @@ if (!teaser) {
       <Teaser title={post.data.title} liveFrom={post.data.liveFrom} />
     ) : (
       <article>
-        <h1>{post.data.title}</h1>
-        <p class="post-meta">
-          <time datetime={post.data.pubDate.toISOString()}>
-            {post.data.pubDate.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' })}
-          </time>
-          <a class={`badge badge-${post.data.category}`} href={`/category/${post.data.category}/`}>
-            {post.data.category}
-          </a>
-          {post.data.draft && <span class="badge badge-warning">draft</span>}
-          {isScheduled(post.data) && post.data.liveFrom && (
-            <span class="badge badge-scheduled">scheduled · {formatScheduleDate(post.data.liveFrom)}</span>
-          )}
-        </p>
+        {/*
+          Centred header, in reading order: what KIND of writing this is, then
+          the title, then when it was published and whether it is really live.
+          The Category moves above the title so a reader knows what they are
+          about to read before they start; date and state move below so they
+          stop competing with it.
+        */}
+        <header class="post-header">
+          <p class="eyebrow">
+            <a class={`badge badge-${post.data.category}`} href={`/category/${post.data.category}/`}>
+              {post.data.category}
+            </a>
+          </p>
+          <h1>{post.data.title}</h1>
+          <p class="post-meta">
+            <time datetime={post.data.pubDate.toISOString()}>
+              {post.data.pubDate.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' })}
+            </time>
+            {post.data.draft && <span class="badge badge-warning">draft</span>}
+            {isScheduled(post.data) && post.data.liveFrom && (
+              <span class="badge badge-scheduled">scheduled · {formatScheduleDate(post.data.liveFrom)}</span>
+            )}
+          </p>
+        </header>
         {Content && <Content />}
       </article>
     )
