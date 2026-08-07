@@ -190,6 +190,14 @@ const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
     --font-prose: system-ui, -apple-system, 'Segoe UI', sans-serif;
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
+    /* Rhythm. Defined once here so the measure, the type size and the leading
+       cannot drift apart — they are one decision about how dense the page is. */
+    --measure: 43rem;
+    --step-0: 1.0625rem;
+    --leading: 1.74;
+    --space-section: 4.5rem; /* air above a section break */
+    --space-figure: 3rem; /* air around any piece of media */
+
     --bg: light-dark(#fafbfa, #111310);
     --ink: light-dark(#1e211d, #e6eae3);
     --muted: light-dark(#5f665d, #a3aa9f);
@@ -212,10 +220,10 @@ const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
   body {
     margin: 0 auto;
     padding: 2rem 1.25rem 4rem;
-    max-width: 42rem;
+    max-width: var(--measure);
     font-family: var(--font-prose);
-    font-size: 1rem;
-    line-height: 1.7;
+    font-size: var(--step-0);
+    line-height: var(--leading);
     color: var(--ink);
     background: var(--bg);
     text-rendering: optimizeLegibility;
@@ -280,7 +288,25 @@ const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
   }
 
   p {
-    margin: 0 0 1.25em;
+    margin: 0 0 1.3em;
+  }
+
+  /* Prose list rules are scoped to the article ON PURPOSE.
+     A bare `ul { padding-left }` reaches every list on the site — the post
+     list, and any nav or footer list added later — and indents rows meant to
+     sit flush. Today `.post-list`'s own `padding: 0` happens to survive it (a
+     class outranks an element selector whatever the source order), so this is
+     defence rather than repair: that reset must not be the only thing standing
+     between prose styling and the archive.
+     e2e/post-list-alignment.spec.ts asserts the rows line up; the unit test in
+     src/lib/prose-scope.test.ts asserts these rules keep their prefix. */
+  article ul,
+  article ol {
+    padding-left: 1.25rem;
+  }
+
+  article li + li {
+    margin-top: 0.4rem;
   }
 
   a {
@@ -328,7 +354,7 @@ const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
   article > img,
   article p > img {
     display: block;
-    margin: 2rem auto;
+    margin: var(--space-figure) auto;
     cursor: zoom-in;
   }
 
@@ -559,7 +585,7 @@ const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
   }
 
   .section-heading {
-    margin-top: 3.5rem;
+    margin-top: var(--space-section);
     padding-top: 1.25rem;
     border-top: 1px solid var(--hairline);
     font-family: var(--font-mono);
