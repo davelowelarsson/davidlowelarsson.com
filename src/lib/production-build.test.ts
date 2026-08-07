@@ -74,9 +74,19 @@ function bodyProbe(source: string, slug: string): string | undefined {
  * page that leaked nothing.
  */
 function visibleHtml(html: string): string {
-  return html
-    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '')
-    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, '');
+  return (
+    html
+      .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '')
+      .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, '')
+      // Site chrome is not the article. The masthead (#109) names Categories in
+      // its navigation — "essays", "experiments" — and those are ordinary words
+      // that a post body can also contain, so scanning them for a leak reports
+      // the nav rather than the Teaser. Strip the masthead and footer and scan
+      // what is left: <head> and the content region, which is where a real leak
+      // would show up.
+      .replace(/<header class="site-header"[^>]*>[\s\S]*?<\/header>/gi, '')
+      .replace(/<footer\b[^>]*>[\s\S]*?<\/footer>/gi, '')
+  );
 }
 
 function rssItemLink(slug: string): string {

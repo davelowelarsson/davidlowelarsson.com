@@ -9,7 +9,9 @@ test('landing page presents David and navigates to posts', async ({ page }) => {
   const tagline = (await page.locator('.tagline').textContent())?.trim() ?? '';
   expect(BYLINES).toContain(tagline);
 
-  await page.getByRole('link', { name: 'Posts', exact: true }).click();
+  // Masthead labels are lower-case mono in the locked design (#109), and the
+  // home page also has an "All posts" link — so target the masthead's nav.
+  await page.locator('.site-nav').getByRole('link', { name: 'posts', exact: true }).click();
   await expect(page).toHaveURL(/\/posts\/$/);
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Posts');
 });

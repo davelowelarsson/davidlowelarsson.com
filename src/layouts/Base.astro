@@ -2,6 +2,7 @@
 import { CLOUDFLARE_ANALYTICS_TOKEN } from 'astro:env/client';
 import Lightbox from '../components/Lightbox.astro';
 import Mermaid from '../components/Mermaid.astro';
+import { isCurrentPage, MASTHEAD_NAV } from '../lib/nav';
 import { SALTAST_URL } from '../lib/saltast';
 import { AUTHOR } from '../lib/seo';
 import { THEME_ATTRIBUTE, THEME_STORAGE_KEY, THEMES } from '../lib/theme';
@@ -29,6 +30,20 @@ const {
 
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
+
+// Theme icons for narrow screens, where three words do not fit beside a
+// centred site name. Inline SVG rather than an icon font or a unicode glyph:
+// no extra request, `currentColor` so they follow the palette in both themes,
+// and no dependence on which symbols a system font happens to carry.
+// They are decorative — each button's accessible name comes from its label,
+// which stays in the DOM and is only visually hidden.
+const THEME_ICONS: Record<string, string> = {
+  light:
+    '<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8" cy="8" r="3"/><path d="M8 1v1.5M8 13.5V15M1 8h1.5M13.5 8H15M3.05 3.05l1.06 1.06M11.89 11.89l1.06 1.06M12.95 3.05l-1.06 1.06M4.11 11.89l-1.06 1.06"/></svg>',
+  dark: '<svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M13.5 10.4A6.2 6.2 0 0 1 5.6 2.5a6 6 0 1 0 7.9 7.9z"/></svg>',
+  system:
+    '<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="5.5"/><path d="M8 2.5a5.5 5.5 0 0 1 0 11z" fill="currentColor" stroke="none"/></svg>',
+};
 ---
 
 <!doctype html>
@@ -93,10 +108,23 @@ const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
     }
   </head>
   <body>
-    <header>
-      <nav>
-        <a href="/">David Lowe Larsson</a>
-        <a href="/posts/">Posts</a>
+    {/*
+      First focusable thing on the page, so a keyboard reader can bypass the
+      masthead on every Post instead of tabbing through it each time. Hidden
+      until focused — off-canvas rather than display:none, because a hidden
+      element cannot receive focus at all.
+    */}
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <a class="site-name" href="/">David Lowe Larsson</a>
+      <nav class="site-nav" aria-label="Main">
+        {
+          MASTHEAD_NAV.map(({ href, label }) => (
+            <a href={href} aria-current={isCurrentPage(href, Astro.url.pathname) ? 'page' : null}>
+              {label}
+            </a>
+          ))
+        }
       </nav>
       {/*
         A labelled group reporting which option is active — not a mystery icon,
@@ -106,7 +134,8 @@ const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
         {
           THEMES.map((theme) => (
             <button type="button" data-theme-set={theme} aria-pressed="false">
-              {theme === 'system' ? 'auto' : theme}
+              <span class="theme-icon" aria-hidden="true" set:html={THEME_ICONS[theme]} />
+              <span class="theme-label">{theme === 'system' ? 'auto' : theme}</span>
             </button>
           ))
         }
@@ -157,7 +186,9 @@ const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
         })();
       </script>
     </header>
-    <main>
+    {/* tabindex="-1" so activating the skip link actually MOVES focus here,
+        rather than only scrolling — a <main> is not focusable by default. */}
+    <main id="main" tabindex="-1">
       <slot />
     </main>
     <footer>
@@ -479,66 +510,179 @@ const ogImageUrl = ogImage ?? new URL('/og-default.png', Astro.site).href;
 
   /* ── Header / footer ── */
 
-  header {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-bottom: 4rem;
-  }
-
-  header nav {
-    display: flex;
-    align-items: baseline;
-    gap: 1.5rem;
-  }
-
-  /* The theme control. Each button clears the WCAG 2.2 24px target minimum on
-     its own, before any spacing exception is invoked. */
-  .theme {
-    display: flex;
-    gap: 0.15rem;
-    padding: 0.15rem;
+  /* Off-canvas rather than hidden: a `display: none` element cannot take
+     focus, so the link would never appear for the reader it exists for. */
+  .skip-link {
+    position: absolute;
+    top: -4rem;
+    left: 0.75rem;
+    z-index: 10;
+    padding: 0.5rem 0.85rem;
     border: 1px solid var(--hairline);
     border-radius: 6px;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    text-decoration: none;
   }
 
-  .theme button {
+  .skip-link:focus {
+    top: 0.75rem;
+  }
+
+  /* A centred stack over a hairline: name, then navigation. The theme control
+     is deliberately NOT in this stack — see below.
+
+     `padding-inline` RESERVES the control's column on both sides. It is what
+     makes the centred name structurally unable to reach the control, at any
+     font size — an absolutely positioned box is offset from the padding box,
+     so `right: 0` keeps the control at the far edge while the flow content is
+     inset. Symmetric, so the name stays optically centred on the page.
+
+     This replaces two failed attempts at a pixel breakpoint. Both looked right
+     on macOS and collided on CI's Linux `system-ui`, which sets the same name
+     wider: the first at 430px, the second at 390–400px. A width chosen by hand
+     is a guess about a font you do not control. */
+  .site-header {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.85rem;
+    margin-bottom: var(--space-section);
+    padding-inline: 6rem;
+    padding-bottom: 1.75rem;
+    border-bottom: 1px solid var(--hairline);
+    text-align: center;
+  }
+
+  .site-name {
+    font-size: 1.0625rem;
+    font-weight: 620;
+    letter-spacing: 0.01em;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .site-nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.4rem 1.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    letter-spacing: 0.04em;
+  }
+
+  .site-nav a {
+    display: inline-flex;
+    align-items: center;
+    /* WCAG 2.2 target size: the label alone is ~16px tall. */
     min-height: 24px;
-    min-width: 34px;
-    padding: 0.15rem 0.5rem;
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  .site-nav a:hover {
+    color: var(--accent);
+  }
+
+  /* The current page is state, so it takes the accent (ADR 0009) — plus an
+     underline, because colour alone is not an indicator. */
+  .site-nav a[aria-current='page'] {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 0.3em;
+  }
+
+  /* The theme control is a reader's preference, not a destination — so it sits
+     in the far corner rather than in the navigation stack, where it read as a
+     third row of nav. Findable if looked for, ignorable otherwise.
+
+     Absolutely positioned so it never shifts the optical centre of the name and
+     nav. Each button clears the WCAG 2.2 24px target minimum on its own, before
+     any spacing exception is invoked. */
+  .theme {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    gap: 0.1rem;
+  }
+
+  /* Icons at every width, and no surrounding box. Three words in a bordered
+     pill read as a component competing with the masthead; three bare glyphs
+     read as a setting. It also makes the control ~86px instead of ~180px, which
+     is what stops it colliding with the centred name on a phone — the fix for
+     "too obvious on desktop" and "pushes the title down on mobile" is the
+     same fix.
+
+     24px targets are kept. Icon-only does NOT cost anything under WCAG here:
+     the label stays in the DOM as the accessible name, and 3 × 24px is already
+     small enough to be quiet. */
+  .theme button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 24px;
+    min-width: 28px;
+    padding: 0;
     border: 0;
     border-radius: 4px;
     background: none;
     color: var(--muted);
-    font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    letter-spacing: 0.06em;
     cursor: pointer;
+    opacity: 0.65;
   }
 
   .theme button:hover {
     color: var(--accent);
+    opacity: 1;
   }
 
   .theme button[aria-pressed='true'] {
-    background: var(--chip);
     color: var(--ink);
+    opacity: 1;
   }
 
-  header nav a {
-    text-decoration: none;
-    color: var(--muted);
+  .theme button:focus-visible {
+    opacity: 1;
   }
 
-  header nav a:first-child {
-    font-weight: 600;
-    color: var(--ink);
+  .theme-icon {
+    line-height: 0;
   }
 
-  header nav a:hover {
-    color: var(--ink);
+  /* Visually hidden, NOT display:none — the label is the button's accessible
+     name, and an icon marked aria-hidden leaves nothing behind it. */
+  .theme-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* Reserving a column on BOTH sides costs 12rem, which a phone does not have
+     to spare — so below 34rem the centring is what gives way, not the layout.
+     Name and nav go left; only the right column stays reserved, and the
+     control stays in the right corner where it is at every other width. A
+     control that changed sides between breakpoints would be harder to find
+     than one that is simply left of centre.
+
+     This breakpoint decides an ALIGNMENT, not a collision. Overlap is
+     prevented by the reserved column in both modes, so getting this number
+     slightly wrong costs a bit of symmetry, never a broken masthead. */
+  @media (max-width: 34rem) {
+    .site-header {
+      align-items: flex-start;
+      text-align: left;
+      padding-left: 0;
+    }
   }
 
   footer {
