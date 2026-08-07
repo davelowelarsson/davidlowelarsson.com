@@ -7,7 +7,7 @@ import {
   MEDIA_KINDS,
   type MediaKind,
 } from './figure';
-import { cssIn, selectorsIn, stripComments } from './stylesheets';
+import { allCssSources, cssIn, selectorsIn, stripComments } from './stylesheets';
 
 const CONTRACT_STYLESHEET = 'src/styles/media.css';
 const PROSE_COMPONENT = 'src/components/Prose.astro';
@@ -70,16 +70,54 @@ describe('figureClass', () => {
 describe('the contract stylesheet', () => {
   const selectors = selectorsIn(cssIn(CONTRACT_STYLESHEET));
 
-  it('styles the kinds it claims to, one selector each', () => {
-    // The claim #114 makes for this contract is that adding a seventh kind is
-    // ONE SELECTOR rather than a redesign. That is only true while every kind
-    // that exists is reached the same way — so a kind with framing must be
-    // reached by `[data-media='<kind>']` and nothing more exotic.
-    const styled = MEDIA_KINDS.filter((kind: MediaKind) =>
-      selectors.some((selector) => selector.includes(`[data-media='${kind}']`)),
+  /**
+   * Kinds that are real but are NOT reached through `[data-media]`, and why.
+   *
+   * Both are consequences of the two-tier contract rather than oversights, and
+   * naming them is the point: an unexplained gap and a deliberate one look
+   * identical until someone writes the difference down.
+   *
+   *   diagram — emitted by Mermaid.astro, client-side, as `.mermaid-diagram`.
+   *     It was deliberately outside #118's migration list, and #121 draws it
+   *     from the design tokens directly, so its "framing" is the diagram
+   *     itself. Adding an empty `[data-media='diagram']` rule to satisfy this
+   *     test would be writing a rule to please a guard.
+   *   sketch — has no component and is not expected to get one. Sketches are
+   *     authored as plain Markdown (#119), so they are reached by path
+   *     (`*.excalidraw.svg`) in the Prose component's Markdown tier. A kind
+   *     with no component is exactly the limit #114 calls the two-tier
+   *     contract.
+   */
+  const REACHED_ELSEWHERE: readonly MediaKind[] = ['diagram', 'sketch'];
+
+  // Both directions, since #124. The original only checked that no kind is
+  // styled which the contract does not declare — which a kind with NO framing
+  // passes trivially. `screenshot` sat declared and unstyled through four
+  // tickets that way: the contract promised six kinds and delivered five, and
+  // nothing said so.
+  it('accounts for every kind it declares', () => {
+    const unaccounted = MEDIA_KINDS.filter(
+      (kind: MediaKind) =>
+        !REACHED_ELSEWHERE.includes(kind) &&
+        !selectors.some((selector) => selector.includes(`[data-media='${kind}']`)),
     );
-    expect(styled.length, 'no kind has framing yet').toBeGreaterThan(0);
-    expect(styled, 'the tracer-bullet kind is not styled').toContain('photo');
+    expect(
+      unaccounted,
+      'a kind is declared in MEDIA_KINDS but has no framing and no reason — a promise the contract does not keep',
+    ).toEqual([]);
+  });
+
+  it('reaches the kinds that have no component, somewhere', () => {
+    // The exception list is not a way to stop checking. A kind excused from the
+    // contract still has to be styled SOMEWHERE, or it is simply missing.
+    const sources = allCssSources();
+    for (const kind of REACHED_ELSEWHERE) {
+      const marker = kind === 'diagram' ? 'mermaid-diagram' : 'excalidraw';
+      expect(
+        sources.some(([, css]) => css.includes(marker)),
+        `${kind} is excused from the contract but styled nowhere`,
+      ).toBe(true);
+    }
   });
 
   it('names no kind the contract does not define', () => {

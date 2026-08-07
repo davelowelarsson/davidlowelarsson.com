@@ -17,6 +17,8 @@ import testCardWide from './test-card-wide.png';
 import testCardPairA from './test-card-pair-a.png';
 import testCardPairB from './test-card-pair-b.png';
 import testCardTall from './test-card-tall.png';
+import screenshotLight from './screenshot-light-chrome.png';
+import screenshotDark from './screenshot-dark-chrome.png';
 
 This is a fixture, not writing. It exists so that the e2e specs which are really
 about *rendering* have somewhere to point that is not a published Post, and so
@@ -161,6 +163,29 @@ at 60rem is unreadable and a caption is text.
     { src: testCardPairB, alt: 'Test card B: a 4:3 green ground with a 100px grid and a centre cross' },
   ]}
   caption="A pair is one figure with one caption, not two figures side by side."
+/>
+
+### Screenshots, in both chromes
+
+The kind that answers every framing question the opposite way from `photo`:
+never cropped, never dimmed, and given an edge by the page. Both captures below
+have outer pixels that are exactly the site's own ground colours — light and
+dark — which is the case the kind exists for. Whichever theme you are reading
+in, one of them is the "wrong" one, and neither should read as a hole in the
+page.
+
+<ArticleImage
+  src={screenshotLight}
+  alt="Screenshot of an application with light chrome: a title bar, a sidebar with nine items, and rows of content"
+  kind="screenshot"
+  caption="Light chrome. On the light theme its outer pixels match the page exactly."
+/>
+
+<ArticleImage
+  src={screenshotDark}
+  alt="Screenshot of the same application with dark chrome"
+  kind="screenshot"
+  caption="Dark chrome. Same problem, the other way round."
 />
 
 ### An aside that breaks out, with its media beside the text

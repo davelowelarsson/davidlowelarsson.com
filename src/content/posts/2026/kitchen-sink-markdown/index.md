@@ -104,6 +104,14 @@ figure:
 
 ![Test card: a wide slate ground with a 100px grid, corner markers and a centre cross](./test-card-wide.png)
 
+A screenshot arriving as a plain Markdown image. It gets the raster treatment,
+because the Markdown tier cannot know a screenshot from a photograph — the path
+is the only hook, and `photo` versus `screenshot` is deliberately not inferred
+from a filename. This is the two-tier limit showing its edge: to get the
+screenshot kind's plate, an author reaches for the component.
+
+![Screenshot of an application with light chrome: a title bar, a sidebar, and rows of content](./screenshot-light-chrome.png)
+
 A hand-drawn sketch, exported as SVG and named so the inversion rule finds it.
 The rule is keyed on the path, which is the only hook a plain Markdown image
 offers:
