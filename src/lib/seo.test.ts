@@ -98,6 +98,29 @@ describe('blogPostingJsonLd', () => {
       height: 500,
     });
   });
+
+  it('a raster cover below Google’s 696×400 minimum falls back to the default OG card', () => {
+    const withTinyCover = blogPostingJsonLd(
+      {
+        ...post,
+        data: {
+          ...post.data,
+          cover: { src: '/_astro/tiny.png', format: 'png', width: 150, height: 100 },
+        },
+      },
+      SITE,
+    );
+    expect(withTinyCover.image.url).toBe(`${SITE}/og-default.png`);
+
+    const withUnsizedCover = blogPostingJsonLd(
+      {
+        ...post,
+        data: { ...post.data, cover: { src: '/_astro/unsized.png', format: 'png' } },
+      },
+      SITE,
+    );
+    expect(withUnsizedCover.image.url).toBe(`${SITE}/og-default.png`);
+  });
 });
 
 describe('collectionPageJsonLd', () => {

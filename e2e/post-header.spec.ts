@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { futureScheduledSlugs } from '../src/lib/scheduled-slugs';
 import { KITCHEN_SINK } from './fixtures';
 
 // Centred header, in reading order: Category eyebrow, title, then date and
@@ -113,13 +114,18 @@ test('a scheduled Post is marked, a published one is not', async ({ page }) => {
   // The e2e build runs with SHOW_DRAFTS=true, which is what a Preview
   // Deployment does — so scheduled Posts render here the way David sees them.
   //
-  // content-pinned: this asserts Post STATE — both slugs below — and neither
-  // state exists on a permanent draft. A fixture could only show "draft" here.
+  // content-pinned: this asserts Post STATE, which no permanent draft can
+  // show. A published Post never un-publishes, so this pin cannot rot.
   await page.goto('/posts/essay-ai-code-ownership/');
   await expect(page.locator('.post-header .badge-scheduled')).toHaveCount(0);
 
-  // content-pinned: a really-scheduled Post, which is the case under test.
-  await page.goto('/posts/til-dnsendpoint-cloudflare-comments/');
+  // A really-scheduled Post, found at runtime: a pinned slug rots the day its
+  // liveFrom passes (the first pin did exactly that), while the publishing
+  // queue always holds something scheduled — and if it ever doesn't, that is
+  // worth a loud failure here.
+  const [scheduledSlug] = futureScheduledSlugs();
+  expect(scheduledSlug, 'the publishing queue has at least one scheduled Post').toBeTruthy();
+  await page.goto(`/posts/${scheduledSlug}/`);
   const scheduled = page.locator('.post-header .badge-scheduled');
   await expect(scheduled).toBeVisible();
   await expect(scheduled).toContainText('scheduled');
