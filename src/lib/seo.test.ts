@@ -120,6 +120,32 @@ describe('blogPostingJsonLd', () => {
       SITE,
     );
     expect(withUnsizedCover.image.url).toBe(`${SITE}/og-default.png`);
+
+    // Exactly at the minimum is good enough for Google — only BELOW falls back.
+    const atMinimum = blogPostingJsonLd(
+      {
+        ...post,
+        data: {
+          ...post.data,
+          cover: { src: '/_astro/exact.png', format: 'png', width: 696, height: 400 },
+        },
+      },
+      SITE,
+    );
+    expect(atMinimum.image.url).toBe(`${SITE}/_astro/exact.png`);
+
+    // One known dimension proves nothing about the other — fall back.
+    const withOneDimension = blogPostingJsonLd(
+      {
+        ...post,
+        data: {
+          ...post.data,
+          cover: { src: '/_astro/half.png', format: 'png', width: 1200 },
+        },
+      },
+      SITE,
+    );
+    expect(withOneDimension.image.url).toBe(`${SITE}/og-default.png`);
   });
 });
 
