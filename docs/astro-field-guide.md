@@ -778,3 +778,13 @@ how the project actually grew.
   overflowed: `getBoundingClientRect()` showed no element past the viewport,
   because the leak only shows as `scrollWidth - clientWidth` on the ancestors.
   Probe for that, not for right edges.
+
+## An animated GIF survives the image pipeline as an animated webp (2026-08-21)
+
+- **A `![](x.gif)` in Markdown is transcoded, not passed through** — the sharp
+  service keeps every frame and emits responsive animated-webp variants, unlike
+  SVG which skips the pipeline entirely. Verified by summing `ANMF` chunk
+  durations in the output: a 242-frame / 24.2s source GIF came out as 18 webp
+  frames totalling exactly 24.2s, because libwebp merges identical "hold"
+  frames into one longer-duration frame. Smaller AND intact: 532k → 328k.
+  Docs: https://docs.astro.build/en/guides/images/#responsive-image-behavior

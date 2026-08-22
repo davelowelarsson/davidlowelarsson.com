@@ -59,14 +59,22 @@ export function profilePageJsonLd(site: string) {
   };
 }
 
+/** Google's BlogPosting rich-result minimum — smaller images are ignored. */
+const MIN_IMAGE_WIDTH = 696;
+const MIN_IMAGE_HEIGHT = 400;
+
 /**
  * BlogPosting must always carry an image (Google wants ≥696×400): a raster
  * cover with its real dimensions, else the 1200×630 default OG card.
- * Crawlers ignore SVG, so SVG covers fall through to the default.
+ * Crawlers ignore SVG, and a cover below the minimum (archival posts carry
+ * small originals) would be ignored too — both fall through to the default.
  */
 function articleImage(post: SeoSourcePost, site: string) {
   const cover = post.data.cover;
   if (!cover || cover.format === 'svg') return defaultOgImage(site);
+  if ((cover.width ?? 0) < MIN_IMAGE_WIDTH || (cover.height ?? 0) < MIN_IMAGE_HEIGHT) {
+    return defaultOgImage(site);
+  }
   return imageObject(new URL(cover.src, site).href, cover.width, cover.height);
 }
 
