@@ -31,7 +31,7 @@ I wanted to **see** that loop turn, literally, on a screen share. So I built one
 ## The loop
 
 The factory evolves a landing page for a fake notes app called NimbusNote, three
-files, `index.html`, `styles.css` and `app.js`, made deliberately horrible at the
+files, `index.html`, `styles.css`, and `app.js`, made deliberately horrible at the
 start. Comic Sans. A 21-color clashing palette, 1.3:1 body contrast, `<center>`
 tags, a busy loop that runs at parse time. Quality score at v0: 24 out of 100.
 
@@ -48,8 +48,10 @@ accessibility auditor steering toward Material Design 3, a growth architect who
 wants one obvious action on the page, and a performance engineer whose favorite
 change is deleting things. Each persona ends its cycle by writing a handover,
 what it did and what the next persona should care about, and every backlog item
-carries a why the planner can point to, a measurement or a user report. Fifteen
-cycles in, the same three files score around 97.
+carries a why the planner can point to, a measurement or a user report. None of
+this is clever storage, the backlog with its whys and the last twenty handovers
+live in one JSON file on disk. Fifteen cycles in, the same three files score
+around 97.
 
 ![A mission card from the backlog, showing the persona, the mission, a conclusion with the score delta, and the handover text to the next persona](./mission-card.png)
 
@@ -62,7 +64,7 @@ concrete steps, down to file names and which CSS custom properties to change,
 and 84 seconds later it was deployed and on screen. Even the hardcoded SVG fills
 that bypass the design tokens got caught, which surprised me.
 
-And when a build overran its 300 second budget the factory killed it, rolled
+And when a build overran its 300-second budget the factory killed it, rolled
 back so nothing half-built shipped, and told me why in plain language before
 retrying next cycle. That part I'd want at work.
 
@@ -103,7 +105,8 @@ it because a colleague said the backlog looked unclear.
 
 And the safety guard that reverts stray agent edits outside the sandbox happily
 reverted my own uncommitted files too 🙃. Autonomous cleanup needs a baseline of
-what was already dirty before the run.
+what was already dirty before the run... the fix was a `git status --porcelain`
+snapshot taken before each run, and anything on it is off limits to the guard.
 
 The part I enjoy most is that the factory was itself built the same way, by
 orchestrated AI agents working in parallel for a day, test-first, about 475
@@ -115,8 +118,11 @@ The backlog is the pluggable part. Today it's analyzer findings and typed seeds,
 tomorrow it could be an issue tracker like in the Astro setup, or support
 tickets. The next thing I want to try is a release gate where any persona can
 veto a deploy and the veto's reasoning gets written down, so the next cycle can
-read why and not do it again. I'm not sure how well any of this scales past a
-demo... we'll see, time will tell 😁
+read why and not do it again. It's the same question I poked at in
+[Who owns the code AI writes?](/posts/essay-ai-code-ownership/), because when
+the loop turns on its own, what I actually own is the instruments and the
+gates. I'm not sure how well any of this scales past a demo... we'll see, time
+will tell 😁
 
 ## Links
 
