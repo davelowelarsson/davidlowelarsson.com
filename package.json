@@ -41,6 +41,7 @@
     "yaml": "^2.9.0"
   },
   "overrides": {
+    "nanoid": "^3.3.18",
     "wrangler": {
       "undici": "^7.29.0"
     }
