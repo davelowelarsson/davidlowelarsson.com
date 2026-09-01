@@ -27,7 +27,7 @@ const site = Astro.site?.href ?? 'https://davidlowelarsson.com';
     site adopts <ClientRouter/>, the flash returns / rotation breaks. The guard
     is e2e/byline-rotation.spec.ts; the reasoning is in docs/astro-field-guide.md.
   */}
-  <script define:vars={{ bylines: BYLINES }}>
+  <script is:inline define:vars={{ bylines: BYLINES }}>
     const el = document.getElementById('tagline');
     if (el) el.textContent = bylines[Math.floor(Math.random() * bylines.length)];
   </script>

@@ -12,6 +12,8 @@ import { meetsFloor } from './version-floor';
 
 /** Lowest undici release with no known advisory against it (GHSA-8xcm-r25x-g524 et al). */
 const UNDICI_ADVISORY_FLOOR = '7.29.0';
+/** Lowest nanoid 3.x release without GHSA-2v37-7h3g-55p8. */
+const NANOID_ADVISORY_FLOOR = '3.3.18';
 
 function packageJson() {
   return JSON.parse(readFileSync('package.json', 'utf8'));
@@ -22,11 +24,22 @@ function declaredOverride(): string | undefined {
   return packageJson().overrides?.wrangler?.undici;
 }
 
+function declaredNanoidOverride(): string | undefined {
+  return packageJson().overrides?.nanoid;
+}
+
 /** Every `undici` version the lockfile actually resolves, keyed by tree path. */
 function resolvedUndiciVersions(): Array<[string, string]> {
   const lock = JSON.parse(readFileSync('package-lock.json', 'utf8'));
   return Object.entries(lock.packages as Record<string, { version?: string }>)
     .filter(([path]) => path.endsWith('node_modules/undici'))
+    .map(([path, meta]) => [path, meta.version ?? ''] as [string, string]);
+}
+
+function resolvedNanoidVersions(): Array<[string, string]> {
+  const lock = JSON.parse(readFileSync('package-lock.json', 'utf8'));
+  return Object.entries(lock.packages as Record<string, { version?: string }>)
+    .filter(([path]) => path.endsWith('node_modules/nanoid'))
     .map(([path, meta]) => [path, meta.version ?? ''] as [string, string]);
 }
 
@@ -58,6 +71,35 @@ describe('undici override', () => {
       expect(
         meetsFloor(version, UNDICI_ADVISORY_FLOOR),
         `${path} resolves undici@${version}, below the ${UNDICI_ADVISORY_FLOOR} advisory floor`,
+      ).toBe(true);
+    }
+  });
+});
+
+describe('nanoid override', () => {
+  it('is declared at the root', () => {
+    expect(
+      declaredNanoidOverride(),
+      'overrides.nanoid was removed — Dependabot cannot resolve the security update itself',
+    ).toBeDefined();
+  });
+
+  it('declares a floor at or above the advisory floor', () => {
+    const bare = String(declaredNanoidOverride() ?? '').replace(/^[\^~>=\s]+/, '');
+    expect(meetsFloor(bare, NANOID_ADVISORY_FLOOR)).toBe(true);
+  });
+
+  it('stays inside nanoid 3 rather than opening the door to a major bump', () => {
+    expect(String(declaredNanoidOverride() ?? '')).toMatch(/^\^3\./);
+  });
+
+  it('resolves every nanoid in the lockfile at or above the advisory floor', () => {
+    const resolved = resolvedNanoidVersions();
+    expect(resolved.length, 'no nanoid in the lockfile').toBeGreaterThan(0);
+    for (const [path, version] of resolved) {
+      expect(
+        meetsFloor(version, NANOID_ADVISORY_FLOOR),
+        `${path} resolves nanoid@${version}, below the ${NANOID_ADVISORY_FLOOR} advisory floor`,
       ).toBe(true);
     }
   });

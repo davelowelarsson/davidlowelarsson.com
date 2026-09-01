@@ -97,7 +97,7 @@ const THEME_ICONS: Record<string, string> = {
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageUrl} />
-    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+    {jsonLd && <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
     {
       CLOUDFLARE_ANALYTICS_TOKEN && (
         <script
