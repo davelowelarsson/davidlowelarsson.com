@@ -36,7 +36,7 @@
     "@types/node": "^26.4.1",
     "@types/sanitize-html": "^2.16.1",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.11",
+    "vitest": "^5.0.0",
     "wrangler": "^4.129.0",
     "yaml": "^2.9.0"
   },
