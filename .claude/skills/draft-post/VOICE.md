@@ -11,9 +11,9 @@ changes only when David explicitly says "promote `<slug>` to the canon."
 
 - `src/content/posts/2020/building-with-children/index.mdx`
 - `src/content/posts/2020/raspberry-pi-cluster/index.md`
-- `src/content/posts/2013/cgfx-and-glsl/index.md`
+- `src/content/posts/2013/cgfx-and-glsl/index.mdx`
 - `src/content/posts/2013/git-the-new-svn/index.md`
-- `src/content/posts/2013/maya-scene-python-to-xml/index.md`
+- `src/content/posts/2013/maya-scene-python-to-xml/index.mdx`
 - `src/content/posts/2020/dev-sec-and-ops/index.md`
 - `src/content/posts/2020/segling-del-1/index.md`
 

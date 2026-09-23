@@ -1,0 +1,149 @@
+---
+title: Practising incidents together
+description: Planning and running our second Game Day, from rehearsing six faults to seeing how we worked together when things started breaking.
+pubDate: 2026-09-23
+category: essay
+draft: true
+tags: [gameday, incident-response, devops, teamwork]
+cover: ./gameday-2026.png
+coverAlt: Game Day 2026 logo with a gold trophy and colourful figures.
+---
+
+import ArticleImage from '../../../../components/ArticleImage.astro';
+import MediaAside from '../../../../components/MediaAside.astro';
+import gameDayLogo from './gameday-2026.png';
+import dashboard from './dashboard-redacted.png';
+import exerciseNote from './exercise-note-redacted.png';
+import debrief from './debrief-redacted.png';
+
+During Preparedness Week in September 2026, or Beredskapsveckan here in Sweden,
+I ran our second Game Day. We had done this before, it was really fun and people
+learned a lot, so I wanted to do it again. The main reason was still the same...
+get some practice handling incidents before we have to do it for real.
+
+<MediaAside
+  src={gameDayLogo}
+  kind="screenshot"
+  alt="Game Day 2026 logo with a gold trophy and colourful figures."
+  caption="The logo I made for the event."
+>
+
+Two mixed teams had their own production-like exercise environments, with
+production kept outside the exercise. Colleagues played users and the business,
+and I had six challenges prepared for the morning.
+
+The same week, colleagues were working through a tabletop scenario about the
+decisions around an incident. Our exercise brought in the practical side, with
+systems that actually broke and people who had to investigate while answering
+questions from everyone else.
+
+</MediaAside>
+
+## Before the morning
+
+The biggest thing for me was probably the amount of preparation. To make half a
+day successful and fun took roughly three to six times as long in preparation,
+and quite a lot of that was checking whether things actually worked the way I
+thought they would. Breaking something sounds fairly simple... but I also
+needed to know what the teams would see and how to put it back.
+
+So I rehearsed the faults, checked the symptoms, checked the recovery, and went
+back over the ones that behaved differently from what I expected. One planned
+outage initially left the application serving requests, because the old version
+kept running while its broken replacement failed to start. That was useful to
+learn before putting two teams in front of it and starting a timer.
+
+There were cue cards for the colleagues playing stakeholders, hints prepared as
+questions, and a running order for me to follow. My own notes included a reminder
+to resist helping when a team was stuck (a little easier to write down than to
+do, I think).
+
+## The challenges
+
+I split the morning into two parts, with a short debrief and a break between
+them. The faults ranged from an obvious outage to something unfamiliar running
+without breaking anything, so the teams couldn't rely on every challenge
+announcing itself with a red dashboard. These are the scenarios, with the
+systems kept anonymous:
+
+| Challenge | Change in the exercise environment | Visible effect |
+| --- | --- | --- |
+| Service outage | Made a service fail to start | Errors and repeated restarts |
+| Search failure | Interrupted a dependency connection | Search hung while the rest of the site worked |
+| Incomplete data | Removed part of the result data | Results arrived without images |
+| App access | Changed an exercise credential | Apps were denied access while the web still worked |
+| Unfamiliar workload | Added background work that didn't belong | No obvious outage |
+| Publishing failure | Broke a database connection | Pages responded but content was stale |
+
+The dashboard gave each team its own column, and I had controls for starting
+faults and recording points alongside the live signals. Scoring depended on the
+teams explaining what they thought was wrong, what they had done and how they
+had checked it. That also left us something to go back through afterwards.
+
+<ArticleImage
+  src={dashboard}
+  kind="screenshot"
+  alt="Two exercise dashboard columns with red down checks and green healthy checks alongside deployment status."
+  caption="Cropped exercise dashboard. Team and system labels replaced, original status colours retained."
+  breakout
+/>
+
+## In the room
+
+Colleagues from UX and product reported what they could see and asked for a
+change before a deadline. Someone describing missing images could be precise
+about what was wrong on screen without knowing the system behind it, and the
+teams needed to answer while they were still investigating.
+
+<MediaAside
+  src={exerciseNote}
+  kind="screenshot"
+  alt="The paper ransom-note prop, prominently marked OVNING, Swedish for exercise."
+  caption="Exercise prop, not a real threat. Return instruction removed."
+  placement="left"
+>
+
+Partway through, our manager walked into the rooms carrying a printed ransom
+note. It was marked as an exercise, but it arrived while other things were
+already competing for attention. The security scenario gave us another question
+to work through... who else needed to know, and which decisions belonged outside
+the team?
+
+The stress came up in the debrief too. Everyone knew it was an exercise, but the
+messages got shorter as the morning went on, and the requests from the business
+still needed an answer while people were trying to understand a fault.
+
+</MediaAside>
+
+AI-assisted tooling was allowed and used during the investigation, with the
+same expectation that findings needed checking. The notes also contained a
+successful repair with an explanation that didn't match the fault I had
+introduced. Getting something working again gave us a result, but we still
+needed to check our explanation before carrying it into the incident write-up.
+
+## After the exercise
+
+We used paper worksheets to separate facts from assumptions, alongside actions
+and communication. One recorded a careful observation and a hypothesis that
+turned out to be wrong, which meant we could look at how reasonable it had
+seemed at the time. The debrief also brought up how people found their way from
+a symptom to the tools they needed.
+
+<ArticleImage
+  src={debrief}
+  kind="photo"
+  alt="The debrief room with participants replaced by opaque silhouettes and identifying text cropped out."
+  caption="Debrief photograph, with participants masked and identifying text removed."
+  breakout
+/>
+
+There were things in how I organised it that needed revisiting too. Some people
+playing stakeholders also took roles inside a team, giving them two jobs at
+once, and changed attendance meant the teams weren't evenly matched. Hybrid
+participation needed more attention as well, so I couldn't read the scoreboard
+as a fair comparison of how the teams worked.
+
+I built a retrospective into the follow-up, using the notes and worksheets
+alongside a timeline of when faults began, when signals appeared and when people
+responded. I wanted us to agree on a few improvements together, with someone
+responsible for each, instead of arriving with all the conclusions already made.
