@@ -1,0 +1,183 @@
+---
+title: Practising incidents together
+description: Planning and running our second Game Day, from rehearsing six faults to seeing how we worked together when things started breaking.
+pubDate: 2026-10-01
+category: essay
+draft: false
+liveFrom: 2026-10-01
+tags: [gameday, incident-response, devops, teamwork]
+cover: ./gameday-2026.png
+coverAlt: Game Day 2026 logo with a gold trophy and colourful figures.
+---
+
+import ArticleImage from '../../../../components/ArticleImage.astro';
+import MediaAside from '../../../../components/MediaAside.astro';
+import gameDayLogo from './gameday-2026.png';
+import dashboard from './dashboard-redacted.png';
+import exerciseNote from './exercise-note-redacted.png';
+import debrief from './debrief-illustration.jpg';
+import slackMessages from './slack-challenge-messages.png';
+import slackSchedule from './slack-schedule.png';
+
+During Preparedness Week in September 2026, or Beredskapsveckan here in Sweden,
+I ran our second Game Day. We had done this before, it was really fun and people
+learned a lot, so I wanted to do it again. The main reason was still the same...
+get some practice handling incidents before we have to do it for real.
+
+<MediaAside
+  src={gameDayLogo}
+  kind="screenshot"
+  alt="Game Day 2026 logo with a gold trophy and colourful figures."
+  caption="The logo I made for the event."
+>
+
+Two mixed teams had their own production-like exercise environments, with
+production kept outside the exercise. Colleagues played users and the business,
+and I had six challenges prepared for the morning.
+
+Colleagues outside our team were working through a tabletop scenario that week,
+and we decided to combine them. Not just practising the theoretical side... but
+also the practical, on systems that actually broke, while answering questions
+from everyone else.
+
+</MediaAside>
+
+## Before the morning
+
+The biggest thing for me was probably the preparation. Making half a day
+successful and fun took roughly three to six times as long in preparation. Breaking
+something sounds fairly simple... but I needed to know what the teams would
+see and how to put it back.
+
+So I rehearsed the faults, checked the symptoms, checked the recovery, and went
+back over it again, and again, and again... until it worked as expected. One
+planned outage initially left the application serving requests, because the old
+version kept running while its broken replacement failed to start. Good to find
+out before two teams and a timer were in front of it.
+
+So I wrote a Game Day shell script to inject and revert the faults and send
+messages to the two Slack channels (each team had one, where everything was
+communicated). Starting a challenge injected the fault, announced it in Slack if
+it was meant to be announced, and pushed an update to the Grafana dashboard.
+Then I could stop the challenge with the same script... and then start the next
+one. The script made everything very reproducible and helped a lot to do this
+systematically.
+
+<ArticleImage
+  src={slackMessages}
+  kind="screenshot"
+  alt="Messages from the GameDay2026 Slack bot in Swedish: Team Orange limited the damage on a challenge but didn't get all the way (+1), time is up for the search challenge, and a new challenge starts now with a 12 minute time frame. Each message shows the score, Purple 6, Orange 1."
+  caption="The script talking to one of the team channels, in Swedish."
+  breakout
+/>
+
+There were cue cards for the colleagues playing stakeholders, and hints
+prepared as questions. My own notes included a reminder to resist helping when
+a team was stuck (a little easier to write down than to do, I think).
+
+## The challenges
+
+<MediaAside
+  src={slackSchedule}
+  kind="screenshot"
+  alt="The morning's schedule posted in Slack, in Swedish: kick-off and rules at 09:30, getting to know the environment and tools, episode 1 with three challenges of about 13 minutes each, a short debrief and break at 10:30, episode 2 titled 'Is it an attack?' at 10:45, debrief at 11:30, a quick retro with top 3 actions, and lunch at 12:00."
+  caption="The schedule as it was posted in the team channels."
+>
+
+We started with a briefing about why we were doing this, followed by a first
+episode with three challenges. After a fifteen-minute break came a second
+episode with three more, called "Is it an attack?", and then a debrief. So more
+like four parts to the morning.
+
+</MediaAside>
+
+Some faults were obvious, others didn't turn anything red:
+
+| Challenge | Change in the exercise environment | Visible effect |
+| --- | --- | --- |
+| Service outage | Made a service fail to start | Errors and repeated restarts |
+| Search failure | Interrupted a dependency connection | Search hung while the rest of the site worked |
+| Incomplete data | Removed part of the result data | Results arrived without images |
+| App access | Changed an exercise credential | Apps were denied access while the web still worked |
+| Unfamiliar workload | Added background work that didn't belong (Fake Attacker) | No obvious outage |
+| Publishing failure | Broke a database connection | Pages responded but content was stale |
+
+The dashboard gave each team its own column. Scoring depended on them explaining
+what they thought was wrong, what they had done and how they had checked it,
+which also left us something to go back through afterwards.
+
+<ArticleImage
+  src={dashboard}
+  kind="screenshot"
+  alt="Two exercise dashboard columns with red down checks and green healthy checks alongside deployment status."
+  caption="Cropped exercise dashboard. Team and system labels replaced, original status colours retained."
+  breakout
+/>
+
+## In the room
+
+Colleagues from UX and product reported what they could see and asked for a
+change before a deadline. Someone describing missing images could be precise
+about what was wrong on screen without knowing the system behind it, and the
+teams needed to answer while they were still investigating.
+
+<MediaAside
+  src={exerciseNote}
+  kind="screenshot"
+  alt="The paper ransom-note prop, prominently marked as an exercise in Swedish."
+  caption="Exercise prop, not a real threat. Return instruction removed."
+  placement="left"
+>
+
+Partway through, our manager walked into the rooms carrying a printed ransom
+note. It was marked as an exercise, and our manager was also meant to take
+focus... and intentionally obstruct the work already going on. The teams had to
+work out who else needed to know while being interrupted.
+
+In the debrief we talked about the stress. The messages in Slack got shorter,
+communication in general was affected, and requests from the business still
+needed an answer while people were investigating.
+
+</MediaAside>
+
+The AI tools were very helpful... but they also took time and attention from
+what was going on. An AI-assisted triage took at least a minute or two, just to
+get an idea of what was wrong, and getting an exact root cause was sometimes
+possible and sometimes not (I had hidden some of them too deep even for our AI
+triage skill). So everyone investigating had to weigh the time it took to use AI
+against checking themselves, on a challenge that maybe had 13 minutes from start
+to finish.
+
+## After the exercise
+
+I had paper worksheets too... but actually most of what we learned was
+documented directly in the Slack channels. Only one person used the paper, and
+wrote something down around the third challenge, no one else. The Slack channels
+were used much more (so maybe paper is not the best way to capture this kind of learning 📝).
+
+<ArticleImage
+  src={debrief}
+  kind="sketch"
+  alt="Cartoon illustration of the debrief: about fifteen people on sofas and chairs around a white table covered in laptops, a conference speaker, worksheets and cables, one person leaning over a laptop at the front."
+  caption="The debrief, redrawn by Gemini from the masked photo, so the people are invented."
+  breakout
+/>
+
+This was a definite learning. Some people playing stakeholders also took roles
+inside a team, two jobs at once, so I think the next Game Day would need a
+clearer separation of responsibilities... or more of a blue vs red team, or
+automating each episode completely, with stakeholder messages and other "stress
+signals" included. But it also pulled product owners, UX and even managers into
+the exercise, increasing the stress while getting them engaged. No one was
+bored 😅 which could have been a risk if they hadn't leaned in.
+
+A product owner even said she felt how uncomfortable it was to ask for a
+delivery while knowing the team was already busy solving the incident. That's
+not uncommon in the real world, and a good, important lesson.
+
+But we also aimed for it to be an ordinary day... people have meetings, get sick
+or have important doctor's appointments. So the planned teams didn't really turned out as I had planned. But that's just how the real world is, and
+also something we need to practise and experience.
+
+So I'm undecided here... should people have several roles at once? It served a good purpose, we'll see how the next one
+turns out.
