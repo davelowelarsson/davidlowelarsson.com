@@ -1,9 +1,10 @@
 ---
 title: Practising incidents together
 description: Planning and running our second Game Day, from rehearsing six faults to seeing how we worked together when things started breaking.
-pubDate: 2026-09-23
+pubDate: 2026-10-01
 category: essay
-draft: true
+draft: false
+liveFrom: 2026-10-01
 tags: [gameday, incident-response, devops, teamwork]
 cover: ./gameday-2026.png
 coverAlt: Game Day 2026 logo with a gold trophy and colourful figures.
@@ -14,7 +15,7 @@ import MediaAside from '../../../../components/MediaAside.astro';
 import gameDayLogo from './gameday-2026.png';
 import dashboard from './dashboard-redacted.png';
 import exerciseNote from './exercise-note-redacted.png';
-import debrief from './debrief-redacted.png';
+import debrief from './debrief-illustration.jpg';
 import slackMessages from './slack-challenge-messages.png';
 import slackSchedule from './slack-schedule.png';
 
@@ -98,7 +99,7 @@ Some faults were obvious, others didn't turn anything red:
 | Search failure | Interrupted a dependency connection | Search hung while the rest of the site worked |
 | Incomplete data | Removed part of the result data | Results arrived without images |
 | App access | Changed an exercise credential | Apps were denied access while the web still worked |
-| Unfamiliar workload | Added background work that didn't belong | No obvious outage |
+| Unfamiliar workload | Added background work that didn't belong (Fake Attacker) | No obvious outage |
 | Publishing failure | Broke a database connection | Pages responded but content was stale |
 
 The dashboard gave each team its own column. Scoring depended on them explaining
@@ -152,13 +153,13 @@ to finish.
 I had paper worksheets too... but actually most of what we learned was
 documented directly in the Slack channels. Only one person used the paper, and
 wrote something down around the third challenge, no one else. The Slack channels
-were used much more.
+were used much more (so maybe paper is not the best way to capture this kind of learning 📝).
 
 <ArticleImage
   src={debrief}
-  kind="photo"
-  alt="The debrief room with participants replaced by opaque silhouettes and identifying text cropped out."
-  caption="Debrief photograph, with participants masked and identifying text removed."
+  kind="sketch"
+  alt="Cartoon illustration of the debrief: about fifteen people on sofas and chairs around a white table covered in laptops, a conference speaker, worksheets and cables, one person leaning over a laptop at the front."
+  caption="The debrief, redrawn by Gemini from the masked photo, so the people are invented."
   breakout
 />
 
@@ -175,8 +176,8 @@ delivery while knowing the team was already busy solving the incident. That's
 not uncommon in the real world, and a good, important lesson.
 
 But we also aimed for it to be an ordinary day... people have meetings, get sick
-or have important doctor's appointments. That's just how the real world is, and
+or have important doctor's appointments. So the planned teams didn't really turned out as I had planned. But that's just how the real world is, and
 also something we need to practise and experience.
 
-So I'm undecided here... it served a good purpose, we'll see how the next one
+So I'm undecided here... should people have several roles at once? It served a good purpose, we'll see how the next one
 turns out.
