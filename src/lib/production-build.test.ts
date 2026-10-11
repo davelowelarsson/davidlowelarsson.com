@@ -1,6 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
-import { tmpdir } from 'node:os';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
 import { frontmatterBlock, futureScheduledSlugs } from './scheduled-slugs';
@@ -95,7 +94,11 @@ function rssItemLink(slug: string): string {
   return `<link>https://davidlowelarsson.com/posts/${slug}/</link>`;
 }
 
-const outDir = mkdtempSync(join(tmpdir(), 'prod-build-'));
+// Inside .astro/, not the OS tmpdir: Astro renames prerendered assets into
+// outDir, and a rename can't cross filesystems (EXDEV on Ubuntu 26.04 runners).
+const buildRoot = join(process.cwd(), '.astro');
+mkdirSync(buildRoot, { recursive: true });
+const outDir = mkdtempSync(join(buildRoot, 'prod-build-'));
 
 afterAll(() => rmSync(outDir, { recursive: true, force: true }));
 
