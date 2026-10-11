@@ -244,6 +244,10 @@ const NON_COLOUR_TOKENS = [
  *     not a surface the theme has an opinion about. The `embed` framing that
  *     IS the page's opinion (border, radius) lives in src/styles/media.css and
  *     uses tokens.
+ *   MegamanNewsletterDemo — a recreation of the 2014 Retrospelsmässan design. Its
+ *     white card, blue band and blue button are the old site's colours, fixed
+ *     on purpose so the recreation looks the same in both themes. Like the
+ *     brand marks above, a theme change must not repaint it.
  *
  * Debt, and named as such:
  *   ArticleLinks — a surface pair (`light-dark(#ffffff, #151518)`) that could
@@ -254,6 +258,7 @@ const NON_COLOUR_TOKENS = [
 const COLOUR_EXCEPTIONS = new Set([
   'src/components/ArticleLinks.astro',
   'src/components/Lightbox.astro',
+  'src/components/MegamanNewsletterDemo.astro',
   'src/components/ProcessStepCard.astro',
   'src/components/Video.astro',
   'src/components/YouTube.astro',

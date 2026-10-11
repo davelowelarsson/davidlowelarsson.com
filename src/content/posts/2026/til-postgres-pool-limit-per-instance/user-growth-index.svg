@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" role="img" aria-labelledby="title description">
+  <title id="title">Illustrative user growth versus plan</title>
+  <desc id="description">An anonymized, normalized illustration. The planned line rises steadily, while observed growth rises above it and then levels off. The index and timeline are illustrative, not production data.</desc>
+  <rect width="960" height="560" fill="#f5f8fc" />
+  <g fill="none" stroke="#d4dce7" stroke-width="1">
+    <path d="M112 96H916M112 177H916M112 258H916M112 339H916M112 420H916" />
+  </g>
+  <g fill="#354153" font-family="sans-serif" font-size="16">
+    <text x="100" y="425" text-anchor="end">0</text>
+    <text x="100" y="344" text-anchor="end">25</text>
+    <text x="100" y="263" text-anchor="end">50</text>
+    <text x="100" y="182" text-anchor="end">75</text>
+    <text x="100" y="101" text-anchor="end">100</text>
+    <text x="112" y="454">Earlier</text>
+    <text x="916" y="454" text-anchor="end">Later</text>
+    <text x="112" y="55" font-size="19" font-weight="600">Relative index (illustrative)</text>
+  </g>
+  <path d="M112 420L916 267" fill="none" stroke="#3478f6" stroke-width="5" stroke-linecap="round" />
+  <path d="M112 420C151 416 177 403 213 397S268 384 301 380 357 356 394 354 441 347 478 345 533 340 563 337 596 326 616 310 631 282 650 267 674 241 691 226 714 203 731 193 751 171 773 161 800 139 820 132 849 115 871 112 895 111 916 111" fill="none" stroke="#e98a3a" stroke-width="5" stroke-linecap="round" />
+  <g font-family="sans-serif" font-size="16" fill="#354153">
+    <path d="M250 500h42" stroke="#3478f6" stroke-width="5" stroke-linecap="round" />
+    <text x="304" y="506">Planned growth</text>
+    <path d="M495 500h42" stroke="#e98a3a" stroke-width="5" stroke-linecap="round" />
+    <text x="549" y="506">Observed growth</text>
+  </g>
+</svg>

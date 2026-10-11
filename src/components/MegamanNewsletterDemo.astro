@@ -1,0 +1,172 @@
+---
+import megamanRocking from '../assets/megaman/megaman-rocking.gif';
+import megamanStill from '../assets/megaman/megaman-still.png';
+import { figureClass } from '../lib/figure';
+
+// A recreation of the Retrospelsmässan newsletter signup, whose one quirk was
+// that focusing the email field made MegaMan rock. It is an interactive MDX
+// component with a bundled `<script>` (same posture as YouTube.astro), scoped
+// by element so any number of demos can share a page.
+//
+// Nothing here talks to anything: there is no form to submit and the input has
+// no `name`, with or without JavaScript. The sprites use the imported
+// assets' `.src` directly rather than <Image>, because the image pipeline
+// transcodes a GIF to animated webp and the original frame timing is the point.
+// They are CSS backgrounds rather than <img> so the Lightbox does not offer to
+// "examine" a decorative sprite.
+interface Props {
+  /** Optional caption. The GIF credit always follows it. */
+  caption?: string;
+}
+
+const { caption } = Astro.props;
+---
+
+<figure class={figureClass('megaman-demo-figure')} data-media="embed">
+  <div class="media__body">
+    <div class="megaman-demo" data-megaman-demo data-rocking="false">
+      <div class="megaman-demo__form">
+        <label class="megaman-demo__field">
+          <span class="megaman-demo__label">Email address</span>
+          <input class="megaman-demo__input" type="email" autocomplete="off" placeholder="Nyhetsbrev ..." />
+        </label>
+        <button class="megaman-demo__button" type="button">Ok</button>
+      </div>
+      <div class="megaman-demo__sprite" aria-hidden="true">
+        <span class="megaman-demo__frame megaman-demo__still" style={`background-image: url('${megamanStill.src}')`}></span>
+        <span class="megaman-demo__frame megaman-demo__rocking" style={`background-image: url('${megamanRocking.src}')`}></span>
+      </div>
+      <p class="megaman-demo__note">A recreation. Nothing is sent anywhere.</p>
+    </div>
+  </div>
+  <figcaption class="media__caption">{caption && <>{caption} </>}MegaMan rocking GIF by MegamanMaster64.</figcaption>
+</figure>
+
+<style>
+  .megaman-demo-figure {
+    max-width: min(24rem, 100%);
+    margin: 2rem auto;
+  }
+
+  /* The 2014 sidebar card, kept as it was: white, a bright blue band on top.
+     Fixed colours on purpose, so the recreation looks the same in both themes. */
+  .megaman-demo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.25rem 1rem 1rem;
+    border-top: 0.75rem solid #33b5ff;
+    background: #fff;
+    color: #3a3f44;
+  }
+
+  .megaman-demo__form {
+    display: flex;
+    gap: 0.5rem;
+    width: 100%;
+    max-width: 18rem;
+  }
+
+  .megaman-demo__field {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .megaman-demo__label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .megaman-demo__input {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0.4rem 0.8rem;
+    border: 1px solid #c4c8cc;
+    border-radius: 999px;
+    background: #fff;
+    color: inherit;
+    font: inherit;
+    font-size: 0.85rem;
+  }
+
+  .megaman-demo__button {
+    padding: 0.4rem 0.9rem;
+    border: 0;
+    border-radius: 999px;
+    background: #0a6aa8;
+    color: #fff;
+    font: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+
+  /* Upscaled 2x from 44x48 and 48x48. Both layers always paint so the GIF is
+     already loaded when the field is focused. */
+  .megaman-demo__sprite {
+    position: relative;
+    width: 96px;
+    height: 96px;
+  }
+
+  .megaman-demo__frame {
+    position: absolute;
+    inset: 0;
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    image-rendering: pixelated;
+  }
+
+  .megaman-demo__still {
+    background-size: 88px 96px;
+  }
+
+  .megaman-demo__rocking {
+    background-size: 96px 96px;
+    opacity: 0;
+  }
+
+  .megaman-demo[data-rocking='true'] .megaman-demo__still {
+    opacity: 0;
+  }
+
+  .megaman-demo[data-rocking='true'] .megaman-demo__rocking {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .megaman-demo__rocking {
+      display: none;
+    }
+
+    .megaman-demo[data-rocking='true'] .megaman-demo__still {
+      opacity: 1;
+    }
+  }
+
+  .megaman-demo__note {
+    margin: 0;
+    font-size: 0.75rem;
+    color: #5d6369;
+  }
+</style>
+
+<script>
+  // Bundled and same-origin, so it satisfies `script-src 'self'`. State lives
+  // in `data-rocking` on each demo, and nothing is looked up by id.
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  for (const demo of document.querySelectorAll<HTMLElement>('[data-megaman-demo]')) {
+    const setRocking = (on: boolean) => {
+      demo.dataset.rocking = String(on && !reduceMotion.matches);
+    };
+    const input = demo.querySelector('input');
+    input?.addEventListener('focus', () => setRocking(true));
+    input?.addEventListener('blur', () => setRocking(false));
+  }
+</script>

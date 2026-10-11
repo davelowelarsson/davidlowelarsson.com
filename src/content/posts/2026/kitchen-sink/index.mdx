@@ -11,6 +11,7 @@ import ArticleImage from '../../../../components/ArticleImage.astro';
 import ArticleLinks from '../../../../components/ArticleLinks.astro';
 import ImagePair from '../../../../components/ImagePair.astro';
 import MediaAside from '../../../../components/MediaAside.astro';
+import MegamanNewsletterDemo from '../../../../components/MegamanNewsletterDemo.astro';
 import Video from '../../../../components/Video.astro';
 import YouTube from '../../../../components/YouTube.astro';
 import testCardWide from './test-card-wide.png';
@@ -362,6 +363,23 @@ a mismatched image:
 `src` is an R2 key, not a local import — video is the one medium that does not
 travel in the bundle. `poster` is optional and omitting it is a real choice: no
 poster gives the browser's first frame, which beats a mismatched image.
+
+### An interactive demo with its own script
+
+A small recreation, and an `embed` because the page controls the box and never
+what happens inside it. Focusing the field swaps the sprite, and the state sits
+in a `data-rocking` attribute on each demo rather than behind an id, so two of
+them can share a page. Nothing is sent anywhere.
+
+<MegamanNewsletterDemo caption="Fixture demo, captioned." />
+
+<MegamanNewsletterDemo />
+
+```mdx
+<MegamanNewsletterDemo caption="What the reader should notice about it." />
+```
+
+The caption is optional, and the credit for the GIF follows it either way.
 
 ## A diagram
 

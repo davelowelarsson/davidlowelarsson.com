@@ -1,0 +1,53 @@
+<svg width="800" height="470" viewBox="0 0 800 470" xmlns="http://www.w3.org/2000/svg" font-family="Menlo, Monaco, Consolas, monospace">
+  <title>A Worker route on saltast.com sits in front of the proxied A records, and the Worker's own fetch to saltast.com fails with error 1042</title>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#93c5fd" />
+    </marker>
+    <marker id="arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#f87171" />
+    </marker>
+    <marker id="arrowGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#86efac" />
+    </marker>
+    <marker id="arrowGrey" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b" />
+    </marker>
+  </defs>
+
+  <rect width="800" height="470" rx="16" fill="#0f172a" />
+
+  <text x="30" y="44" fill="#e5e7eb" font-size="24" font-weight="700">saltast.com with Worker routes</text>
+
+  <rect x="30" y="160" width="150" height="80" rx="14" fill="#1f2937" stroke="#334155" stroke-width="2" />
+  <text x="105" y="207" fill="#e5e7eb" font-size="20" text-anchor="middle">Visitor</text>
+
+  <rect x="300" y="150" width="200" height="100" rx="14" fill="#1f2937" stroke="#3b82f6" stroke-width="2" />
+  <text x="400" y="186" fill="#dbeafe" font-size="20" text-anchor="middle">Route</text>
+  <text x="400" y="212" fill="#93c5fd" font-size="16" text-anchor="middle">saltast.com/*</text>
+  <text x="400" y="234" fill="#93c5fd" font-size="16" text-anchor="middle">www.saltast.com/*</text>
+
+  <rect x="590" y="150" width="190" height="100" rx="14" fill="#1f2937" stroke="#f6821f" stroke-width="2" />
+  <text x="685" y="192" fill="#fde5cf" font-size="20" text-anchor="middle">Worker</text>
+  <text x="685" y="220" fill="#fdba74" font-size="16" text-anchor="middle">the dashboard</text>
+
+  <rect x="300" y="340" width="200" height="100" rx="14" fill="#111827" stroke="#64748b" stroke-width="2" stroke-dasharray="8 6" />
+  <text x="400" y="380" fill="#cbd5e1" font-size="18" text-anchor="middle">Proxied A records</text>
+  <text x="400" y="408" fill="#94a3b8" font-size="16" text-anchor="middle">only an anchor</text>
+
+  <rect x="590" y="340" width="190" height="100" rx="14" fill="#1f2937" stroke="#22c55e" stroke-width="2" />
+  <text x="685" y="380" fill="#dcfce7" font-size="20" text-anchor="middle">ASSETS</text>
+  <text x="685" y="408" fill="#86efac" font-size="16" text-anchor="middle">static files</text>
+
+  <line x1="180" y1="200" x2="296" y2="200" stroke="#93c5fd" stroke-width="3" marker-end="url(#arrow)" />
+  <line x1="500" y1="200" x2="586" y2="200" stroke="#93c5fd" stroke-width="3" marker-end="url(#arrow)" />
+
+  <line x1="400" y1="250" x2="400" y2="336" stroke="#64748b" stroke-width="2" stroke-dasharray="6 6" marker-end="url(#arrowGrey)" />
+  <text x="388" y="300" fill="#94a3b8" font-size="16" text-anchor="end">not reached</text>
+
+  <path d="M 685 150 C 685 92 400 92 400 146" fill="none" stroke="#f87171" stroke-width="3" marker-end="url(#arrowRed)" />
+  <text x="542" y="86" fill="#fca5a5" font-size="16" text-anchor="middle">fetch("saltast.com/assets/…") rejected: 1042</text>
+
+  <line x1="685" y1="250" x2="685" y2="336" stroke="#86efac" stroke-width="3" marker-end="url(#arrowGreen)" />
+  <text x="673" y="300" fill="#86efac" font-size="16" text-anchor="end">env.ASSETS.fetch()</text>
+</svg>

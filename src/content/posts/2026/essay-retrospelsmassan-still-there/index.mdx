@@ -1,0 +1,131 @@
+---
+title: "MegaMan is still standing there"
+description: "The Retrospelsmässan site I built around 2010 to 2012 is still in use, and MegaMan is still standing in the sidebar where he used to rock."
+pubDate: 2026-11-05
+category: essay
+draft: false
+liveFrom: 2026-11-05
+tags: ["retrospelsmassan", "retro-games", "wordpress", "web", "archive"]
+cover: ./rsm-2026.png
+coverAlt: The 2026 Retrospelsmässan website with its pixel-character header, menu and MegaMan standing in the sidebar.
+---
+
+import ArticleImage from '../../../../components/ArticleImage.astro';
+import MediaAside from '../../../../components/MediaAside.astro';
+import MegamanNewsletterDemo from '../../../../components/MegamanNewsletterDemo.astro';
+import rsm2014 from './rsm-2014.png';
+import rsm2026 from './rsm-2026.png';
+import funktionar from './rsm-funktionar.png';
+
+Retrospelsmässan, the retro gaming fair in Göteborg, has its event every spring,
+this year on 30 May (or maybe it was during the summer, I'm not sure anymore).
+Anyway, it made me check in on the website and just look around... and there
+it was. My blue design, the very telling menu and header with the pixel
+characters, and my nice little MegaMan standing in the sidebar 😁.
+
+<ArticleImage
+  src={rsm2026}
+  kind="screenshot"
+  alt="The 2026 Retrospelsmässan homepage: a light blue page with a pixel-art logo, a header of pixel characters, a dark menu bar, a news post about the fair on 30 May, and a sidebar where a small pixel-art MegaMan stands below the social icons."
+  caption="Retrospelsmässan in 2026. MegaMan is in the sidebar, bottom right."
+  breakout
+/>
+
+## TL;DR
+
+- The Retrospelsmässan site I built around 2010 to 2012 is still in use, design
+  and all.
+- Even the images are from my day, including a volunteer photo of a friend.
+- MegaMan is still standing in the sidebar... but he doesn't rock anymore.
+
+I was happy to see that my design is still there, and a little proud too, I
+think. Most things I have built on the web are not live anymore... so it was
+nice to see that this one still is.
+
+## Back in 2010
+
+It must have been around 2010, 2011 or 2012, I'm honestly not sure 🤔. I had
+already made a [trailer for the fair in 2011](/posts/portfolio-retrospelsmassan-8-bit-ftw/),
+and somewhere around then I built the website too. The whole WordPress theme
+and the backend, I set it up and maintained it for years. I don't maintain it
+anymore, but it's still in use.
+
+There's a snapshot on the Wayback Machine from 2014, and it looks almost exactly
+like today. The blue design and the header are still there, and the menu looks
+just like when I built it. The footer still says "© 2010-2015" 😅.
+
+<ArticleImage
+  src={rsm2014}
+  kind="screenshot"
+  alt="The 2014 Retrospelsmässan homepage: the same light blue page, pixel-character header and dark menu bar, with a news post and a sidebar holding the date, social icons and a small newsletter field labelled Nyhetsbrev with an Ok button."
+  caption="The same page in 2014, from the Wayback Machine."
+  breakout
+/>
+
+It's more of an information site now than it was back then, but it was fun to
+see how the menu and the images are still "screen width aware"... just the same
+way as when I built it. And even the images are from my day.
+
+<MediaAside
+  src={funktionar}
+  kind="photo"
+  placement="left"
+  alt="A volunteer in an orange shirt marked Funktionär at a red table, handling green paper wristbands, with a stack of papers nearby."
+  caption="The Funktionär photo, still on the site, taken maybe ten years ago."
+>
+
+Clicking around a bit more, I found the page asking for volunteers, and the
+photo on it is of a friend. It was taken maybe ten years ago, and it's still
+there, with the same text offering free food and drink for helping out.
+
+That is pretty much how we ran the whole thing. We all worked for free, nobody
+had a paycheck, it was only nostalgia and love for old games that made us do
+it... and it was hard and a lot of work.
+
+Today it's run more like a company, with making money as one of the goals (I
+haven't been involved for many years, so this is just my outside perspective).
+
+</MediaAside>
+
+The website was my part of that, and seeing it still there reminded me of my
+uncle.
+
+## Pointing at buildings
+
+My uncle worked as a "kalkylator" and architect for decades, from around the late 70s, and he could drive
+around the city, in Göteborg, and point at buildings he had built or been involved with.
+
+When working digitally that is so much rarer. Everything gets rebuilt with such
+speed that it's hardly ever seen... most of the webpages and things I have
+built are not maintained or live anymore, or they have been rebuilt with some
+new and cooler framework. And with the internet and AI running faster and
+faster, I don't think that will slow down. So it's nice to have at least one I
+can still point at, even if it's a small event site with a pixel MegaMan in a sidebar.
+
+## Why isn't MegaMan rocking?
+
+Back then there was a newsletter field in the sidebar, the small one that said
+"Nyhetsbrev ..." with an Ok button, and when someone clicked into it MegaMan
+started rocking. When the field lost focus he went back to standing still. It
+was such a small thing, a little GIF and a few lines of jQuery, but I really
+liked it.
+
+This time I didn't remember how to trigger it. So I went digging in the page
+source and found him, an empty div with the class `megaman_still_image`, and my
+old jQuery file still being served, swapping the class whenever a field with
+the id `mce-EMAIL` got focus. But that field is gone. The newsletter was
+removed at some point, so there is nothing left to click into, and MegaMan just
+stands there. A bit sad, honestly.
+
+So I rebuilt the field here, just as it was, with the original still image and
+the rocking GIF. Nothing is sent anywhere... he just rocks while the field has
+focus 🎸.
+
+<MegamanNewsletterDemo caption="The old newsletter field, rebuilt." />
+
+## Links
+
+- [Retrospelsmässan](https://retrospelsmassan.se/), the fair and its site
+- [The 2014 snapshot](https://web.archive.org/web/20140301015651/http://www.retrospelsmassan.se/) on the Wayback Machine
+- [Retrospelsmässan 8-bit FTW](/posts/portfolio-retrospelsmassan-8-bit-ftw/), the 2011 trailer
+- [In praise of boring tools](/posts/essay-in-praise-of-boring-tools/), where I came back to the site
