@@ -1,5 +1,5 @@
 ---
-title: "Deleting the lease brought it back"
+title: "Deleting the lease brought the service back"
 description: "We knew how to bring a service VIP back, but the quick fix kept leaving us without an answer for why it stopped working."
 pubDate: 2026-10-20
 category: til
@@ -8,13 +8,9 @@ liveFrom: 2026-10-20
 tags: [cilium, kubernetes, networking, l2-announcements, troubleshooting]
 ---
 
-One way into a service stopped accepting connections.
+One way into a service, a virtual IP (VIP) that Cilium announces on the network with L2 announcements, stopped accepting connections, while another way to the same service still worked. Everything looked healthy, my first thought was, "it's the same thing again."
 
-
-
-While another way to the same service still worked. Everything looked healthy, my first thought was, "it's the same thing again."
-
-We knew how to get traffic back. Delete the lease, let another node take it, and it sends out an ARP announcement so the network can find the VIP again. It came back within seconds. We did it twice, and learned nothing either time.
+We knew how to get traffic back. Delete the lease, let a node take it again, and it sends out an ARP announcement so the network can find the VIP again. It came back within seconds. We did it twice, and learned nothing either time.
 
 The logs showed the API server stalling and the lease renewal timing out. Then the same node took the lease again. But we never looked at what MAC the router had cached, or whether a node still had the wrong entry in its ARP responder map. We didn't capture where a failing packet stopped either, so I'm not sure the renewal caused the outage at all.
 
@@ -22,9 +18,11 @@ Cilium [issue #45068](https://github.com/cilium/cilium/issues/45068) gave us one
 
 Longer lease timings might stop the same node having to take the lease again after a short API stall. That's something we want to test, not a fix yet.
 
-I learned that the fast and easy fix also removes all the evidence and proof on how to avoid this in the future.
+I learned that the fast and easy fix also removes the evidence and proof on how to avoid this in the future.
 
 So we wrote a runbook to capture the ARP entry, the responder map and a packet trace before deleting the lease next time. The quick fix will still be there, but maybe we'll know a little more before using it again.
+
+![Diagram of the runbook: first check which MAC the router has for the VIP, then whether a node still holds the wrong entry in its ARP responder map, then run a packet trace to see where a failing packet stops, and only after those three delete the lease](./before-deleting-the-lease.svg)
 
 ## Links
 

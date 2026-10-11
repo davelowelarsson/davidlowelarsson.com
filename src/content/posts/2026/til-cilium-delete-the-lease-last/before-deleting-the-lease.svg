@@ -1,0 +1,40 @@
+<svg width="800" height="430" viewBox="0 0 800 430" xmlns="http://www.w3.org/2000/svg" font-family="Menlo, Monaco, Consolas, monospace">
+  <title>Before deleting the lease next time: check the router's ARP entry, check the ARP responder map on the nodes, run a packet trace, and only then delete the lease</title>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#93c5fd" />
+    </marker>
+  </defs>
+
+  <rect width="800" height="430" rx="16" fill="#0f172a" />
+
+  <text x="30" y="46" fill="#e5e7eb" font-size="24" font-weight="700">Before deleting the lease next time</text>
+
+  <rect x="30" y="90" width="350" height="120" rx="14" fill="#1f2937" stroke="#3b82f6" stroke-width="2" />
+  <text x="54" y="130" fill="#93c5fd" font-size="18">1</text>
+  <text x="84" y="130" fill="#dbeafe" font-size="20">Router ARP entry</text>
+  <text x="84" y="162" fill="#94a3b8" font-size="16">which MAC does it have</text>
+  <text x="84" y="184" fill="#94a3b8" font-size="16">for the VIP?</text>
+
+  <rect x="420" y="90" width="350" height="120" rx="14" fill="#1f2937" stroke="#3b82f6" stroke-width="2" />
+  <text x="444" y="130" fill="#93c5fd" font-size="18">2</text>
+  <text x="474" y="130" fill="#dbeafe" font-size="20">ARP responder map</text>
+  <text x="474" y="162" fill="#94a3b8" font-size="16">does a node still hold</text>
+  <text x="474" y="184" fill="#94a3b8" font-size="16">the wrong entry?</text>
+
+  <rect x="30" y="270" width="350" height="120" rx="14" fill="#1f2937" stroke="#3b82f6" stroke-width="2" />
+  <text x="54" y="310" fill="#93c5fd" font-size="18">3</text>
+  <text x="84" y="310" fill="#dbeafe" font-size="20">Packet trace</text>
+  <text x="84" y="342" fill="#94a3b8" font-size="16">where does a failing</text>
+  <text x="84" y="364" fill="#94a3b8" font-size="16">packet stop?</text>
+
+  <rect x="420" y="270" width="350" height="120" rx="14" fill="#1f2937" stroke="#f6821f" stroke-width="2" />
+  <text x="444" y="310" fill="#fdba74" font-size="18">4</text>
+  <text x="474" y="310" fill="#fde5cf" font-size="20">Delete the lease</text>
+  <text x="474" y="342" fill="#fdba74" font-size="16">the quick fix, but</text>
+  <text x="474" y="364" fill="#fdba74" font-size="16">only after 1 to 3</text>
+
+  <line x1="380" y1="150" x2="416" y2="150" stroke="#93c5fd" stroke-width="3" marker-end="url(#arrow)" />
+  <path d="M 595 210 C 595 245 205 235 205 266" fill="none" stroke="#93c5fd" stroke-width="3" marker-end="url(#arrow)" />
+  <line x1="380" y1="330" x2="416" y2="330" stroke="#93c5fd" stroke-width="3" marker-end="url(#arrow)" />
+</svg>

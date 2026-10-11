@@ -8,8 +8,8 @@ import { figureClass } from '../lib/figure';
 // component with a bundled `<script>` (same posture as YouTube.astro), scoped
 // by element so any number of demos can share a page.
 //
-// Nothing here talks to anything: the input has no `name`, the form has no
-// `action`, and the script cancels submit. The sprites use the imported
+// Nothing here talks to anything: there is no form to submit and the input has
+// no `name`, with or without JavaScript. The sprites use the imported
 // assets' `.src` directly rather than <Image>, because the image pipeline
 // transcodes a GIF to animated webp and the original frame timing is the point.
 // They are CSS backgrounds rather than <img> so the Lightbox does not offer to
@@ -25,13 +25,13 @@ const { caption } = Astro.props;
 <figure class={figureClass('megaman-demo-figure')} data-media="embed">
   <div class="media__body">
     <div class="megaman-demo" data-megaman-demo data-rocking="false">
-      <form class="megaman-demo__form" novalidate>
+      <div class="megaman-demo__form">
         <label class="megaman-demo__field">
           <span class="megaman-demo__label">Email address</span>
           <input class="megaman-demo__input" type="email" autocomplete="off" placeholder="Nyhetsbrev ..." />
         </label>
-        <button class="megaman-demo__button" type="submit">Ok</button>
-      </form>
+        <button class="megaman-demo__button" type="button">Ok</button>
+      </div>
       <div class="megaman-demo__sprite" aria-hidden="true">
         <span class="megaman-demo__frame megaman-demo__still" style={`background-image: url('${megamanStill.src}')`}></span>
         <span class="megaman-demo__frame megaman-demo__rocking" style={`background-image: url('${megamanRocking.src}')`}></span>
@@ -168,6 +168,5 @@ const { caption } = Astro.props;
     const input = demo.querySelector('input');
     input?.addEventListener('focus', () => setRocking(true));
     input?.addEventListener('blur', () => setRocking(false));
-    demo.querySelector('form')?.addEventListener('submit', (event) => event.preventDefault());
   }
 </script>

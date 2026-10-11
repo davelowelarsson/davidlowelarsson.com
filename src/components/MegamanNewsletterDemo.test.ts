@@ -22,7 +22,7 @@ describe('MegamanNewsletterDemo', () => {
 
     expect(html).toMatch(/<label[^>]*>[\s\S]*<input[^>]*type="email"/);
     expect(html).toContain('placeholder="Nyhetsbrev ..."');
-    expect(html).toMatch(/<button[^>]*type="submit"[^>]*>\s*Ok\s*<\/button>/);
+    expect(html).toMatch(/<button[^>]*type="button"[^>]*>\s*Ok\s*<\/button>/);
   });
 
   it('references both sprites and starts still', async () => {
@@ -41,11 +41,11 @@ describe('MegamanNewsletterDemo', () => {
     expect(html).not.toContain('.webp');
   });
 
-  it('has no external URL, no action, and nothing a submit could serialise', async () => {
+  it('has no external URL and nothing that can submit, even without JavaScript', async () => {
     const html = await render();
 
     expect(html).not.toMatch(/https?:\/\//);
-    expect(html).not.toMatch(/<form[^>]*\saction=/);
+    expect(html).not.toMatch(/<form[\s>]/);
     expect(html).not.toMatch(/<input[^>]*\sname=/);
   });
 

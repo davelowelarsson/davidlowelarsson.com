@@ -13,7 +13,7 @@ experiments I run, I wanted it on `saltast.com` itself. The zone already
 had proxied A records for `saltast.com` and `www`, so I added two Worker routes in
 `wrangler.toml`, `saltast.com/*` and `www.saltast.com/*`, and left the records alone.
 
-![Diagram: a visitor's request to saltast.com hits the Worker route and goes into the dashboard Worker, while the proxied A records underneath are never reached. The Worker's own fetch to saltast.com/assets goes back into the route and fails with error 1042, and env.ASSETS.fetch() reads the static files directly](./worker-route-over-dns.svg)
+![Diagram: a visitor's request to saltast.com hits the Worker route and goes into the dashboard Worker, while the proxied A records underneath are never reached. The Worker's own fetch to saltast.com/assets is rejected with error 1042, and env.ASSETS.fetch() reads the static files directly](./worker-route-over-dns.svg)
 
 What I hadn't really thought about is that matching requests go straight into the
 Worker, before they ever reach the server the A records point to. Cloudflare still needs

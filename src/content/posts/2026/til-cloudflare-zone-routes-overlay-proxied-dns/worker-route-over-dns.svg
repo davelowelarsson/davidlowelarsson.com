@@ -46,7 +46,7 @@
   <text x="388" y="300" fill="#94a3b8" font-size="16" text-anchor="end">not reached</text>
 
   <path d="M 685 150 C 685 92 400 92 400 146" fill="none" stroke="#f87171" stroke-width="3" marker-end="url(#arrowRed)" />
-  <text x="542" y="86" fill="#fca5a5" font-size="16" text-anchor="middle">fetch("saltast.com/assets/…") → 1042</text>
+  <text x="542" y="86" fill="#fca5a5" font-size="16" text-anchor="middle">fetch("saltast.com/assets/…") rejected: 1042</text>
 
   <line x1="685" y1="250" x2="685" y2="336" stroke="#86efac" stroke-width="3" marker-end="url(#arrowGreen)" />
   <text x="673" y="300" fill="#86efac" font-size="16" text-anchor="end">env.ASSETS.fetch()</text>
