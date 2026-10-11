@@ -467,21 +467,32 @@ test('on a phone the figure is centred, not pinned to the corner', async ({ page
 
   const dialog = dialogOf(page);
   await expect(dialog).toBeVisible();
+  // The clone loads the full `src`, not the inline srcset candidate, so until
+  // it decodes the box has the wrong height. Measuring then made this flaky.
+  const figure = dialog.locator('.lightbox-content img');
+  await expect
+    .poll(() => figure.evaluate((img: HTMLImageElement) => img.complete && img.naturalHeight > 0))
+    .toBe(true);
   // The FIGURE, not the dialog. A dialog sized to the viewport is trivially
   // centred in it, so measuring the dialog reports success on exactly the
   // layout that was reported broken — the figure pinned to the top-left of a
   // full-screen box.
-  const box = await dialog.locator('.lightbox-content img').boundingBox();
-  expect(box, 'no figure to measure').not.toBeNull();
-  const { x, y, width, height } = box as NonNullable<typeof box>;
+  const offCentre = async () => {
+    const box = await figure.boundingBox();
+    if (!box) return { x: Number.POSITIVE_INFINITY, y: Number.POSITIVE_INFINITY };
+    return {
+      x: Math.abs(box.x + box.width / 2 - PHONE.width / 2),
+      y: Math.abs(box.y + box.height / 2 - PHONE.height / 2),
+    };
+  };
 
   // Centred on both axes, within a pixel of rounding.
-  expect(Math.abs(x + width / 2 - PHONE.width / 2), 'not horizontally centred').toBeLessThanOrEqual(
-    2,
-  );
-  expect(Math.abs(y + height / 2 - PHONE.height / 2), 'not vertically centred').toBeLessThanOrEqual(
-    2,
-  );
+  await expect
+    .poll(async () => (await offCentre()).x, { message: 'not horizontally centred' })
+    .toBeLessThanOrEqual(2);
+  await expect
+    .poll(async () => (await offCentre()).y, { message: 'not vertically centred' })
+    .toBeLessThanOrEqual(2);
 });
 
 test('on a phone the page is still visibly behind it', async ({ page }) => {
