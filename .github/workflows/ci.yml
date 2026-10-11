@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   changes:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
       pull-requests: read # paths-filter lists PR files via the REST API
@@ -48,7 +48,7 @@ jobs:
     # failed, we fail here explicitly rather than letting a PR merge untested.
     if: ${{ always() }}
     needs: changes
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - if: needs.changes.result != 'success'
         run: |
@@ -79,7 +79,7 @@ jobs:
   deploy-preview:
     if: github.event_name == 'pull_request' && needs.changes.outputs.app == 'true'
     needs: [changes, quality]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
       pull-requests: write
@@ -140,7 +140,7 @@ jobs:
   deploy-production:
     if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main' && needs.changes.outputs.app == 'true'
     needs: [changes, quality]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     env:
       HAS_CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
     steps:
