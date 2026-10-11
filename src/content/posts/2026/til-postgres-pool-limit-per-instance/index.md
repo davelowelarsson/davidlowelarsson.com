@@ -18,6 +18,23 @@ The client service ran on several replicas, each with its own pool. I looked at 
 
 But the pool wasn't the whole story. `shared_buffers` is the memory Postgres uses for its cache. `effective_cache_size` sounds like it reserves memory, but only tells the planner what might be available in Postgres and the operating system. `work_mem` is for each sort or hash, not the whole server, so several operations can use it at once. Too little meant temporary files on our slow storage; too much could use more memory than the container had.
 
+So the last two days against the same two days a week earlier:
+
+| Metric | Before | After |
+| --- | --- | --- |
+| Buffer hit rate | 64.5% | 81.4% |
+| Disk reads | 30.5 blocks/s | 18.2 blocks/s (−40%) |
+| Temporary files | 731 MB | 0 |
+| Transactions | 1.85/s | 1.55/s (−16%) |
+
+| Metric | Before | After |
+| --- | --- | --- |
+| Primary connections, peak | 97 | 15 |
+| Requests waiting for a connection | 0 | 0 |
+| Longest wait for a connection | 4.8–11 s | 0.8–1.2 s |
+
+Memory peaked at 1.30 GB of the 2Gi limit, mostly file cache. The cap itself hasn't met a real peak yet.
+
 I was also worried that a bigger cache meant a rush of writes. `checkpoint_completion_target` spreads them over time. We compared cache hits, reads per transaction and temporary files; traffic was lower, so raw totals could mislead us. Cache hits improved, reads per transaction fell, and temporary files stopped after we changed `work_mem`.
 
 There wasn't one setting to fix it. We had to look at connections, memory and storage together... we'll see how it holds up as more people use it.

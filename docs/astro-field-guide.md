@@ -788,3 +788,18 @@ how the project actually grew.
   frames totalling exactly 24.2s, because libwebp merges identical "hold"
   frames into one longer-duration frame. Smaller AND intact: 532k → 328k.
   Docs: https://docs.astro.build/en/guides/images/#responsive-image-behavior
+
+## An interactive MDX component wires itself per instance (2026-10-11)
+
+- **A bundled `<script>` in a component runs once per page, however many times
+  the component is used**, so it loops over a `data-` hook
+  (`[data-megaman-demo]`) and keeps state in an attribute (`data-rocking`) on
+  each instance. No ids, so two demos on one page cannot collide, and it stays
+  inside the CSP's `script-src 'self'`.
+  Docs: https://docs.astro.build/en/guides/client-side-scripts/
+- **An imported image is `ImageMetadata`, and `.src` is the emitted file as it
+  was**, with no `<Image>` and no `srcset`. That is what a CSS `background-image`
+  needs, and it hands the GIF over byte for byte. Used as a background rather
+  than an `<img>` so the Lightbox, which offers to examine every `<img>` in an
+  article, leaves a decorative sprite alone.
+  Docs: https://docs.astro.build/en/guides/images/#images-in-astro-files
