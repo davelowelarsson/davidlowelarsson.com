@@ -9,31 +9,22 @@ tags: ["cloudflare", "dns", "workers", "networking"]
 ---
 
 The same day I set up [saltast.com](https://saltast.com), my dashboard for all the
-experiments I run, I wanted it on the apex. The zone already had proxied
-A records for `saltast.com` and `www`, so I added two Worker routes in `wrangler.toml`,
-`saltast.com/*` and `www.saltast.com/*`, and left the records alone.
+experiments I run, I wanted it on `saltast.com` itself. The zone already
+had proxied A records for `saltast.com` and `www`, so I added two Worker routes in
+`wrangler.toml`, `saltast.com/*` and `www.saltast.com/*`, and left the records alone.
 
 ![Diagram: a visitor's request to saltast.com hits the Worker route and goes into the dashboard Worker, while the proxied A records underneath are never reached. The Worker's own fetch to saltast.com/assets goes back into the route and fails with error 1042, and env.ASSETS.fetch() reads the static files directly](./worker-route-over-dns.svg)
 
-What I hadn't really thought about is that the route takes every matching request
-before it ever reaches an origin, so everything on `saltast.com/*` goes straight into
-the Worker. Cloudflare still needs the proxied record for the route to trigger at all,
-so the records stayed, but for this site they're mostly an anchor.
-
-It shows in the zone list too, the one the dashboard reads as its registry. The
-experiments carry a `dash` comment with a title and an icon, but `saltast.com` and `www`
-have no comment at all... they're only there so the routes have something to trigger on.
-
-| Record | Comment |
-| --- | --- |
-| `saltast.com` | none |
-| `www.saltast.com` | none |
-| `shortener.saltast.com` | `{"dash":1,"t":"URL Shortener v2 (Next)","i":"⚡",...}` |
+What I hadn't really thought about is that matching requests go straight into the
+Worker, before they ever reach the server the A records point to. Cloudflare still needs
+the proxied records for the routes to work, so I left them there... and in the zone list
+the dashboard reads, they have no `dash` comment like the experiments do, they're just
+sitting there so the routes have something to trigger on.
 
 A couple of hours later I was fixing the image lookup. The Worker checked for an image
-override with a `fetch()` to `https://saltast.com/assets/<host>.png`. Now that hostname
-belonged to the Worker itself, and a Worker can't fetch a route on its own zone, so
-Cloudflare answered with error 1042. I mentioned it briefly in
+override with a `fetch()` to `https://saltast.com/assets/<host>.png`, which matched the
+route I'd just added... so the Worker was trying to fetch its own route, and Cloudflare
+answered with error 1042. I mentioned it briefly in
 [the dashboard experiment](/posts/experiment-dashboard-up-when-lab-is-down/).
 
 So I changed it to read the file through the static assets binding instead of over the
@@ -45,10 +36,10 @@ const head = await env.ASSETS.fetch(
 );
 ```
 
-**What I learned:** putting the Worker on the apex is what turned a normal `fetch()` into
-a self-fetch, so anything the Worker needs from its own site now goes through a binding.
-And I picked routes only because the records were already there. Cloudflare recommends a
-Custom Domain when the Worker is the origin, so next time I'd check that first 🤔.
+**What I learned:** I picked routes only because the records were already there, and I
+didn't think about the Worker fetching its own site. Cloudflare recommends a Custom
+Domain when the Worker is the whole site, so next time I'd check that first, and keep
+the Worker's own files on the `ASSETS` binding from the start 🤔.
 
 ## Links
 
