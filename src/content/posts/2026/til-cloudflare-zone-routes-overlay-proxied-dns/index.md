@@ -13,7 +13,7 @@ experiments I run, I wanted it on the apex. The zone already had proxied
 A records for `saltast.com` and `www`, so I added two Worker routes in `wrangler.toml`,
 `saltast.com/*` and `www.saltast.com/*`, and left the records alone.
 
-![Abstract composition of overlapping translucent layers suggesting routing precedence](./til-cloudflare-zone-routes.svg)
+![Diagram: a visitor's request to saltast.com hits the Worker route and goes into the dashboard Worker, while the proxied A records underneath are never reached. The Worker's own fetch to saltast.com/assets goes back into the route and fails with error 1042, and env.ASSETS.fetch() reads the static files directly](./worker-route-over-dns.svg)
 
 What I hadn't really thought about is that the route takes every matching request
 before it ever reaches an origin, so everything on `saltast.com/*` goes straight into
