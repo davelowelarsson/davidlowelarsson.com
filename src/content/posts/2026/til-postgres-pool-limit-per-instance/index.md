@@ -1,6 +1,6 @@
 ---
-title: "More than a bigger Postgres pool"
-description: "A growth check taught me that connection headroom, cache, and temporary I/O each need a different setting and a different measure."
+title: "Postgres needed more than a bigger pool"
+description: "A growth chart made me look at the pool, the memory Postgres was really using, and the temporary files it kept writing."
 pubDate: 2026-10-27
 category: til
 draft: false
@@ -8,19 +8,19 @@ liveFrom: 2026-10-27
 tags: [postgresql, connection-pooling, kubernetes, reliability]
 ---
 
-We were preparing for growth when a user chart showed a jump we hadn't seen before. It wasn't remarkable globally, but it was new for us, so we checked the database.
+We were preparing for growth when a chart showed more users than we expected. Maybe it isn't much in a global perspective, but it was new for us, so I wanted to understand what it meant for the database.
 
 ![Illustrative, anonymized chart comparing planned and observed user growth. The relative index and timeline are synthetic, not production data.](./user-growth-index.svg)
 
 *Illustrative curve only; the dates, counts and index are not real.*
 
-Each client replica had its own pool. I added those caps together and compared the total with Postgres's `max_connections`, leaving room for backups and other clients. A full pool makes requests wait and eventually time out; a full Postgres refuses new connections.
+The client service ran on several replicas, each with its own pool. I looked at one setting and thought it was fine. Then I added them together and compared the total with Postgres's `max_connections`, leaving room for backups and other clients. When a pool is full, a request waits and can time out. When Postgres is full, it refuses the connection.
 
-The pool wasn't the whole story. `shared_buffers` is memory Postgres uses for its cache. `effective_cache_size` only informs the planner about cache it may find in Postgres and the operating system; it reserves nothing. `work_mem` applies per sort or hash operation, not per server. Concurrent queries can multiply it, while too little spills to temporary files. Raising it carelessly can trade disk I/O for memory pressure.
+But the pool wasn't the whole story. `shared_buffers` is the memory Postgres uses for its cache. `effective_cache_size` sounds like it reserves memory, but only tells the planner what might be available in Postgres and the operating system. `work_mem` is for each sort or hash, not the whole server, so several operations can use it at once. Too little meant temporary files on our slow storage; too much could use more memory than the container had.
 
-We checked `checkpoint_completion_target` too: it spreads dirty-page writes across the checkpoint interval, smoothing I/O rather than avoiding it. To judge the changes, we compared buffer hits, reads per transaction and temporary-file bytes. Traffic was lower in the comparison period, so raw totals would mislead us. Cache hits improved, reads per transaction fell, and temporary writes stopped after the `work_mem` change.
+I was also worried that a bigger cache meant a rush of writes. `checkpoint_completion_target` spreads them over time. We compared cache hits, reads per transaction and temporary files; traffic was lower, so raw totals could mislead us. Cache hits improved, reads per transaction fell, and temporary files stopped after we changed `work_mem`.
 
-**What I learned:** a database doesn't have one performance knob. I had to budget connections across replicas, size memory for the container and workload, and measure reads and spills separately. So we changed a few things and checked what moved... we'll see how it holds up as usage grows.
+There wasn't one setting to fix it. We had to look at connections, memory and storage together... we'll see how it holds up as more people use it.
 
 ## Links
 
