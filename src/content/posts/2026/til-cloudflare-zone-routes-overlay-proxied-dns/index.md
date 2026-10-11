@@ -20,6 +20,16 @@ before it ever reaches an origin, so everything on `saltast.com/*` goes straight
 the Worker. Cloudflare still needs the proxied record for the route to trigger at all,
 so the records stayed, but for this site they're mostly an anchor.
 
+It shows in the zone list too, the one the dashboard reads as its registry. The
+experiments carry a `dash` comment with a title and an icon, but `saltast.com` and `www`
+have no comment at all... they're only there so the routes have something to trigger on.
+
+| Record | Comment |
+| --- | --- |
+| `saltast.com` | none |
+| `www.saltast.com` | none |
+| `shortener.saltast.com` | `{"dash":1,"t":"URL Shortener v2 (Next)","i":"⚡",...}` |
+
 A couple of hours later I was fixing the image lookup. The Worker checked for an image
 override with a `fetch()` to `https://saltast.com/assets/<host>.png`. Now that hostname
 belonged to the Worker itself, and a Worker can't fetch a route on its own zone, so
