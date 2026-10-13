@@ -1,0 +1,133 @@
+---
+title: "What would we do differently if we knew the future?"
+description: "Forecasting total stream starts was easier than working out what I'd do differently with the result."
+pubDate: 2026-10-22
+category: essay
+draft: false
+liveFrom: 2026-10-22
+tags: ["ai", "forecasting", "experiments", "data"]
+---
+
+import ArticleImage from '../../../../components/ArticleImage.astro';
+import forecastErrors from './forecast-errors.svg';
+import campaignInputs from './campaign-inputs.svg';
+import forecastTimeline from './forecast-timeline.svg';
+
+When I got the forecast running for total stream starts at a streaming service, I was quite happy with it.
+The error rate looked impressive... but then came the question, how does this help?
+
+I spent a few days on the experiment, with a nod to *Minority Report*. Our precogs were mostly
+seeing the weekly rhythm, but I was starting to wonder what we would do differently with that information.
+
+All numbers are mostly obfuscated to protect sensitive data. But the error rates are still the same as when I ran the experiment.
+
+## TL;DR
+
+- TimesFM with a calendar reached about 7% average daily percentage error in a retrospective test, beating simple baselines.
+- The total hid the title-level changes a campaign budget might act on, and those smaller forecasts were harder.
+- Campaign counts didn't improve the total forecast. Releases and campaigns overlapped, so the title-level comparisons couldn't isolate what the ads did.
+- The calendar and honest scoring took more work than running the model. Next time I'll start with the decision.
+
+## What we could predict
+
+I gave Google's [TimesFM 2.5](https://github.com/google-research/timesfm) daily stream-start
+history without retraining it. It was already trained on other time series and ran locally in seconds.
+
+We added a Swedish calendar as *covariates*, a word I learned doing this.
+They're extra inputs alongside the history, with dates we know ahead of time. We used public holidays,
+bridge days and separate flags for the big holidays, such as Christmas and Midsummer.
+
+School breaks were weighted by pupil numbers, using real dates for the largest municipalities
+and estimated dates for the rest. The calendar part fits our history even though the pretrained model stays unchanged.
+
+The *ensemble* combines TimesFM with the calendar model, leaning on the calendar on holidays.
+We compared it with repeating last week's viewing and using last year adjusted for growth.
+
+<ArticleImage
+  src={forecastErrors}
+  alt="Rounded retrospective average percentage errors against actual stream starts, seven days after issue: last week about 23%, last year about 13%, plain TimesFM about 10%, and the ensemble about 7%. Lower is better."
+  kind="chart"
+  caption="Rounded daily mean absolute percentage error (MAPE) on the same scored dates over two years. Lower is better. Calendar design used these years, so this is exploratory hindsight, not a live track record."
+/>
+
+We had used these years to improve the calendar, and I had less than a week of live tracking then.
+So I'm keeping the claim at around 7% in hindsight.
+
+The table shows average absolute percentage error against actual stream starts, seven days after issue.
+Lower is better. "Last year" means the same weekday 52 weeks earlier, adjusted for growth.
+
+| Day type | Last year | Ensemble |
+| --- | ---: | ---: |
+| Ordinary weekday | 11% | 5% |
+| Weekend | 11% | 7% |
+| School break | 13% | 10% |
+| Around break edges | 15% | 9% |
+| Public holiday | 51% | 9% |
+| Easter holidays | 112% | 9% |
+| Christmas / New Year | 25% | 17% |
+| Midsummer | 5% | 15% |
+
+*Rounded percentages. Holiday rows overlap broader day types, and rare holidays have only a handful of scored days.*
+
+Even on weekdays the error was less than half last year's. Easter moves between years, so the
+baseline can compare a holiday with an ordinary day, but Midsummer was where last year won.
+There aren't many Christmas Eves to learn from...
+
+Our first Easter-break rule put breaks a week late. Local dates brought one calendar backtest's
+error from about 30% to about 14%. Better calendar data did more than fiddling with the model.
+
+<ArticleImage
+  src={forecastTimeline}
+  alt="Fourteen weeks of indexed actual stream starts and retrospective seven-day ensemble forecasts. Both follow the rise and weekly dips, with some actuals outside the shaded forecast range. Volumes and calendar dates are omitted."
+  kind="chart"
+  caption="Real daily measurements and seven-day retrospective forecasts on one shared scale: the first week's average actuals = 100. Rounded to five index points, with relative weeks instead of dates. Shading runs from the 10th to the 90th percentile (P10-P90), a calibrated range intended to contain 80% of results. This is not live validation."
+/>
+
+Across tested lead times, the calibrated range meant to contain 80% of results caught about 80%
+on ordinary weekdays, weekends and public holidays, and about 70% on big holidays and school breaks.
+
+We logged forecasts before results were known and kept live runs separate from hindsight.
+A second review by an artificial intelligence (AI) tool found leakage and a wrong lead-time comparison. The model was the easy part,
+not fooling ourselves was the work.
+
+## What would an ad change?
+
+So I thought a marketer might have a useful question for it: where should we put money to get
+the most back from a campaign budget? Facebook/Meta, YouTube or television, and would extra spending bring extra viewing?
+
+But the forecast test used campaign counts grouped by size, with scope for the title-level comparisons.
+It didn't test channel performance or actual spend, so it couldn't answer that budget question.
+Adding counts barely moved the total forecast with more history, and made it worse with less, which surprised me.
+
+<ArticleImage
+  src={campaignInputs}
+  alt="Rounded average percentage errors against actual results in a separate exploratory test: about 8% with or without campaign counts on longer history. About 9% without and 11% with counts on shorter history. Lower is better."
+  kind="chart"
+  caption="Rounded MAPE for otherwise matching calendar forecasts in a separate, restricted-history test. Not directly comparable with the headline score, and not a measure of advertising effectiveness."
+/>
+
+The total adds together lots of different viewing, which makes it easier to predict and hides
+the title-level changes I'd want to act on. Several campaigns could run at once and recur each year,
+so some of their pattern might already be in the history.
+
+In a small title-level test, error was around 21% using weighted absolute percentage error (WAPE),
+which weights errors by viewing volume.
+The total's 7% uses MAPE, an average of daily percentage errors, so this isn't a direct
+three-times-worse comparison. Those smaller forecasts were harder, but closer to the decision.
+
+During campaigns with recent or new episodes, median daily viewing roughly doubled compared with
+the four weeks before. Without new episodes it fell about 20%. On the same five titles, the release
+bump with a campaign was about 0.9 times the bump without one. That looked more like big releases
+getting campaigns than ads creating the bump, but five titles is far from proof.
+
+I think forecasting is very cool, but without a real use case I'm not sure what I'd use it for.
+I built the forecast first and went looking for a decision afterwards...
+
+So we got our "20/20 hindsight", which is a bit funny for an experiment with precogs.
+What should we ask them to predict, and what would we do differently with the answer?
+I don't know yet 😄
+
+## Links
+
+- [Google's TimesFM repository](https://github.com/google-research/timesfm)
+- [TimesFM 2.5 model card](https://huggingface.co/google/timesfm-2.5-200m-pytorch)
