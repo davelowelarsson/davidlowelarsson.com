@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="560" viewBox="0 0 600 560" role="img" aria-labelledby="title desc">
+  <title id="title">Did campaign inputs help the forecast?</title>
+  <desc id="desc">Mean absolute percentage errors against actual results, rounded to one decimal place, in a separate historical test of matching calendar forecasts. With longer history: 7.8 percent without campaign counts and 7.9 percent with them. With shorter history: 9.3 percent without and 10.7 percent with counts. Lower is better. Bars match the displayed scores. This test used less history, so it is not directly comparable with the headline score and does not measure advertising effectiveness.</desc>
+  <style>
+    text { font-family: Verdana, sans-serif; fill: #25282c; }
+    .muted { fill: #5b6268; }
+    .grid { stroke: #dce0e2; stroke-width: 1; }
+    .calendar { fill: #25765b; }
+    .campaign { fill: #337eaa; }
+  </style>
+  <rect width="600" height="560" fill="#fafbfc" />
+  <text x="32" y="48" font-size="30" font-weight="700">Did campaign inputs help?</text>
+  <text class="muted" x="32" y="80" font-size="20">Forecast error. Lower is better.</text>
+  <g font-size="21">
+    <rect class="calendar" x="32" y="106" width="18" height="18" />
+    <text x="62" y="122">Calendar</text>
+    <rect class="campaign" x="220" y="106" width="18" height="18" />
+    <text x="250" y="122">+ campaign counts</text>
+  </g>
+  <g class="grid">
+    <path d="M32 150V459 M152 150V459 M272 150V459 M392 150V459 M512 150V459" />
+  </g>
+  <g font-size="24">
+    <text x="32" y="185" font-weight="700">Longer history</text>
+    <rect class="calendar" x="32" y="207" width="312" height="30" />
+    <text x="360" y="232">7.8%</text>
+    <rect class="campaign" x="32" y="249" width="316" height="30" />
+    <text x="364" y="274">7.9%</text>
+    <text x="32" y="350" font-weight="700">Shorter history</text>
+    <rect class="calendar" x="32" y="372" width="372" height="30" />
+    <text x="420" y="397">9.3%</text>
+    <rect class="campaign" x="32" y="414" width="428" height="30" />
+    <text x="476" y="439">10.7%</text>
+  </g>
+  <g class="muted" font-size="18" text-anchor="middle">
+    <text x="32" y="484">0%</text>
+    <text x="152" y="484">3%</text>
+    <text x="272" y="484">6%</text>
+    <text x="392" y="484">9%</text>
+    <text x="512" y="484">12%</text>
+  </g>
+  <text class="muted" x="32" y="536" font-size="18">Tests on past data, not a measure of ad impact.</text>
+</svg>

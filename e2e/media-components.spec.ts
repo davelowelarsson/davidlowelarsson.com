@@ -122,6 +122,21 @@ test('a caption stays at the reading measure even when its figure breaks out', a
 
   const figure = page.locator('figure.media.breakout[data-media="photo"]').first();
   await expect(figure).toBeVisible();
+  const image = figure.locator('.media__body img');
+  await expect(image).toBeVisible();
+  const proportions = await image.evaluate((element) => {
+    const bounds = element.getBoundingClientRect();
+    return {
+      rendered: bounds.width / bounds.height,
+      declared: Number(element.getAttribute('width')) / Number(element.getAttribute('height')),
+      objectFit: getComputedStyle(element).objectFit,
+    };
+  });
+  expect(proportions.rendered, 'the breakout photo is cropped').toBeCloseTo(
+    proportions.declared,
+    2,
+  );
+  expect(proportions.objectFit).toBe('contain');
   const caption = figure.locator('.media__caption');
   await expect(caption).toBeVisible();
 
@@ -322,6 +337,36 @@ test('the Markdown tier gets framing but not the plate — the two-tier limit', 
 // not get: it was styled in the contract and declared in MEDIA_KINDS, but its
 // only use anywhere was inside a published Post — which ADR 0011 forbids e2e
 // from pinning. So the kind shipped with nothing allowed to test it.
+for (const viewport of [
+  { name: 'short desktop', width: 1280, height: 360 },
+  { name: 'phone', width: 390, height: 844 },
+]) {
+  test(`a chart keeps its full proportions on a ${viewport.name}`, async ({ page }) => {
+    await page.setViewportSize({
+      width: viewport.width,
+      height: viewport.height,
+    });
+    await page.goto(KITCHEN_SINK);
+    const image = page.locator('figure.media[data-media="chart"] img').first();
+    await expect(image).toBeVisible();
+
+    const proportions = await image.evaluate((element) => {
+      const bounds = element.getBoundingClientRect();
+      return {
+        rendered: bounds.width / bounds.height,
+        declared: Number(element.getAttribute('width')) / Number(element.getAttribute('height')),
+        objectFit: getComputedStyle(element).objectFit,
+      };
+    });
+    expect(proportions.declared).not.toBeNaN();
+    expect(proportions.rendered, 'the chart is cropped').toBeCloseTo(proportions.declared, 2);
+    expect(proportions.objectFit).not.toBe('cover');
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
+      viewport.width,
+    );
+  });
+}
+
 for (const scheme of ['light', 'dark'] as const) {
   test(`a chart is framed but never dimmed — ${scheme} ground`, async ({ page }) => {
     await page.emulateMedia({ colorScheme: scheme });
