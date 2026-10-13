@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="600" height="560" viewBox="0 0 600 560" role="img" aria-labelledby="title desc">
   <title id="title">Did campaign inputs help the forecast?</title>
-  <desc id="desc">Rounded average absolute percentage errors against actual results in a separate exploratory comparison of otherwise matching calendar forecasts. With longer history: about 8 percent with or without campaign counts. With shorter history: about 9 percent without and 11 percent with counts. Lower is better. Bars use the rounded values. This restricted-history test is not directly comparable with the headline score and does not measure advertising effectiveness.</desc>
+  <desc id="desc">Mean absolute percentage errors against actual results, rounded to one decimal place, in a separate historical test of matching calendar forecasts. With longer history: 7.8 percent without campaign counts and 7.9 percent with them. With shorter history: 9.3 percent without and 10.7 percent with counts. Lower is better. Bars match the displayed scores. This test used less history, so it is not directly comparable with the headline score and does not measure advertising effectiveness.</desc>
   <style>
     text { font-family: Verdana, sans-serif; fill: #25282c; }
     .muted { fill: #5b6268; }
@@ -22,15 +22,15 @@
   </g>
   <g font-size="24">
     <text x="32" y="185" font-weight="700">Longer history</text>
-    <rect class="calendar" x="32" y="207" width="320" height="30" />
-    <text x="368" y="232">~8%</text>
-    <rect class="campaign" x="32" y="249" width="320" height="30" />
-    <text x="368" y="274">~8%</text>
+    <rect class="calendar" x="32" y="207" width="312" height="30" />
+    <text x="360" y="232">7.8%</text>
+    <rect class="campaign" x="32" y="249" width="316" height="30" />
+    <text x="364" y="274">7.9%</text>
     <text x="32" y="350" font-weight="700">Shorter history</text>
-    <rect class="calendar" x="32" y="372" width="360" height="30" />
-    <text x="408" y="397">~9%</text>
-    <rect class="campaign" x="32" y="414" width="440" height="30" />
-    <text x="488" y="439">~11%</text>
+    <rect class="calendar" x="32" y="372" width="372" height="30" />
+    <text x="420" y="397">9.3%</text>
+    <rect class="campaign" x="32" y="414" width="428" height="30" />
+    <text x="476" y="439">10.7%</text>
   </g>
   <g class="muted" font-size="18" text-anchor="middle">
     <text x="32" y="484">0%</text>
@@ -39,5 +39,5 @@
     <text x="392" y="484">9%</text>
     <text x="512" y="484">12%</text>
   </g>
-  <text class="muted" x="32" y="536" font-size="18">Source: my experiment. No causal claim about ads.</text>
+  <text class="muted" x="32" y="536" font-size="18">Tests on past data, not a measure of ad impact.</text>
 </svg>

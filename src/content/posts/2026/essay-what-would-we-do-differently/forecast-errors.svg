@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="600" height="566" viewBox="0 0 600 566" role="img" aria-labelledby="title desc">
   <title id="title">Forecast error in the retrospective test</title>
-  <desc id="desc">Rounded average absolute percentage errors against actual stream starts seven days after issue, on the same scored dates over two years. Last week: about 23 percent. Last year adjusted for growth: about 13 percent. Plain TimesFM: about 10 percent. Calendar-aware ensemble: about 7 percent. Lower is better. Bars use the rounded values. Calendar design used these years, so this is exploratory hindsight, not blind validation.</desc>
+  <desc id="desc">Mean absolute percentage errors against actual stream starts seven days ahead, rounded to one decimal place, on the same scored dates over two years. Repeat last week: 22.9 percent. Last year adjusted for growth: 13.4 percent. Plain TimesFM: 10.1 percent. Calendar-aware ensemble: 6.9 percent. Lower is better. Bars match the displayed scores. We used these years to improve the calendar, so these are tests on past data, not independent validation.</desc>
   <style>
     text { font-family: Verdana, sans-serif; fill: #25282c; }
     .muted { fill: #5b6268; }
@@ -11,23 +11,23 @@
   </style>
   <rect width="600" height="566" fill="#fafbfc" />
   <text x="32" y="48" font-size="30" font-weight="700">How close did we get?</text>
-  <text class="muted" x="32" y="80" font-size="20">7 days after issue. Lower error is better.</text>
+  <text class="muted" x="32" y="80" font-size="20">7 days ahead. Lower error is better.</text>
   <g class="grid">
     <path d="M32 110V474 M132 110V474 M232 110V474 M332 110V474 M432 110V474 M532 110V474" />
   </g>
   <g font-size="24">
     <text x="32" y="138">Repeat last week</text>
-    <rect class="rule" x="32" y="153" width="460" height="28" />
-    <text x="501" y="176" font-weight="700">~23%</text>
+    <rect class="rule" x="32" y="153" width="458" height="28" />
+    <text x="500" y="176" font-weight="700">22.9%</text>
     <text x="32" y="230">Last year, adjusted for growth</text>
-    <rect class="rule" x="32" y="245" width="260" height="28" />
-    <text x="312" y="268" font-weight="700">~13%</text>
+    <rect class="rule" x="32" y="245" width="268" height="28" />
+    <text x="310" y="268" font-weight="700">13.4%</text>
     <text x="32" y="322">TimesFM, history only</text>
-    <rect class="plain" x="32" y="337" width="200" height="28" />
-    <text x="246" y="360" font-weight="700">~10%</text>
+    <rect class="plain" x="32" y="337" width="202" height="28" />
+    <text x="244" y="360" font-weight="700">10.1%</text>
     <text x="32" y="414">Ensemble: TimesFM + calendar</text>
-    <rect class="calendar" x="32" y="429" width="140" height="28" />
-    <text x="182" y="452" font-weight="700">~7%</text>
+    <rect class="calendar" x="32" y="429" width="138" height="28" />
+    <text x="180" y="452" font-weight="700">6.9%</text>
   </g>
   <g class="muted" font-size="18" text-anchor="middle">
     <text x="32" y="497">0%</text>
@@ -37,5 +37,5 @@
     <text x="432" y="497">20%</text>
     <text x="532" y="497">25%</text>
   </g>
-  <text class="muted" x="32" y="544" font-size="18">Rounded results from my retrospective experiment.</text>
+  <text class="muted" x="32" y="544" font-size="18">Historical test results, rounded to one decimal.</text>
 </svg>
