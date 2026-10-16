@@ -11,15 +11,17 @@ tags: ["kubernetes", "argocd", "disaster-recovery", "aws", "cloudflare"]
 
 We reused our Kubernetes and Argo CD setup for a low-cost alternative site for our streaming service. Its workers stay at zero until needed, with an estimated 10–30 minutes to recover (closer to 50 if there are issues) and a target of data no more than 24 hours old.
 
-We have a new mandate at the company to keep functioning even if there are issues in our data centre. For our users, that means getting the public streaming site back while we fix the main site. Audio/Video streaming will also move to a cloud provider so playback can continue. Login and teacher guides are outside this DR setup's scope.
+We have a new mandate at the company to keep functioning even if there are issues in our data centre. For our users, that means getting the public streaming site back while we fix the main site. Audio/Video streaming will also move to a cloud provider so playback can continue. Other functionality, like user login and some other parts are outside this DR setup's scope.
 
 I've spent years putting our Kubernetes architecture in place. We discussed Kubernetes and containers a lot maybe ten years ago, and the resistance was strong, but that choice has paid off a lot over the years. With Argo CD deploying what's defined in Git, deploying to multiple clusters is so easy ... although getting the data there needs a little more thought.
 
 ## Reusing what we have
 
-The alternative site runs on a standard Amazon EKS cluster, AWS's managed Kubernetes service, without EKS Auto Mode. Auto Mode would provision workers for pods waiting to run even when we wanted to stay at zero, so we control worker scaling ourselves. We use the same application manifests as production, with small changes to the image registry and storage. Argo CD deploys to both clusters from our data centre, reaching AWS over a VPN.
+The alternative site runs on a standard Amazon EKS cluster, AWS's managed Kubernetes service, without EKS Auto Mode. Auto Mode would provision workers for pods waiting to run even when we wanted to stay at zero, so we control worker scaling ourselves. We use the same application manifests as production, with small changes to the image registry and storage.
 
-That keeps the normal workflow familiar, but Argo CD can't be a requirement for recovery if the data centre running it is unavailable. The runbook also has to work with AWS CloudShell, the browser-based shell in the AWS console, and `kubectl`.
+Being able to use those same manifests with a completely new provider is where that choice from ten years ago pays off again. It made this DR site achievable without having to rebuild everything around it.
+
+Argo CD deploys to both clusters from our data centre, reaching AWS over a VPN. That keeps the normal workflow familiar, but Argo CD can't be a requirement for recovery if the data centre running it is unavailable. The runbook also has to work with AWS CloudShell, the browser-based shell in the AWS console, and `kubectl`.
 
 Database backups go to S3, and container images are copied from Harbor, our image registry, to Amazon ECR. Otherwise our healthy cluster in AWS could be trying to download its applications from the place that just went offline 😅
 
@@ -64,7 +66,13 @@ Zero workers doesn't mean a zero bill, either. The managed control plane, networ
 
 ## Waking it up
 
-I ran a couple of drills, scaling up and back down to check that everything worked. I think of recovery in waves: first the nodes come up, then applications get scheduled and start, and finally we restore fresh data if needed. Workers were running after about a minute, the site answered after roughly two, and content rows filled in over about five to nine minutes. Those are elapsed wake-up timings from scale-up, before any fresh restore, checks or traffic switch.
+I ran a couple of drills, scaling up and back down to check that everything worked. I think of recovery in waves:
+
+- first the nodes come up
+- then applications get scheduled and start
+- and finally we restore fresh data if needed.
+
+Workers were running after about a minute, the site answered after roughly two, and content rows filled in over about five to nine minutes. Those are elapsed wake-up timings from scale-up, before any fresh restore, checks or traffic switch.
 
 ```mermaid
 flowchart TD
@@ -88,13 +96,11 @@ flowchart TD
 
 *Only wake-up is measured here. A fresh restore, checks and the traffic switch still need their own time.*
 
-Waking the cluster doesn't automatically restore the newest backup, which wasn't obvious to me when I built this. Our restore runs as a Kubernetes Job, and the EKS control plane still records it as completed with no workers running. New workers don't rerun a completed Job ... logical when I think about it. For a fresh restore, the runbook empties the database and runs a new restore Job from S3, followed by rebuilding the search index.
+Waking the cluster doesn't automatically restore the newest backup, which wasn't obvious to me when I built this. Our restore runs as a Kubernetes Job, and the EKS control plane still records it as completed with no workers running (so a restore that ran 3 months ago is till counted as completed when we scale up the workers).  New workers don't rerun a completed Job ... logical when you think about it. For a fresh restore, the runbook empties the database and runs a new restore Job from S3, followed by rebuilding the search index.
 
 We also found an application caching failed responses, which kept pages empty after the backend was working again. Storage needed adjustments too: on production NFS, a requested volume size hadn't been an enforced limit. A search node requesting 1 GiB was using more than that, and giving it a real 1 GiB disk in AWS made the difference rather obvious ... it ran out of space.
 
-Being able to reuse our architecture with a completely new provider is the latest example. It made this DR site achievable without having to rebuild everything around it.
-
-The drills have made the recovery steps more familiar, and the next one should give us a better idea of how much of that 10–30 minute window we actually need.
+Finding the storage and caching issues during the drills made the recovery steps more familiar.
 
 ## Links
 
