@@ -164,8 +164,14 @@ show — where they conflict with a canon-derived rule, THESE win, and check
 mode must not flag them:
 
 - **TL;DR** — case-by-case, decided in the drafting interview. When wanted:
-  3–5 bullets at the top. A TL;DR does not license a closing recap too —
-  the ending stays canon (hedged, no summary).
+  3–5 bullets or a short paragraph of 1–2 sentences at the top (prose confirmed
+  2026-10-16). A TL;DR does not license a closing recap too — the ending stays
+  canon (hedged, no summary).
+- **Reinforcement with substance** (confirmed 2026-10-16). Don't cut a recurring
+  point simply because David wants to emphasise it. Each return should add
+  history, evidence or consequences: the resistance to Kubernetes years ago,
+  for example, and the DR site that choice later made achievable. Keep the
+  forward-looking close rather than turning it into a recap.
 - **Links footer** — an optional `## Links` section at the end collecting
   the docs, repos, and tools the post touched. David's public bookmark
   trail — encourage it whenever a post leans on external docs. Inline links

@@ -55,4 +55,36 @@ for (const post of POSTS) {
       darkBackground,
     );
   });
+
+  test(`${post.format} prose TL;DR joins its heading in the same summary band`, async ({
+    page,
+  }) => {
+    await page.goto(post.path);
+    await page.locator('article h2#tldr + ul').evaluate((list) => {
+      const paragraph = document.createElement('p');
+      paragraph.textContent = 'A short prose summary instead of a checklist.';
+      list.replaceWith(paragraph);
+    });
+
+    const heading = page.locator('article h2#tldr');
+    const summary = page.locator('article h2#tldr + p');
+    await expect(summary).toHaveCSS('border-left-width', '3px');
+    await expect(summary).toHaveCSS('margin-top', '0px');
+    await expect(summary).toHaveCSS(
+      'padding-left',
+      await heading.evaluate((element) => getComputedStyle(element).paddingLeft),
+    );
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
+      391,
+    );
+    for (const colorScheme of ['light', 'dark'] as const) {
+      await page.emulateMedia({ colorScheme });
+      await expect(summary).toHaveCSS(
+        'background-color',
+        await heading.evaluate((element) => getComputedStyle(element).backgroundColor),
+      );
+    }
+  });
 }
