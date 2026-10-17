@@ -39,12 +39,12 @@ Deployments and invisible in Production. Draft status is orthogonal to Category.
 
 ## TL;DR
 
-An optional 3–5 bullet summary near the start of a Post. Author it as ordinary
-Markdown: `## TL;DR` immediately followed by a list. That single shape works in
-both `.md` and `.mdx`, and the Core Site styles the rendered `#tldr` heading and
-adjacent list as one summary band. It is not a blockquote — David is summarizing
-his own Post, not quoting another source. Its styling is part of the frozen
-non-media style (see Frozen Style below).
+An optional summary near the start of a Post: 3–5 bullets or a short paragraph.
+Author it as ordinary Markdown: `## TL;DR` immediately followed by a list or
+paragraph. Both shapes work in `.md` and `.mdx`, and the Core Site styles the
+rendered `#tldr` heading and adjacent summary as one band. It is not a blockquote
+— David is summarizing his own Post, not quoting another source. Its styling is
+part of the frozen non-media style (see Frozen Style below).
 
 ## Fixture
 
