@@ -3,7 +3,8 @@ title: "A cold DR site with Kubernetes and Argo CD"
 description: "Reusing our Kubernetes architecture for an alternative streaming service in AWS, with worker nodes scaled to zero until we need them."
 pubDate: 2026-11-19
 category: essay
-draft: true
+draft: false
+liveFrom: 2026-11-19
 tags: ["kubernetes", "argocd", "disaster-recovery", "aws", "cloudflare"]
 ---
 
@@ -19,7 +20,7 @@ I've spent years putting our Kubernetes architecture in place. We discussed Kube
 
 The alternative site runs on a standard Amazon EKS cluster, AWS's managed Kubernetes service, without EKS Auto Mode. Auto Mode would provision workers for pods waiting to run even when we wanted to stay at zero, so we control worker scaling ourselves. We use the same application manifests as production, with small changes to the image registry and storage.
 
-Being able to use those same manifests with a completely new provider is where that choice from ten years ago pays off again. It made this DR site achievable without having to rebuild everything around it.
+Being able to use those same manifests with a completely new provider is where that choice from ten years ago pays off again. A static site could have done the job too, but future development would have become a parallel project. Now we can keep developing the same applications, and the work benefits both the main site and DR.
 
 Argo CD deploys to both clusters from our data centre, reaching AWS over a VPN. That keeps the normal workflow familiar, but Argo CD can't be a requirement for recovery if the data centre running it is unavailable. The runbook also has to work with AWS CloudShell, the browser-based shell in the AWS console, and `kubectl`.
 
@@ -96,11 +97,11 @@ flowchart TD
 
 *Only wake-up is measured here. A fresh restore, checks and the traffic switch still need their own time.*
 
-Waking the cluster doesn't automatically restore the newest backup, which wasn't obvious to me when I built this. Our restore runs as a Kubernetes Job, and the EKS control plane still records it as completed with no workers running (so a restore that ran 3 months ago is till counted as completed when we scale up the workers).  New workers don't rerun a completed Job ... logical when you think about it. For a fresh restore, the runbook empties the database and runs a new restore Job from S3, followed by rebuilding the search index.
+Waking the cluster doesn't automatically restore the newest backup, which wasn't obvious to me when I built this. Our restore uses a Stash `RestoreSession` that runs a Kubernetes Job. Scaling the workers up doesn't create a new session, so a restore completed months ago doesn't run again ... logical when I think about it. For a fresh restore, the runbook empties the database and creates a new `RestoreSession` to restore from S3, followed by rebuilding the search index.
 
 We also found an application caching failed responses, which kept pages empty after the backend was working again. Storage needed adjustments too: on production NFS, a requested volume size hadn't been an enforced limit. A search node requesting 1 GiB was using more than that, and giving it a real 1 GiB disk in AWS made the difference rather obvious ... it ran out of space.
 
-Finding the storage and caching issues during the drills made the recovery steps more familiar.
+After doing this work, a long-running outage in our data centre feels like less of an issue. Users might be missing login and some other nice features, but we can still serve them ... and the kids can keep learning. We can add those features too, but we'll need to think through how they keep working during an outage.
 
 ## Links
 
